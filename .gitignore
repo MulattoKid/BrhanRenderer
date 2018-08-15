@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Windows platform specific
+*.pdb
+*.ilk
