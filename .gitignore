@@ -31,6 +31,14 @@
 *.out
 *.app
 
+##########################
+######## MY STUFF ########
+##########################
+
+# Folders
+build/
+build_debug/
+
 # Windows platform specific
 *.pdb
 *.ilk
