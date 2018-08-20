@@ -29,7 +29,9 @@ int main(int argc, char** argv)
 			
 			if (sphere.Intersect(&ray))
 			{
-				color = glm::vec3(1.0f, 0.0f, 0.0f);
+				color = sphere.Normal(ray.At());
+				color += 1.0f;
+				color *= 0.5f;
 			}
 
 			int idx = (y * width + x) * 4;

@@ -10,7 +10,8 @@ struct Sphere
 	float radius;
 	
 	Sphere(const glm::vec3& center, const float radius);
-	bool Intersect(Ray* ray);
+	bool Intersect(Ray* ray) const;
+	glm::vec3 Normal(const glm::vec3& point) const;
 };
 
 #endif
