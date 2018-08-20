@@ -6,9 +6,11 @@
 struct Ray
 {
 	glm::vec3 origin;
-	glm::vec3 direction;
+	glm::vec3 dir;
+	float t;
 
-	Ray(const glm::vec3& origin, const glm::vec3& direction);
+	Ray(const glm::vec3& origin, const glm::vec3& dir);
+	glm::vec3 At() const;
 	glm::vec3 At(float t) const;
 };
 

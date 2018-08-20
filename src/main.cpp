@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Ray.h"
+#include "Sphere.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 //#define STBI_MSC_SECURE_CRT
 #include "stb/stb_image_write.h"
@@ -8,6 +9,7 @@
 int main(int argc, char** argv)
 {
 	Camera* camera = new Camera(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+	Sphere sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
 
 	const int width = 400, height = 200;
 	unsigned char* image = new unsigned char[width * height * 4];
@@ -22,8 +24,13 @@ int main(int argc, char** argv)
 			float v = float(y) / float(height);
 			Ray ray(camera->position, top_left + (u * horizontal) + (v * vertical));
 
-			float t = 0.5 * (ray.direction.y + 1.0f);
+			float t = 0.5 * (ray.dir.y + 1.0f);
 			glm::vec3 color = (1.0f - t) * glm::vec3(1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
+			
+			if (sphere.Intersect(&ray))
+			{
+				color = glm::vec3(1.0f, 0.0f, 0.0f);
+			}
 
 			int idx = (y * width + x) * 4;
 			image[idx+0] = (unsigned char)(color.x * 255.0f);
