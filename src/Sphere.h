@@ -2,15 +2,15 @@
 #define SPHERE_H
 
 #include "glm/vec3.hpp"
-#include "Ray.h"
+#include "Geometry.h"
 
-struct Sphere
+struct Sphere : Geometry
 {
 	glm::vec3 center;
 	float radius;
 	
 	Sphere(const glm::vec3& center, const float radius);
-	bool Intersect(Ray* ray) const;
+	bool Intersect(Ray* ray, const float t_min, const float t_max) const;
 	glm::vec3 Normal(const glm::vec3& point) const;
 };
 

@@ -5,11 +5,15 @@
 //#define STBI_MSC_SECURE_CRT
 #include "stb/stb_image_write.h"
 #include <stdio.h>
+#include <vector>
 
 int main(int argc, char** argv)
 {
 	Camera* camera = new Camera(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-	Sphere sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
+	std::vector<Sphere> spheres;
+	spheres.push_back(Sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));
+	spheres.push_back(Sphere(glm::vec3(0.5f, 0.5f, -2.0f), 0.5f));
+	spheres.push_back(Sphere(glm::vec3(-0.5f, -0.5f, -0.5f), 0.5f));
 
 	const int width = 400, height = 200;
 	unsigned char* image = new unsigned char[width * height * 4];
@@ -27,11 +31,14 @@ int main(int argc, char** argv)
 			float t = 0.5 * (ray.dir.y + 1.0f);
 			glm::vec3 color = (1.0f - t) * glm::vec3(1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
 			
-			if (sphere.Intersect(&ray))
+			for (Sphere& sphere : spheres)
 			{
-				color = sphere.Normal(ray.At());
-				color += 1.0f;
-				color *= 0.5f;
+				if (sphere.Intersect(&ray, camera->NEAR_PLANE, camera->FAR_PLANE))
+				{
+					color = sphere.Normal(ray.At());
+					color += 1.0f;
+					color *= 0.5f;
+				}
 			}
 
 			int idx = (y * width + x) * 4;
