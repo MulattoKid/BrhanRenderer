@@ -4,8 +4,8 @@ SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 CXX = g++
-CXXFLAGS = -std=c++11 -fopenmp
-LDFLAGS = 
+CXXFLAGS = -std=c++11
+LDFLAGS = -fopenmp
 
 #Setup for release
 all : CXXFLAGS += -O2
