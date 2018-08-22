@@ -12,6 +12,8 @@ struct Camera
 	//Scene concepts
 	glm::vec3 position;
 	glm::vec3 view_direction;
+	glm::vec3 right;
+	glm::vec3 up;
 	float NEAR_PLANE;
 	float FAR_PLANE;
 
