@@ -16,18 +16,24 @@ bool Sphere::Intersect(Ray* ray, const float t_min, const float t_max) const
 	const float c = glm::dot(center_to_ray_origin, center_to_ray_origin) - glm::pow(radius, 2);
 	
 	const float discriminant = glm::pow(b, 2) - 4.0f * a * c;
-	if (discriminant < 0.0f) { return false; }
+	if (discriminant <= 0.0f) { return false; }
 	
 	const float denomiator = 2.0f * a;
-	const float t1 = (-b + discriminant) / denomiator;
-	const float t2 = (-b - discriminant) / denomiator;
-	const float t = glm::min(t1, t2);
-	if (t <= 0.0f || t < t_min || t > t_max) { return false; }
+	const float t2 = (-b - glm::sqrt(discriminant)) / denomiator;
+	if (t2 >= t_min && t2 <= t_max && t2 < ray->t)
+	{
+		ray->t = t2;
+		return true;
+	}
 	
-	if (t > ray->t) { return false; }
+	const float t1 = (-b + glm::sqrt(discriminant)) / denomiator;
+	if (t1 >= t_min && t1 <= t_max && t1 < ray->t)
+	{
+		ray->t = t1;
+		return true;
+	}
 	
-	ray->t = t;
-	return true;
+	return false;
 }
 
 glm::vec3 Sphere::Normal(const glm::vec3& point) const

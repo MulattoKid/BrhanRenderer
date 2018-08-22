@@ -13,8 +13,7 @@ int main(int argc, char** argv)
 	Camera* camera = new Camera(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 	std::vector<Sphere> spheres;
 	spheres.push_back(Sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));
-	spheres.push_back(Sphere(glm::vec3(0.5f, 0.5f, -2.0f), 0.5f));
-	spheres.push_back(Sphere(glm::vec3(-0.5f, -0.5f, -0.5f), 0.5f));
+	spheres.push_back(Sphere(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f));
 
 	const int width = 400, height = 200;
 	const int ssp = 100;
