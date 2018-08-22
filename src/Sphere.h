@@ -2,9 +2,9 @@
 #define SPHERE_H
 
 #include "glm/vec3.hpp"
-#include "Geometry.h"
+#include "Shape.h"
 
-struct Sphere : Geometry
+struct Sphere : Shape
 {
 	glm::vec3 center;
 	float radius;

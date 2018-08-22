@@ -2,6 +2,7 @@
 #include "glm/geometric.hpp"
 #include "glm/gtc/constants.hpp"
 #include "glm/trigonometric.hpp"
+#include "SampleShapes.h"
 
 #include <stdio.h>
 
@@ -38,15 +39,6 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& view_direction, const
 	this->vertical_end = lens_height * (-this->up);
 	this->NEAR_PLANE = 0.0001f;
 	this->FAR_PLANE = 10000.0f;
-	
-	printf("ViewDirection: %f %f %f\n", this->view_direction.x, this->view_direction.y, this->view_direction.z);
-	printf("Right: %f %f %f\n", this->right.x, this->right.y, this->right.z);
-	printf("Up: %f %f %f\n", this->up.x, this->up.y, this->up.z);
-	const glm::vec3 base_top_left_corner = glm::vec3(-lens_half_width, lens_half_height, -1.0f);
-	printf("BaseTopLeftCorner: %f %f %f\n", base_top_left_corner.x, base_top_left_corner.y, base_top_left_corner.z);
-	printf("TopLeftCorner: %f %f %f\n", this->top_left_corner.x, this->top_left_corner.y, this->top_left_corner.z);
-	printf("HorizontalEnd: %f %f %f\n", this->horizontal_end.x, this->horizontal_end.y, this->horizontal_end.z);
-	printf("VerticalEnd: %f %f %f\n", this->vertical_end.x, this->vertical_end.y, this->vertical_end.z);
 }
 
 

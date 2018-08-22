@@ -5,7 +5,7 @@
 Ray::Ray(const glm::vec3& origin, const glm::vec3& dir)
 {
 	this->origin = origin;
-	this->dir = dir;
+	this->dir = glm::normalize(dir);
 	this->t = std::numeric_limits<float>::max();
 }
 
