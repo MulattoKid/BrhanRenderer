@@ -10,14 +10,15 @@
 
 int main(int argc, char** argv)
 {
-	Camera* camera = new Camera(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+	const int width = 480, height = 270;
+	const int ssp = 100;
+	unsigned char* image = new unsigned char[width * height * 4];
+	
+	Camera* camera = new Camera(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -1.0f), 30.0f, float(width) / float(height));
 	std::vector<Sphere> spheres;
 	spheres.push_back(Sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));
 	spheres.push_back(Sphere(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f));
-
-	const int width = 400, height = 200;
-	const int ssp = 100;
-	unsigned char* image = new unsigned char[width * height * 4];
+	
 	for (int y = 0; y < height; y++)
 	{
 #pragma omp parallel for
