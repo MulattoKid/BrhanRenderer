@@ -1,3 +1,4 @@
+#include "glm/geometric.hpp"
 #include "Quad.h"
 #include "Triangle.h"
 
@@ -12,6 +13,13 @@ glm::vec2 Quad::UV(const glm::vec3& point) const
 {
 	//TODO: interpolate according to point
 	return glm::vec2(0.0f);
+}
+
+float Quad::Area() const
+{
+	float triangle_v0v1v2_area = glm::length(glm::cross(v[0] - v[1], v[2] - v[1])) / 2;
+	float triangle_v2v3v0_area = glm::length(glm::cross(v[2] - v[3], v[0] - v[3])) / 2;
+	return triangle_v0v1v2_area + triangle_v2v3v0_area;
 }
 
 bool Quad::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const

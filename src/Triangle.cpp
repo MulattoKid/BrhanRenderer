@@ -14,6 +14,13 @@ glm::vec2 Triangle::UV(const glm::vec3& point) const
 	return glm::vec2(0.0f);
 }
 
+float Triangle::Area() const
+{
+	glm::vec3 v0v1 = v[1] - v[0];
+	glm::vec3 v0v2 = v[2] - v[0];
+	return glm::length(glm::cross(v0v1, v0v2)) / 2.0f;
+}
+
 bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const
 {
 	//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection

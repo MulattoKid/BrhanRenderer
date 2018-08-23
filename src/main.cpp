@@ -12,18 +12,13 @@
 
 int main(int argc, char** argv)
 {
-	Scene* scene = new Scene();
-	scene->Load("models/CornellBox/CornellBox-Original.obj");
-
 	const int width = 480, height = 270;
 	const int ssp = 100;
 	unsigned char* image = new unsigned char[width * height * 4];
 	
 	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 70.0f, float(width) / float(height));
-	std::vector<Sphere> spheres;
-	spheres.push_back(Sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));
-	spheres.push_back(Sphere(glm::vec3(4.0f, 0.0f, -3.0f), 0.5f));
-	spheres.push_back(Sphere(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f));
+	Scene* scene = new Scene();
+	scene->Load("models/CornellBox/CornellBox-Original.obj");
 	
 	for (int y = 0; y < height; y++)
 	{
@@ -42,16 +37,7 @@ int main(int argc, char** argv)
 
 				float t = 0.5 * (ray.dir.y + 1.0f);
 				glm::vec3 color = (1.0f - t) * glm::vec3(1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
-			
-				/*for (Sphere& sphere : spheres)
-				{
-					if (sphere.Intersect(&ray, camera->NEAR_PLANE, camera->FAR_PLANE))
-					{
-						color = sphere.Normal(ray.At());
-						color += 1.0f;
-						color *= 0.5f;
-					}
-				}*/
+
 				if (scene->Intersect(&ray, &isect, camera->NEAR_PLANE, camera->FAR_PLANE))
 				{
 					color = isect.shape->DiffuseColor();
