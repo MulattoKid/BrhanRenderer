@@ -48,8 +48,27 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 	model->triangles.resize(num_triangles);
 	model->quads.resize(num_quads);
 	model->shapes.resize(num_triangles + num_quads);
+	model->mtls.resize(materials.size());
 	const bool has_normals = attrib.normals.size() > 0 ? true : false;
 	model->has_uvs = attrib.texcoords.size() > 0 ? true : false;
+
+	//Convert tinyobj::material:_t to MTL
+	for (size_t i = 0; i < materials.size(); i++)
+	{
+		tinyobj::material_t* material = &materials[i];
+		MTL* mtl = &model->mtls[i];
+
+		//Assign
+		mtl->ambient = glm::vec3(material->ambient[0], material->ambient[1], material->ambient[2]);
+		mtl->diffuse = glm::vec3(material->diffuse[0], material->diffuse[1], material->diffuse[2]);
+		mtl->specular = glm::vec3(material->specular[0], material->specular[1], material->specular[2]);
+		mtl->transmittance = glm::vec3(material->transmittance[0], material->transmittance[1], material->transmittance[2]);
+		mtl->emission = glm::vec3(material->emission[0], material->emission[1], material->emission[2]);
+		mtl->shininess = material->shininess;
+		mtl->index_of_refraction = material->ior;
+		mtl->dissolve = material->dissolve;
+		mtl->illumination_model = material->illum;
+	}
 
 	//Loop over shapes - remember that what I call a Shape is NOT the same as the OBJ view of a shape
 	int triangle_index = 0, quad_index = 0, shape_index = 0;
@@ -94,6 +113,9 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 					tri->n[2] = normal;
 				}
 				model->shapes[shape_index++] = tri;
+				
+				//per-face material
+				tri->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
 			}
 			else //Quad
 			{
@@ -130,11 +152,11 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 					quad->n[3] = normal;
 				}
 				model->shapes[shape_index++] = quad;
+				
+				//per-face material
+				quad->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
 			}			
 			index_offset += fv;
-
-			//per-face material
-			shapes[s].mesh.material_ids[f];
 		}
 	}
 	
@@ -143,6 +165,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 	printf("\t%lu triangles\n", model->triangles.size());
 	printf("\t%lu quads\n", model->quads.size());
 	printf("\t%lu shapes\n", model->shapes.size());
+	printf("\t%lu materials\n", model->mtls.size());
 	
 	return true;
 }

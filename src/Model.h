@@ -1,6 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include "MTL.h"
 #include "Quad.h"
 #include "Shape.h"
 #include "Sphere.h"
@@ -14,6 +15,7 @@ struct Model
 	std::vector<Triangle> triangles;
 	std::vector<Quad> quads;
 	std::vector<Shape*> shapes;
+	std::vector<MTL> mtls;
 	bool has_uvs;
 	
 	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const;

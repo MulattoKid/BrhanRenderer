@@ -54,9 +54,10 @@ int main(int argc, char** argv)
 				}*/
 				if (scene->Intersect(&ray, &isect, camera->NEAR_PLANE, camera->FAR_PLANE))
 				{
-					color = isect.normal;
+					color = isect.shape->DiffuseColor();
+					/*color = isect.normal;
 					color += 1.0f;
-					color *= 0.5f;
+					color *= 0.5f;*/
 				}
 				acc_color += color;
 			}

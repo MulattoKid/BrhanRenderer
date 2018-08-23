@@ -2,7 +2,6 @@
 #define QUAD_H
 
 #include "Shape.h"
-#include "SurfaceInteraction.h"
 
 struct Quad : Shape
 {
