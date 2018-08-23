@@ -1,20 +1,25 @@
 #include "Camera.h"
 #include "Ray.h"
 #include "RNG.h"
+#include "Scene.h"
 #include "Sphere.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 //#define STBI_MSC_SECURE_CRT
 #include "stb/stb_image_write.h"
 #include <stdio.h>
+#include "SurfaceInteraction.h"
 #include <vector>
 
 int main(int argc, char** argv)
 {
+	Scene* scene = new Scene();
+	scene->Load("models/CornellBox/CornellBox-Original.obj");
+
 	const int width = 480, height = 270;
 	const int ssp = 100;
 	unsigned char* image = new unsigned char[width * height * 4];
 	
-	Camera* camera = new Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), 70.0f, float(width) / float(height));
+	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 70.0f, float(width) / float(height));
 	std::vector<Sphere> spheres;
 	spheres.push_back(Sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));
 	spheres.push_back(Sphere(glm::vec3(4.0f, 0.0f, -3.0f), 0.5f));
@@ -33,11 +38,12 @@ int main(int argc, char** argv)
 				float u = (float(x) + rnd[0]) / float(width);
 				float v = (float(y) + rnd[1]) / float(height);
 				Ray ray = camera->GenerateRay(u, v);
+				SurfaceInteraction isect;
 
 				float t = 0.5 * (ray.dir.y + 1.0f);
 				glm::vec3 color = (1.0f - t) * glm::vec3(1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
 			
-				for (Sphere& sphere : spheres)
+				/*for (Sphere& sphere : spheres)
 				{
 					if (sphere.Intersect(&ray, camera->NEAR_PLANE, camera->FAR_PLANE))
 					{
@@ -45,6 +51,12 @@ int main(int argc, char** argv)
 						color += 1.0f;
 						color *= 0.5f;
 					}
+				}*/
+				if (scene->Intersect(&ray, &isect, camera->NEAR_PLANE, camera->FAR_PLANE))
+				{
+					color = isect.normal;
+					color += 1.0f;
+					color *= 0.5f;
 				}
 				acc_color += color;
 			}
