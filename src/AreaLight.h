@@ -1,7 +1,9 @@
 #ifndef AREALIGHT_H
 #define AREALIGHT_H
 
-#include "Shape.h"
+#include "glm/vec3.hpp"
+
+struct Shape;
 
 struct AreaLight
 {

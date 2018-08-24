@@ -10,6 +10,7 @@ struct DiffuseAreaLight : AreaLight
 	
 	glm::vec3 L(const glm::vec3& point, const glm::vec3& wo) const;
 	glm::vec3 Power() const;
+	glm::vec3 SampleLi() const; //TODO Section 14.2
 };
 
 #endif

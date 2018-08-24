@@ -103,7 +103,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 					  	tri->uv[v].y = attrib.texcoords[3*idx.texcoord_index+1];
 					}
 				}
-				if (!has_normals) //Generate normals - all are the same
+				if (!has_normals) //Generate normals (all are the same)
 				{
 					glm::vec3 v0v1 = tri->v[1] - tri->v[0];
 					glm::vec3 v0v2 = tri->v[2] - tri->v[0];
@@ -116,6 +116,16 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 				
 				//per-face material
 				tri->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
+				if (tri->mtl->emission != glm::vec3(0.0f)) //Is light
+				{
+					//TODO: only diffuse area light for now
+					DiffuseAreaLight dal;
+					dal.shape = (Shape*)(tri);
+					dal.Lemit = tri->mtl->emission;
+					diffuse_area_lights.push_back(dal);
+					area_lights.push_back((AreaLight*)(&diffuse_area_lights[diffuse_area_lights.size() - 1]));
+					tri->area_light = area_lights[area_lights.size() - 1];
+				}
 			}
 			else //Quad
 			{
@@ -141,7 +151,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 					  	quad->uv[v].y = attrib.texcoords[3*idx.texcoord_index+1];
 					}
 				}
-				if (!has_normals) //Generate normals - all are the same
+				if (!has_normals) //Generate normals (all are the same)
 				{
 					glm::vec3 v0v1 = quad->v[1] - quad->v[0];
 					glm::vec3 v0v2 = quad->v[2] - quad->v[0];
@@ -155,6 +165,16 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 				
 				//per-face material
 				quad->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
+				if (quad->mtl->emission != glm::vec3(0.0f)) //Is light
+				{
+					//TODO: only diffuse area light for now
+					DiffuseAreaLight dal;
+					dal.shape = (Shape*)(quad);
+					dal.Lemit = quad->mtl->emission;
+					diffuse_area_lights.push_back(dal);
+					area_lights.push_back((AreaLight*)(&diffuse_area_lights[diffuse_area_lights.size() - 1]));
+					quad->area_light = area_lights[area_lights.size() - 1];
+				}
 			}			
 			index_offset += fv;
 		}

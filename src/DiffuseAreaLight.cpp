@@ -1,6 +1,7 @@
 #include "DiffuseAreaLight.h"
 #include "glm/geometric.hpp"
 #include "glm/gtc/constants.hpp"
+#include "Shape.h"
 
 glm::vec3 DiffuseAreaLight::L(const glm::vec3& point, const glm::vec3& wo) const
 {
@@ -16,4 +17,10 @@ glm::vec3 DiffuseAreaLight::L(const glm::vec3& point, const glm::vec3& wo) const
 glm::vec3 DiffuseAreaLight::Power() const
 {
 	return Lemit * shape->Area() * glm::pi<float>();
+}
+
+glm::vec3 DiffuseAreaLight::SampleLi() const
+{
+	//TODO
+	return glm::vec3(0.0f);
 }

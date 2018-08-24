@@ -1,6 +1,8 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include "AreaLight.h"
+#include "DiffuseAreaLight.h"
 #include "Model.h"
 #include "Ray.h"
 #include <string>
@@ -10,6 +12,8 @@
 struct Scene
 {
 	std::vector<Model> models;
+	std::vector<DiffuseAreaLight> diffuse_area_lights;
+	std::vector<AreaLight*> area_lights;
 	
 	bool Load(const std::string& scene_file);
 	bool LoadOBJ(const std::string& file, const int model_index);

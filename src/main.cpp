@@ -40,7 +40,14 @@ int main(int argc, char** argv)
 
 				if (scene->Intersect(&ray, &isect, camera->NEAR_PLANE, camera->FAR_PLANE))
 				{
-					color = isect.shape->DiffuseColor();
+					if (isect.shape->IsAreaLight())
+					{
+						color = glm::vec3(1.0f);
+					}
+					else
+					{
+						color = isect.shape->DiffuseColor();
+					}
 					/*color = isect.normal;
 					color += 1.0f;
 					color *= 0.5f;*/

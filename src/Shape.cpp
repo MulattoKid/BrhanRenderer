@@ -39,3 +39,8 @@ glm::vec3 Shape::EmissionColor() const
 	
 	return mtl->emission;
 }
+
+bool Shape::IsAreaLight() const
+{
+	return area_light == NULL ? false : true;
+}
