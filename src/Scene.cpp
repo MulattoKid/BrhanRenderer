@@ -1,6 +1,6 @@
 #include "glm/geometric.hpp"
+#include "Logger.h"
 #include "Scene.h"
-#include <stdio.h>
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tinyobjloader/tiny_obj_loader.h"
 
@@ -180,12 +180,19 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 		}
 	}
 	
-	printf("Successfully loaded %s:\n", file.c_str());
-	printf("\t%lu spheres\n", model->spheres.size());
-	printf("\t%lu triangles\n", model->triangles.size());
-	printf("\t%lu quads\n", model->quads.size());
-	printf("\t%lu shapes\n", model->shapes.size());
-	printf("\t%lu materials\n", model->mtls.size());
+	LOG_MESSAGE(true,
+				"Successfully loaded %s:\n"
+				"\t%lu spheres\n"
+				"\t%lu triangles\n"
+				"\t%lu quads\n"
+				"\t%lu shapes\n"
+				"\t%lu materials\n",
+				file.c_str(),
+				model->spheres.size(),
+				model->triangles.size(),
+				model->quads.size(),
+				model->shapes.size(),
+				model->mtls.size());
 	
 	return true;
 }
