@@ -7,8 +7,9 @@
 struct RNG
 {
 public:
-	static void Uniform1D(float* array, int range = 1);
-	static void Uniform2D(float* array, int range = 1);
+	static float Uniform1D();
+	static void Uniform1D(float* array);
+	static void Uniform2D(float* array);
 
 	RNG(RNG const&) = delete;
 	void operator=(RNG const&) = delete;

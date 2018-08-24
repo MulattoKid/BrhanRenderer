@@ -4,7 +4,7 @@
 #include "RNG.h"
 #include "SampleShapes.h"
 
-glm::vec3 UniformSampleUnitDisk(float* u)
+glm::vec3 UniformSampleUnitDisk(const float u[2])
 {
 	//TODO: should improve accoriding to p.776
 	const float r = glm::sqrt(u[0]);

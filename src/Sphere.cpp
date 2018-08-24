@@ -1,5 +1,6 @@
 #include "glm/geometric.hpp"
 #include "glm/gtc/constants.hpp"
+#include "glm/trigonometric.hpp"
 #include "Sphere.h"
 
 Sphere::Sphere(const glm::vec3& center, const float radius)
@@ -22,6 +23,22 @@ glm::vec2 Sphere::UV(const glm::vec3& point) const
 float Sphere::Area() const
 {
 	return 4.0f * glm::pi<float>() * glm::pow(radius, 2);
+}
+
+glm::vec3 Sphere::Sample(const float u[2]) const
+{
+	const float param0 = 1.0f - glm::pow(u[0], 2);
+	const float param1 = glm::two_pi<float>() * u[1];
+	
+	const float x = glm::sqrt(param0) * glm::cos(param1);
+	const float y = glm::sqrt(param0) * glm::sin(param1);
+	const float z = param0;
+	glm::vec3 sample(x, y, z);
+	
+	sample += center;
+	sample *= radius;
+	
+	return sample;
 }
 
 bool Sphere::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const
