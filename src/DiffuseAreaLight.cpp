@@ -11,16 +11,24 @@ glm::vec3 DiffuseAreaLight::L(const glm::vec3& point, const glm::vec3& wo) const
 		return glm::vec3(0.0f);
 	}
 	
-	return Lemit;
+	return L_emit;
 }
 
 glm::vec3 DiffuseAreaLight::Power() const
 {
-	return Lemit * shape->Area() * glm::pi<float>();
+	return L_emit * shape->Area() * glm::pi<float>();
 }
 
-glm::vec3 DiffuseAreaLight::SampleLi() const
+float DiffuseAreaLight::PdfLi(const SurfaceInteraction& isect, const glm::vec3& wi) const
 {
-	//TODO
-	return glm::vec3(0.0f);
+	return shape->Pdf(isect, wi);
+}
+
+//p.845
+glm::vec3 DiffuseAreaLight::SampleLi(const SurfaceInteraction& isect, const float u[2], float* pdf, glm::vec3* wi) const
+{
+	const glm::vec3 sample_point = shape->Sample(u);
+	*wi = glm::normalize(sample_point - isect.point); //Intersection point to sample point on light
+	*pdf = PdfLi(isect, *wi);
+	return L(sample_point, -*wi);
 }

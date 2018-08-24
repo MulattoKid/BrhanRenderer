@@ -121,7 +121,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 					//TODO: only diffuse area light for now
 					DiffuseAreaLight dal;
 					dal.shape = (Shape*)(tri);
-					dal.Lemit = tri->mtl->emission;
+					dal.L_emit = tri->mtl->emission;
 					diffuse_area_lights.push_back(dal);
 					area_lights.push_back((AreaLight*)(&diffuse_area_lights[diffuse_area_lights.size() - 1]));
 					tri->area_light = area_lights[area_lights.size() - 1];
@@ -170,7 +170,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 					//TODO: only diffuse area light for now
 					DiffuseAreaLight dal;
 					dal.shape = (Shape*)(quad);
-					dal.Lemit = quad->mtl->emission;
+					dal.L_emit = quad->mtl->emission;
 					diffuse_area_lights.push_back(dal);
 					area_lights.push_back((AreaLight*)(&diffuse_area_lights[diffuse_area_lights.size() - 1]));
 					quad->area_light = area_lights[area_lights.size() - 1];

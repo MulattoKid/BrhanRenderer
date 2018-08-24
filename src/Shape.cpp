@@ -1,4 +1,17 @@
+#include <cfloat>
+#include "glm/geometric.hpp"
 #include "Shape.h"
+
+//p.838
+float Shape::Pdf(const SurfaceInteraction& isect, const glm::vec3& wi) const
+{
+	Ray ray(isect.point, wi);
+	SurfaceInteraction isect_light;
+	if (!Intersect(&ray, &isect_light, 0.0f, FLT_MAX)) { return 0.0f; }
+	
+	const float distance_squared = glm::pow(glm::length(ray.origin - isect.point), 2);
+	return distance_squared / (glm::abs(glm::dot(isect_light.normal, -wi)) * Area());
+}
 
 glm::vec3 Shape::AmbientColor() const
 {
