@@ -9,6 +9,13 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& dir)
 	this->t = std::numeric_limits<float>::max();
 }
 
+Ray::Ray(const glm::vec3& origin, const glm::vec3& dir, const float delta)
+{
+	this->origin = origin + (delta * dir);
+	this->dir = glm::normalize(dir);
+	this->t = std::numeric_limits<float>::max();
+}
+
 glm::vec3 Ray::At() const
 {
 	return origin + (t * glm::normalize(dir));

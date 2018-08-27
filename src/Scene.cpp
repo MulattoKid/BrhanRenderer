@@ -12,6 +12,16 @@ bool Scene::Load(const std::string& file)
 	
 	bool success = LoadOBJ(file, 0);
 	
+	//Create area lights
+	for (DiffuseAreaLight& dal : diffuse_area_lights)
+	{
+		area_lights.push_back((AreaLight*)(&dal));
+	}
+	LOG_MESSAGE(true, "%lu area lights\n", area_lights.size());
+
+	if (models.size() == 0) { LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "No models have been loaded\n"); }
+	if (area_lights.size() == 0) { LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "No lights have been loaded\n"); }
+	
 	return success;
 }
 
@@ -123,8 +133,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 					dal.shape = (Shape*)(tri);
 					dal.L_emit = tri->mtl->emission;
 					diffuse_area_lights.push_back(dal);
-					area_lights.push_back((AreaLight*)(&diffuse_area_lights[diffuse_area_lights.size() - 1]));
-					tri->area_light = area_lights[area_lights.size() - 1];
+					tri->area_light_index = diffuse_area_lights.size() - 1;
 				}
 			}
 			else //Quad
@@ -172,8 +181,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 					dal.shape = (Shape*)(quad);
 					dal.L_emit = quad->mtl->emission;
 					diffuse_area_lights.push_back(dal);
-					area_lights.push_back((AreaLight*)(&diffuse_area_lights[diffuse_area_lights.size() - 1]));
-					quad->area_light = area_lights[area_lights.size() - 1];
+					quad->area_light_index = diffuse_area_lights.size() - 1;
 				}
 			}			
 			index_offset += fv;
@@ -215,7 +223,23 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, co
 	return intersected;
 }
 
-
+bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const
+{
+	bool intersected = false;
+	for (const Model& model : models)
+	{
+		intersected |= model.Intersect(ray, isect, t_less_than); //|= is logical OR
+	}
+	
+	if (intersected)
+	{
+		isect->ray = ray;
+		isect->point = ray->At();
+		isect->normal = isect->shape->Normal(isect->point);
+	}
+	
+	return intersected;
+}
 
 
 

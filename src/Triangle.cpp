@@ -90,3 +90,32 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min,
 
 	return false;
 }
+
+bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const
+{
+	//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
+	glm::vec3 v0v1 = v[1] - v[0];
+	glm::vec3 v0v2 = v[2] - v[0];
+	glm::vec3 pvec = glm::cross(ray->dir, v0v2);
+	float det = glm::dot(v0v1, pvec);
+	if (det < 0.00001f) return false;
+	float invDet = 1 / det;
+
+	glm::vec3 tvec = ray->origin - v[0];
+	float u = glm::dot(tvec, pvec) * invDet;
+	if (u < 0 || u > 1) return false;
+
+	glm::vec3 qvec = glm::cross(tvec, v0v1);
+	float v = glm::dot(ray->dir, qvec) * invDet;
+	if (v < 0 || u + v > 1) return false;
+
+	float t = glm::dot(v0v2, qvec) * invDet;
+	if (t < ray->t && t >= 0.0f && t < t_less_than)
+	{
+		ray->t = t;
+		isect->shape = (Shape*)(this);
+		return true;
+	}
+
+	return false;
+}

@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "IntegratorUtilities.h"
 #include "Ray.h"
 #include "RNG.h"
 #include "Scene.h"
@@ -12,8 +13,8 @@
 
 int main(int argc, char** argv)
 {
-	const int width = 480, height = 270;
-	const int ssp = 100;
+	const int width = 720, height = 480;
+	const int ssp = 10;
 	unsigned char* image = new unsigned char[width * height * 4];
 	
 	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 70.0f, float(width) / float(height));
@@ -32,25 +33,29 @@ int main(int argc, char** argv)
 				RNG::Uniform2D(rnd);
 				float u = (float(x) + rnd[0]) / float(width);
 				float v = (float(y) + rnd[1]) / float(height);
+				u = float(x) / float(width);
+				v = float(y) / float(height);
+				glm::vec3 color(0.0f);
 				Ray ray = camera->GenerateRay(u, v);
 				SurfaceInteraction isect;
-
-				float t = 0.5 * (ray.dir.y + 1.0f);
-				glm::vec3 color = (1.0f - t) * glm::vec3(1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
-
 				if (scene->Intersect(&ray, &isect, camera->NEAR_PLANE, camera->FAR_PLANE))
 				{
 					if (isect.shape->IsAreaLight())
 					{
-						color = glm::vec3(1.0f);
+						color += scene->area_lights[isect.shape->area_light_index]->L(isect.point, -isect.ray->dir);
 					}
-					else
-					{
-						color = isect.shape->DiffuseColor();
-					}
+					color += UniformSampleOne(*scene, isect);
+					
+					
+					
 					/*color = isect.normal;
 					color += 1.0f;
 					color *= 0.5f;*/
+				}
+				else
+				{
+					float t = 0.5 * (ray.dir.y + 1.0f);
+					color = (1.0f - t) * glm::vec3(1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
 				}
 				acc_color += color;
 			}

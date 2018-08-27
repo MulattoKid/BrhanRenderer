@@ -17,7 +17,7 @@ struct AreaLight
 	virtual float PdfLi(const SurfaceInteraction& isect, const glm::vec3& wi) const = 0;
 	//u[2] is used to randomly sample the shape of the area light
 	//pdf returns the probability that the sampling direction is chosen
-	virtual glm::vec3 SampleLi(const SurfaceInteraction& isect, const float u[2], float* pdf, glm::vec3* wi) const = 0;
+	virtual glm::vec3 SampleLi(const SurfaceInteraction& isect, const float u[2], glm::vec3* sample_point, glm::vec3* wi, float* pdf) const = 0;
 };
 
 #endif

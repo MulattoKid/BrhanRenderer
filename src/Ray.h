@@ -10,6 +10,7 @@ struct Ray
 	float t;
 
 	Ray(const glm::vec3& origin, const glm::vec3& dir);
+	Ray(const glm::vec3& origin, const glm::vec3& dir, const float delta);
 	glm::vec3 At() const;
 	glm::vec3 At(float t) const;
 };

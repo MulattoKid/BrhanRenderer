@@ -19,6 +19,7 @@ struct Model
 	bool has_uvs;
 	
 	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const;
+	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const;
 };
 
 #endif

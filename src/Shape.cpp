@@ -8,8 +8,10 @@ float Shape::Pdf(const SurfaceInteraction& isect, const glm::vec3& wi) const
 	Ray ray(isect.point, wi);
 	SurfaceInteraction isect_light;
 	if (!Intersect(&ray, &isect_light, 0.0f, FLT_MAX)) { return 0.0f; }
+	isect_light.point = ray.At();
+	isect_light.normal = isect_light.shape->Normal(isect_light.point);
 	
-	const float distance_squared = glm::pow(glm::length(ray.origin - isect.point), 2);
+	const float distance_squared = glm::pow(glm::length(ray.origin - isect_light.point), 2);
 	return distance_squared / (glm::abs(glm::dot(isect_light.normal, -wi)) * Area());
 }
 
@@ -55,5 +57,5 @@ glm::vec3 Shape::EmissionColor() const
 
 bool Shape::IsAreaLight() const
 {
-	return area_light == NULL ? false : true;
+	return area_light_index == -1 ? false : true;
 }

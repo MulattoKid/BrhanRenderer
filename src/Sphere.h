@@ -16,6 +16,7 @@ struct Sphere : Shape
 	float Area() const;
 	glm::vec3 Sample(const float u[2]) const;
 	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const;
+	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const;
 };
 
 #endif
