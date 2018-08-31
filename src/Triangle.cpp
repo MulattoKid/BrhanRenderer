@@ -1,4 +1,5 @@
 #include "glm/geometric.hpp"
+#include "RNG.h"
 #include "Triangle.h"
 
 glm::vec3 Triangle::BarycentricCoefficients(const glm::vec3& point) const

@@ -19,7 +19,8 @@ float BxDF::Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& norma
 	return UniformHemispherePdf(wo, wi, normal);
 }
 
-glm::vec3 BxDF::Samplef(const glm::vec3& wo, const float u[2], const glm::vec3& normal, glm::vec3* wi, float* pdf, BxDFType* sampled_type) const
+glm::vec3 BxDF::Samplef(const glm::vec3& wo, const float u[2], const glm::vec3& normal,
+						glm::vec3* wi, float* pdf, BxDFType* sampled_type) const
 {
 	*wi = UniformSampleHemisphere(u, normal);
 	*pdf = Pdf(wo, *wi, normal);

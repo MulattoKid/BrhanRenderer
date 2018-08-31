@@ -12,9 +12,16 @@
 #include "SurfaceInteraction.h"
 #include <vector>
 
+#include "GeometricUtilities.h"
+#include "glm/geometric.hpp"
+#include "glm/vec2.hpp"
+#include "glm/trigonometric.hpp"
+#include "glm/mat2x2.hpp"
+#include "glm/mat3x3.hpp"
+
 int main(int argc, char** argv)
 {
-	//Init stuff	
+	//Init stuff
 	float u;
 	RNG::Uniform1D(&u); //Get the first one out of the way....!
 	
