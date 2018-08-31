@@ -15,6 +15,11 @@ float Shape::Pdf(const SurfaceInteraction& isect, const glm::vec3& wi) const
 	return distance_squared / (glm::abs(glm::dot(isect_light.normal, -wi)) * Area());
 }
 
+void Shape::ComputeScatteringFunctions(SurfaceInteraction* isect) const
+{
+	material->ComputeScatteringFunctions(isect);
+}
+
 glm::vec3 Shape::AmbientColor() const
 {
 	if (mtl == NULL)

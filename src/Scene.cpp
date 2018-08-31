@@ -29,10 +29,10 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 {
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
-	std::vector<tinyobj::material_t> materials;
+	std::vector<tinyobj::material_t> material_ts;
 
 	std::string err;
-	bool success = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, file.c_str()); 
+	bool success = tinyobj::LoadObj(&attrib, &shapes, &material_ts, &err, file.c_str()); 
 	if (!err.empty()) //`err` may contain warning message
 	{
 	  printf("%s\n", err.c_str());
@@ -40,6 +40,10 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 	if (!success)
 	{
 	  return false;
+	}
+	if (material_ts.empty())
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "No material detected for object '%s' - nothing to render\n", file.c_str());
 	}
 	
 	//Count number of triangles and quads to resize Model::shapes
@@ -58,14 +62,15 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 	model->triangles.resize(num_triangles);
 	model->quads.resize(num_quads);
 	model->shapes.resize(num_triangles + num_quads);
-	model->mtls.resize(materials.size());
+	model->materials.resize(material_ts.size());
+	model->mtls.resize(material_ts.size());
 	const bool has_normals = attrib.normals.size() > 0 ? true : false;
 	model->has_uvs = attrib.texcoords.size() > 0 ? true : false;
 
 	//Convert tinyobj::material:_t to MTL
-	for (size_t i = 0; i < materials.size(); i++)
+	for (size_t i = 0; i < material_ts.size(); i++)
 	{
-		tinyobj::material_t* material = &materials[i];
+		tinyobj::material_t* material = &material_ts[i];
 		MTL* mtl = &model->mtls[i];
 
 		//Assign
@@ -78,6 +83,11 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 		mtl->index_of_refraction = material->ior;
 		mtl->dissolve = material->dissolve;
 		mtl->illumination_model = material->illum;
+		
+		//TODO
+		//Only matte material for now
+		model->matte_materials.push_back(MatteMaterial(mtl->diffuse));
+		model->materials[i] = (Material*)(&model->matte_materials[model->matte_materials.size() - 1]);
 	}
 
 	//Loop over shapes - remember that what I call a Shape is NOT the same as the OBJ view of a shape
@@ -125,8 +135,10 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 				model->shapes[shape_index++] = tri;
 				
 				//per-face material
+				tri->material = model->materials[shapes[s].mesh.material_ids[f]];
 				tri->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
-				if (tri->mtl->emission != glm::vec3(0.0f)) //Is light
+				//Add to lights if emissive
+				if (tri->mtl->emission != glm::vec3(0.0f))
 				{
 					//TODO: only diffuse area light for now
 					DiffuseAreaLight dal;
@@ -173,8 +185,10 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 				model->shapes[shape_index++] = quad;
 				
 				//per-face material
+				quad->material = model->materials[shapes[s].mesh.material_ids[f]];
 				quad->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
-				if (quad->mtl->emission != glm::vec3(0.0f)) //Is light
+				//Add to lights if emissive
+				if (quad->mtl->emission != glm::vec3(0.0f))
 				{
 					//TODO: only diffuse area light for now
 					DiffuseAreaLight dal;
@@ -200,7 +214,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 				model->triangles.size(),
 				model->quads.size(),
 				model->shapes.size(),
-				model->mtls.size());
+				model->materials.size());
 	
 	return true;
 }
@@ -218,6 +232,7 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, co
 		isect->ray = ray;
 		isect->point = ray->At();
 		isect->normal = isect->shape->Normal(isect->point);
+		isect->ComputeScatteringFunctions();
 	}
 	
 	return intersected;
@@ -236,6 +251,7 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_th
 		isect->ray = ray;
 		isect->point = ray->At();
 		isect->normal = isect->shape->Normal(isect->point);
+		isect->ComputeScatteringFunctions();
 	}
 	
 	return intersected;

@@ -4,20 +4,11 @@
 #include "Ray.h"
 #include "RNG.h"
 #include "Scene.h"
-#include "Sphere.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 //#define STBI_MSC_SECURE_CRT
 #include "stb/stb_image_write.h"
 #include <stdio.h>
 #include "SurfaceInteraction.h"
-#include <vector>
-
-#include "GeometricUtilities.h"
-#include "glm/geometric.hpp"
-#include "glm/vec2.hpp"
-#include "glm/trigonometric.hpp"
-#include "glm/mat2x2.hpp"
-#include "glm/mat3x3.hpp"
 
 int main(int argc, char** argv)
 {

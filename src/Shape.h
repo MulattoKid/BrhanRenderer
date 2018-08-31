@@ -3,12 +3,14 @@
 
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
+#include "Material.h"
 #include "MTL.h"
 #include "Ray.h"
 #include "SurfaceInteraction.h"
 
 struct Shape
 {
+	Material* material = NULL;
 	MTL* mtl = NULL;
 	int area_light_index = -1;
 
@@ -19,6 +21,7 @@ struct Shape
 	virtual glm::vec3 Sample(const float u[2]) const = 0;
 	virtual bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const = 0;
 	virtual bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const = 0;
+	void ComputeScatteringFunctions(SurfaceInteraction* isect) const;
 	glm::vec3 AmbientColor() const;
 	glm::vec3 DiffuseColor() const;
 	glm::vec3 SpecularColor() const;

@@ -3,6 +3,7 @@
 
 #include "glm/vec3.hpp"
 
+struct BSDF;
 struct Ray;
 struct Shape;
 
@@ -12,6 +13,10 @@ struct SurfaceInteraction
 	Shape* shape;
 	glm::vec3 point;
 	glm::vec3 normal;
+	BSDF* bsdf;
+	
+	~SurfaceInteraction();
+	void ComputeScatteringFunctions();
 };
 
 #endif

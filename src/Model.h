@@ -1,6 +1,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include "Material.h"
+#include "MatteMaterial.h"
 #include "MTL.h"
 #include "Quad.h"
 #include "Shape.h"
@@ -15,6 +17,8 @@ struct Model
 	std::vector<Triangle> triangles;
 	std::vector<Quad> quads;
 	std::vector<Shape*> shapes;
+	std::vector<MatteMaterial> matte_materials;
+	std::vector<Material*> materials;
 	std::vector<MTL> mtls;
 	bool has_uvs;
 	
