@@ -71,7 +71,7 @@ glm::vec3 BSDF::Samplef(const glm::vec3& wo, float u[2], const BxDFType type, co
 	RNG::Uniform1D(&u[0]);
 	
 	//Sample BxDF to get wi
-	bxdf->Samplef(wo, u, normal, wi, pdf, sampled_type);
+	glm::vec3 f = bxdf->Samplef(wo, u, normal, wi, pdf, sampled_type);
 	
 	//Account for the other BxDFs that could have been chosen
 	if (num_matching > 1 && !(bxdf->type & BSDF_SPECULAR))
@@ -90,7 +90,6 @@ glm::vec3 BSDF::Samplef(const glm::vec3& wo, float u[2], const BxDFType type, co
 	}
 	
 	//Compute value for BSDF for the the sampled direction
-	glm::vec3 f(0.0f);
 	if (num_matching > 1 && !(bxdf->type & BSDF_SPECULAR))
 	{
 		f = this->f(wo, *wi, type);

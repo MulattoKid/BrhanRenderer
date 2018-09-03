@@ -40,12 +40,12 @@ glm::vec3 UniformSampleHemisphere(const float u[2], const glm::vec3& normal)
 	const glm::mat3 m(glm::vec3(0.0f, v[2], -v[1]), glm::vec3(-v[2], 0.0f, v[0]), glm::vec3(v[1], -v[0], 0.0f));
 	const glm::mat3 R = glm::mat3(1.0f) + m + ((m * m) * ((1.0f - c) / (s * s)));
 	
-	return R * sample_point;
+	return glm::normalize(R * sample_point);
 }
 
 float UniformHemispherePdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal)
 {
-	if (SameHemisphere(wo, wi, normal))
+	if (SameHemisphere(-wo, wi, normal))
 	{
 		return glm::two_over_pi<float>();
 	}

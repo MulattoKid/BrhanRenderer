@@ -77,7 +77,7 @@ glm::vec3 EstimateDirect(const Scene& scene, const AreaLight* area_light, const 
 	}
 	else //TODO: Account for InifiteAreaLights that don't have geometry: p.861
 	{}
-	Ld += f * Li * weight / scattering_pdf;	
+	Ld += f * Li * weight / scattering_pdf;
 
 	return Ld;
 }
