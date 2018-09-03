@@ -9,13 +9,12 @@ struct Shape;
 
 struct SurfaceInteraction
 {
-	Ray* ray;
-	Shape* shape;
+	Ray* ray = NULL;
+	Shape* shape = NULL;
 	glm::vec3 point;
 	glm::vec3 normal;
-	BSDF* bsdf;
+	BSDF* bsdf = NULL;
 	
-	~SurfaceInteraction();
 	void ComputeScatteringFunctions();
 };
 

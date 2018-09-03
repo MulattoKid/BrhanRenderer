@@ -8,7 +8,7 @@ void LOG_MESSAGE(const bool surpress_tag, const char* format, ...)
 	va_list argptr;
 	if (!surpress_tag)
 	{
-    	fprintf(stdout, "MESSAGE:\n");
+    	fprintf(stdout, "MESSAGE ");
 	}
     va_start(argptr, format);
     vfprintf(stdout, format, argptr);

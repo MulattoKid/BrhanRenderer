@@ -1,3 +1,4 @@
+#include "BSDF.h"
 #include "Camera.h"
 #include "glm/common.hpp"
 #include "IntegratorUtilities.h"
@@ -17,7 +18,7 @@ int main(int argc, char** argv)
 	RNG::Uniform1D(&u); //Get the first one out of the way....!
 	
 	const int width = 720, height = 480;
-	const int ssp = 10;
+	const int ssp = 1;
 	unsigned char* image = new unsigned char[width * height * 4];
 	
 	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 70.0f, float(width) / float(height));
@@ -49,6 +50,7 @@ int main(int argc, char** argv)
 					float t = 0.5 * (ray.dir.y + 1.0f);
 					L += (1.0f - t) * glm::vec3(1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
 				}
+				if (isect.bsdf != NULL) { delete isect.bsdf; }
 			}
 			L /= float(ssp);
 			L = glm::clamp(L, 0.0f, 1.0f);

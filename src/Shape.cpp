@@ -1,5 +1,6 @@
 #include <cfloat>
 #include "glm/geometric.hpp"
+#include "Logger.h"
 #include "Shape.h"
 
 //p.838

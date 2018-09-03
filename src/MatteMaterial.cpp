@@ -1,5 +1,6 @@
 #include "BSDF.h"
 #include "LambertianBRDF.h"
+#include "Logger.h"
 #include "MatteMaterial.h"
 
 MatteMaterial::MatteMaterial(const glm::vec3& Kd)

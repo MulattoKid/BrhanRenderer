@@ -68,6 +68,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 	model->has_uvs = attrib.texcoords.size() > 0 ? true : false;
 
 	//Convert tinyobj::material:_t to MTL
+	std::vector<int> matte_material_indices;
 	for (size_t i = 0; i < material_ts.size(); i++)
 	{
 		tinyobj::material_t* material = &material_ts[i];
@@ -84,10 +85,16 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 		mtl->dissolve = material->dissolve;
 		mtl->illumination_model = material->illum;
 		
-		//TODO
-		//Only matte material for now
+		//TODO: only matte material for now
 		model->matte_materials.push_back(MatteMaterial(mtl->diffuse));
-		model->materials[i] = (Material*)(&model->matte_materials[model->matte_materials.size() - 1]);
+		matte_material_indices.push_back(i);
+	}
+	
+	//TODO: only matte material for now
+	//Copy over pointers to model->materials
+	for (size_t i = 0; i < model->matte_materials.size(); i++)
+	{
+		model->materials[matte_material_indices[i]] = (Material*)(&model->matte_materials[i]);
 	}
 
 	//Loop over shapes - remember that what I call a Shape is NOT the same as the OBJ view of a shape

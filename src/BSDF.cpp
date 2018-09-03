@@ -9,6 +9,7 @@ void BSDF::Add(BxDF* bxdf)
 	if (num_bxdfs == max_bxdfs)
 	{
 		LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "The maximum number of BxDFs (%i) is already reached - skipping this new one\n", max_bxdfs);
+		return;
 	}
 	bxdfs[num_bxdfs++] = bxdf;
 }
