@@ -1,3 +1,4 @@
+#include "BSDF.h"
 #include "glm/geometric.hpp"
 #include "IntegratorUtilities.h"
 #include "RNG.h"
@@ -30,9 +31,8 @@ glm::vec3 EstimateDirect(const Scene& scene, const AreaLight* area_light, const 
 	//printf("Li: %f %f %f\n", Li.x, Li.y, Li.z);
 	if (Li != glm::vec3(0.0f) && light_pdf > 0.0f) //Light has a probability of arriving to the point and some light does
 	{
-		//TODO: f = BRDF of intersection point
-		glm::vec3 f = isect.shape->DiffuseColor();
-		if (f != glm::vec3(0.0f)) //Some light is reflected form the intersection point
+		glm::vec3 f = isect.bsdf->f(isect.ray->dir, wi, BxDFType(BSDF_ALL & ~BSDF_SPECULAR)) * glm::abs(glm::dot(isect.normal, wi));
+		if (f != glm::vec3(0.0f)) //Some light is reflected from the intersection point
 		{
 			//Check for visibility to light
 			Ray vis_ray(isect.point, wi);
@@ -46,9 +46,9 @@ glm::vec3 EstimateDirect(const Scene& scene, const AreaLight* area_light, const 
 			}
 		}
 	}
-	//printf("Ld: %f %f %f\n", Ld.x, Ld.y, Ld.z);
 	
-	//TODO: Sample BRDF of intersection point
+	//Sample BRDF of intersection point
+	
 	
 	return Ld;
 }

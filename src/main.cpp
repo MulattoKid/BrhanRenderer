@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	RNG::Uniform1D(&u); //Get the first one out of the way....!
 	
 	const int width = 720, height = 480;
-	const int ssp = 1;
+	const int ssp = 10;
 	unsigned char* image = new unsigned char[width * height * 4];
 	
 	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 70.0f, float(width) / float(height));
