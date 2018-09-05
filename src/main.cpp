@@ -32,16 +32,16 @@ int main(int argc, char** argv)
 	start = GetTime();
 	for (int y = 0; y < height; y++)
 	{
-//#pragma omp parallel for
+#pragma omp parallel for
 		for (int x = 0; x < width; x++)
 		{
 			float u = float(x) / float(width);
 			float v = float(y) / float(height);
-			Ray test_ray = camera->GenerateRay(u, v);
-			SurfaceInteraction test_isect;
+			Ray initial_ray = camera->GenerateRay(u, v);
+			SurfaceInteraction initial_isect;
 			
 			glm::vec3 L(0.0f);
-			if (scene->Intersect(&test_ray, &test_isect, camera->NEAR_PLANE, camera->FAR_PLANE))
+			if (scene->Intersect(&initial_ray, &initial_isect, camera->NEAR_PLANE, camera->FAR_PLANE))
 			{
 				for (int s = 0; s < ssp; s++)
 				{
@@ -55,7 +55,6 @@ int main(int argc, char** argv)
 						}
 						L += UniformSampleOne(*scene, isect);
 					}
-					if (isect.bsdf != NULL) { delete isect.bsdf; }
 				}
 			}
 			

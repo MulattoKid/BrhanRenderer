@@ -6,11 +6,20 @@
 BSDF::BSDF()
 {}
 
+BSDF::~BSDF()
+{
+	for (int i = 0; i < num_bxdfs; i++)
+	{
+		delete bxdfs[i];
+	}
+}
+
 void BSDF::Add(BxDF* bxdf)
 {
 	if (num_bxdfs == max_bxdfs)
 	{
-		LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "The maximum number of BxDFs (%i) is already reached - skipping this new one\n", max_bxdfs);
+		LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "The maximum number of BxDFs (%i) is already reached - skipping and deleting the supplied BxDF\n", max_bxdfs);
+		delete bxdf;
 		return;
 	}
 	bxdfs[num_bxdfs++] = bxdf;

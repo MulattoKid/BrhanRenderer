@@ -28,9 +28,8 @@ glm::vec3 EstimateDirect(const Scene& scene, const AreaLight* area_light, const 
 	//Sample light source
 	glm::vec3 sample_point(0.0f), wi(0.0f);
 	float light_pdf = 0.0f;
-	//glm::vec3 Li = area_light->SampleLi(isect, u_light, &sample_point, &wi, &light_pdf);
-	glm::vec3 Li = area_light->L(glm::vec3(0.0f), glm::vec3(0.0f));
-	/*if (light_pdf > 0.0f && Li != glm::vec3(0.0f)) //Light has a probability of arriving to the point and some light does
+	glm::vec3 Li = area_light->SampleLi(isect, u_light, &sample_point, &wi, &light_pdf);
+	if (light_pdf > 0.0f && Li != glm::vec3(0.0f)) //Light has a probability of arriving to the point and some light does
 	{
 		glm::vec3 f = isect.bsdf->f(isect.ray->dir, wi, BxDFType(BSDF_ALL & ~BSDF_SPECULAR));
 		f *= glm::abs(glm::dot(isect.normal, wi));
@@ -47,7 +46,7 @@ glm::vec3 EstimateDirect(const Scene& scene, const AreaLight* area_light, const 
 				Ld += f * Li * weight / light_pdf;
 			}
 		}
-	}*/
+	}
 	
 	//Sample BRDF of intersection point
 	BxDFType sampled_type;

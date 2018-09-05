@@ -15,6 +15,7 @@ struct SurfaceInteraction
 	glm::vec3 normal;
 	BSDF* bsdf = NULL;
 	
+	~SurfaceInteraction();
 	void ComputeScatteringFunctions();
 };
 

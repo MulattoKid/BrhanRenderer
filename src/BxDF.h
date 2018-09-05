@@ -19,6 +19,7 @@ struct BxDF
 	BxDFType type;
 	
 	BxDF(BxDFType type);
+	virtual ~BxDF();
 	bool MatchesFlags(BxDFType t) const;
 	virtual float Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal) const;
 	virtual glm::vec3 f(const glm::vec3& wo, const glm::vec3& wi) const = 0;

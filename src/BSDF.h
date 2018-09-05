@@ -10,6 +10,7 @@ struct BSDF
 	BxDF* bxdfs[max_bxdfs];
 	
 	BSDF();
+	~BSDF();
 	void Add(BxDF* bxdf);
 	int NumMatchingComponents(const BxDFType type) const;
 	glm::vec3 f(const glm::vec3& wo, const glm::vec3& wi, BxDFType flags) const;

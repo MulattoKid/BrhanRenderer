@@ -9,6 +9,9 @@ BxDF::BxDF(BxDFType type)
 	this->type = type;
 }
 
+BxDF::~BxDF()
+{}
+
 bool BxDF::MatchesFlags(BxDFType t) const
 {
 	return (type & t) == type;
