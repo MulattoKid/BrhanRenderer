@@ -2,14 +2,15 @@
 #include "Camera.h"
 #include "glm/common.hpp"
 #include "IntegratorUtilities.h"
+#include "Logger.h"
 #include "Ray.h"
 #include "RNG.h"
 #include "Scene.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 //#define STBI_MSC_SECURE_CRT
 #include "stb/stb_image_write.h"
-#include <stdio.h>
 #include "SurfaceInteraction.h"
+#include "Timer.h"
 
 int main(int argc, char** argv)
 {
@@ -18,40 +19,47 @@ int main(int argc, char** argv)
 	RNG::Uniform1D(&u); //Get the first one out of the way....!
 	
 	const int width = 720, height = 480;
-	const int ssp = 64;
+	const int ssp = 128;
 	unsigned char* image = new unsigned char[width * height * 4];
 	
+	auto start = GetTime();
 	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 70.0f, float(width) / float(height));
 	Scene* scene = new Scene();
 	scene->Load("models/CornellBox/CornellBox-Original.obj");
+	auto end = GetTime();
+	LogElapsedTime("Load time: ", start, end);
 	
+	start = GetTime();
 	for (int y = 0; y < height; y++)
 	{
 //#pragma omp parallel for
 		for (int x = 0; x < width; x++)
 		{
+			float u = float(x) / float(width);
+			float v = float(y) / float(height);
+			Ray test_ray = camera->GenerateRay(u, v);
+			SurfaceInteraction test_isect;
+			
 			glm::vec3 L(0.0f);
-			for (int s = 0; s < ssp; s++)
+			if (scene->Intersect(&test_ray, &test_isect, camera->NEAR_PLANE, camera->FAR_PLANE))
 			{
-				float u = float(x) / float(width);
-				float v = float(y) / float(height);
-				Ray ray = camera->GenerateRay(u, v);
-				SurfaceInteraction isect;
-				if (scene->Intersect(&ray, &isect, camera->NEAR_PLANE, camera->FAR_PLANE))
+				for (int s = 0; s < ssp; s++)
 				{
-					if (isect.shape->IsAreaLight())
+					Ray ray = camera->GenerateRay(u, v);
+					SurfaceInteraction isect;
+					if (scene->Intersect(&ray, &isect, camera->NEAR_PLANE, camera->FAR_PLANE))
 					{
-						L += scene->area_lights[isect.shape->area_light_index]->L(isect.point, -isect.ray->dir);
+						if (isect.shape->IsAreaLight())
+						{
+							L += scene->area_lights[isect.shape->area_light_index]->L(isect.point, -isect.ray->dir);
+						}
+						L += UniformSampleOne(*scene, isect);
 					}
-					L += UniformSampleOne(*scene, isect);
+					if (isect.bsdf != NULL) { delete isect.bsdf; }
 				}
-				else
-				{
-					float t = 0.5 * (ray.dir.y + 1.0f);
-					L += (1.0f - t) * glm::vec3(1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
-				}
-				if (isect.bsdf != NULL) { delete isect.bsdf; }
 			}
+			
+			
 			L /= float(ssp);
 			L = glm::clamp(L, 0.0f, 1.0f);
 
@@ -62,11 +70,17 @@ int main(int argc, char** argv)
 			image[idx+3] = 255;
 		}
 	}
+	end = GetTime();
+	LogElapsedTime("Render time: ", start, end);
 
 	if (!stbi_write_bmp("IMAGE.bmp", width, height, 4, (void*)image))
 	{
-		fprintf(stderr, "Error writing image\n");
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Error writing image\n");
 	}
+	
+	delete scene;
+	delete camera;
+	delete[] image;
 
 	return 0;
 }

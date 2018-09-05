@@ -28,11 +28,12 @@ glm::vec3 EstimateDirect(const Scene& scene, const AreaLight* area_light, const 
 	//Sample light source
 	glm::vec3 sample_point(0.0f), wi(0.0f);
 	float light_pdf = 0.0f;
-	glm::vec3 Li = area_light->SampleLi(isect, u_light, &sample_point, &wi, &light_pdf);
-	//printf("Li: %f %f %f\n", Li.x, Li.y, Li.z);
-	if (Li != glm::vec3(0.0f) && light_pdf > 0.0f) //Light has a probability of arriving to the point and some light does
+	//glm::vec3 Li = area_light->SampleLi(isect, u_light, &sample_point, &wi, &light_pdf);
+	glm::vec3 Li = area_light->L(glm::vec3(0.0f), glm::vec3(0.0f));
+	/*if (light_pdf > 0.0f && Li != glm::vec3(0.0f)) //Light has a probability of arriving to the point and some light does
 	{
-		glm::vec3 f = isect.bsdf->f(isect.ray->dir, wi, BxDFType(BSDF_ALL & ~BSDF_SPECULAR)) * glm::abs(glm::dot(isect.normal, wi));
+		glm::vec3 f = isect.bsdf->f(isect.ray->dir, wi, BxDFType(BSDF_ALL & ~BSDF_SPECULAR));
+		f *= glm::abs(glm::dot(isect.normal, wi));
 		if (f != glm::vec3(0.0f)) //Some light is reflected from the intersection point
 		{
 			//Check for visibility to light
@@ -46,38 +47,45 @@ glm::vec3 EstimateDirect(const Scene& scene, const AreaLight* area_light, const 
 				Ld += f * Li * weight / light_pdf;
 			}
 		}
-	}
+	}*/
 	
 	//Sample BRDF of intersection point
 	BxDFType sampled_type;
 	float scattering_pdf = 0.0f;
 	glm::vec3 f = isect.bsdf->Samplef(isect.ray->dir, u_scattering, BxDFType(BSDF_ALL & ~BSDF_SPECULAR), isect.normal, &wi, &scattering_pdf, &sampled_type);
 	f *= glm::abs(glm::dot(isect.normal, wi));
-	bool sampled_specular = sampled_type & BSDF_SPECULAR;
-	float weight = 1.0f;
-	if (!sampled_specular) //Multiple-importance sampling shouldn't be applied as there's only one direction that can be sampled
+	if (f != glm::vec3(0.0f) && scattering_pdf > 0.0f)
 	{
-		light_pdf = area_light->PdfLi(isect, wi);
-		if (light_pdf == 0.0f)
+		bool sampled_specular = sampled_type & BSDF_SPECULAR;
+		float weight = 1.0f;
+		if (!sampled_specular) //Multiple-importance sampling shouldn't be applied as there's only one direction that can be sampled
 		{
-			return Ld;
+			light_pdf = area_light->PdfLi(isect, wi);
+			if (light_pdf == 0.0f)
+			{
+				return Ld;
+			}
+			weight = 1.0f; //TODO: PowerHeuristic
 		}
-		weight = 1.0f; //TODO: PowerHeuristic
-	}
-	//Check if the sampled direction intersects the light source's geometry
-	Ray light_ray(isect.point, wi);
-	SurfaceInteraction light_isect;
-	bool found_intersection = scene.Intersect(&light_ray, &light_isect, 0.0001f, 10000.0f);
-	if (found_intersection)
-	{
-		if (light_isect.shape == area_light->shape)
+		//Check if the sampled direction intersects the light source's geometry
+		Ray light_ray(isect.point, wi);
+		SurfaceInteraction light_isect;
+		bool found_intersection = scene.Intersect(&light_ray, &light_isect, 0.0001f, 10000.0f);
+		Li = glm::vec3(0.0f);
+		if (found_intersection)
 		{
-			Li = area_light->L(light_isect.point, -wi);
+			if (light_isect.shape == area_light->shape)
+			{
+				Li = area_light->L(light_isect.point, -wi);
+			}
+		}
+		else //TODO: Account for InifiteAreaLights that don't have geometry: p.861
+		{}
+		if (Li != glm::vec3(0.0f))
+		{
+			Ld += f * Li * weight / scattering_pdf;
 		}
 	}
-	else //TODO: Account for InifiteAreaLights that don't have geometry: p.861
-	{}
-	Ld += f * Li * weight / scattering_pdf;
 
 	return Ld;
 }

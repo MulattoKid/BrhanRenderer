@@ -8,7 +8,7 @@ CXXFLAGS = -std=c++11
 LDFLAGS = -fopenmp
 
 #Setup for release
-all : CXXFLAGS += -O2
+all : CXXFLAGS += -fopenmp -O2
 all : BrhanRenderer
 
 #Setup for debug
