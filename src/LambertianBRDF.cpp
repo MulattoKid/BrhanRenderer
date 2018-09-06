@@ -12,5 +12,5 @@ LambertianBRDF::~LambertianBRDF()
 
 glm::vec3 LambertianBRDF::f(const glm::vec3& wo, const glm::vec3& wi) const
 {
-	return R / glm::one_over_pi<float>();
+	return R;// / glm::one_over_pi<float>();
 }

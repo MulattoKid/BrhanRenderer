@@ -19,6 +19,7 @@ glm::vec3 UniformSampleOne(const Scene& scene, const SurfaceInteraction& isect, 
 	float u_light[2], u_scattering[2];
 	rng.Uniform2D(u_light);
 	rng.Uniform2D(u_scattering);
+	
 	return EstimateDirect(scene, rng, area_light, isect, u_light, u_scattering) * float(scene.area_lights.size());
 }
 
@@ -30,10 +31,14 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 	glm::vec3 sample_point(0.0f), wi(0.0f);
 	float light_pdf = 0.0f;
 	glm::vec3 Li = area_light->SampleLi(rng, isect, u_light, &sample_point, &wi, &light_pdf);
+	//LOG_MESSAGE(true, "AreaLight: %p\n", area_light);
+	//LOG_MESSAGE(true, "SamplePoint: %f %f %f\n", sample_point.x, sample_point.y, sample_point.z);
+	//LOG_MESSAGE(true, "Wi: %f %f %f\n", wi.x, wi.y, wi.z);
 	if (light_pdf > 0.0f && Li != glm::vec3(0.0f)) //Light has a probability of arriving to the point and some light does
 	{
 		glm::vec3 f = isect.bsdf->f(isect.ray->dir, wi, BxDFType(BSDF_ALL & ~BSDF_SPECULAR));
 		f *= glm::abs(glm::dot(isect.normal, wi));
+		//LOG_MESSAGE(true, "F: %f %f %f\n", f.x, f.y, f.z);
 		if (f != glm::vec3(0.0f)) //Some light is reflected from the intersection point
 		{
 			//Check for visibility to light
@@ -43,8 +48,9 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 			//The subtraction of 0.0001f make it so that an intersection with the light itself isn't detected
 			if (!scene.Intersect(&vis_ray, &light_isect, glm::length(vis_ray.origin - sample_point) - 0.0001f))
 			{
-				float weight = 1.0f; //TODO: PowerHeuristic
+				const float weight = 1.0f; //TODO: PowerHeuristic
 				Ld += f * Li * weight / light_pdf;
+				//LOG_MESSAGE(true, "Ld: %f %f %f\n", Ld.x, Ld.y, Ld.z);
 			}
 		}
 	}
