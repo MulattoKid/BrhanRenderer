@@ -1,9 +1,10 @@
 #include <math.h>
 #include "RNG.h"
+#include <time.h>
 
 RNG::RNG()
 {
-	generator = std::default_random_engine();
+	generator = std::default_random_engine(time(NULL));
 	distribution = std::uniform_real_distribution<double>(0.0f, 1.0f);
 }
 
