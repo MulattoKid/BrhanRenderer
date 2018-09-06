@@ -53,7 +53,7 @@ glm::vec3 BSDF::f(const glm::vec3& wo, const glm::vec3& wi, BxDFType flags) cons
 	return f;
 }
 
-glm::vec3 BSDF::Samplef(const glm::vec3& wo, float u[2], const BxDFType type, const glm::vec3& normal,
+glm::vec3 BSDF::Samplef(RNG& rng, const glm::vec3& wo, float u[2], const BxDFType type, const glm::vec3& normal,
 						glm::vec3* wi, float* pdf, BxDFType* sampled_type) const
 {
 	const int num_matching = NumMatchingComponents(type);
@@ -77,7 +77,7 @@ glm::vec3 BSDF::Samplef(const glm::vec3& wo, float u[2], const BxDFType type, co
 	}
 	
 	//Reample u[0] as it was used to choose the BxDF
-	RNG::Uniform1D(&u[0]);
+	rng.Uniform1D(&u[0]);
 	
 	//Sample BxDF to get wi
 	glm::vec3 f = bxdf->Samplef(wo, u, normal, wi, pdf, sampled_type);

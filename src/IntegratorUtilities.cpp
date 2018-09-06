@@ -1,6 +1,7 @@
 #include "BSDF.h"
 #include "glm/geometric.hpp"
 #include "IntegratorUtilities.h"
+#include "Logger.h"
 #include "RNG.h"
 
 #include <stdio.h>
@@ -11,24 +12,24 @@ glm::vec3 UniformSampleAll()
 	return glm::vec3(0.0f);
 }
 
-glm::vec3 UniformSampleOne(const Scene& scene, const SurfaceInteraction& isect)
+glm::vec3 UniformSampleOne(const Scene& scene, const SurfaceInteraction& isect, RNG& rng)
 {
-	const unsigned int area_light_index = RNG::Uniform1D() * scene.area_lights.size();
+	const unsigned int area_light_index = rng.Uniform1D() * scene.area_lights.size();
 	const AreaLight* area_light = scene.area_lights[area_light_index];
 	float u_light[2], u_scattering[2];
-	RNG::Uniform2D(u_light);
-	RNG::Uniform2D(u_scattering);
-	return EstimateDirect(scene, area_light, isect, u_light, u_scattering) * float(scene.area_lights.size());
+	rng.Uniform2D(u_light);
+	rng.Uniform2D(u_scattering);
+	return EstimateDirect(scene, rng, area_light, isect, u_light, u_scattering) * float(scene.area_lights.size());
 }
 
-glm::vec3 EstimateDirect(const Scene& scene, const AreaLight* area_light, const SurfaceInteraction& isect, const float u_light[2], float u_scattering[2])
+glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_light, const SurfaceInteraction& isect, const float u_light[2], float u_scattering[2])
 {
 	glm::vec3 Ld(0.0f); //Direct lighting
 
 	//Sample light source
 	glm::vec3 sample_point(0.0f), wi(0.0f);
 	float light_pdf = 0.0f;
-	glm::vec3 Li = area_light->SampleLi(isect, u_light, &sample_point, &wi, &light_pdf);
+	glm::vec3 Li = area_light->SampleLi(rng, isect, u_light, &sample_point, &wi, &light_pdf);
 	if (light_pdf > 0.0f && Li != glm::vec3(0.0f)) //Light has a probability of arriving to the point and some light does
 	{
 		glm::vec3 f = isect.bsdf->f(isect.ray->dir, wi, BxDFType(BSDF_ALL & ~BSDF_SPECULAR));
@@ -49,9 +50,9 @@ glm::vec3 EstimateDirect(const Scene& scene, const AreaLight* area_light, const 
 	}
 	
 	//Sample BRDF of intersection point
-	BxDFType sampled_type;
+	/*BxDFType sampled_type;
 	float scattering_pdf = 0.0f;
-	glm::vec3 f = isect.bsdf->Samplef(isect.ray->dir, u_scattering, BxDFType(BSDF_ALL & ~BSDF_SPECULAR), isect.normal, &wi, &scattering_pdf, &sampled_type);
+	glm::vec3 f = isect.bsdf->Samplef(rng, isect.ray->dir, u_scattering, BxDFType(BSDF_ALL & ~BSDF_SPECULAR), isect.normal, &wi, &scattering_pdf, &sampled_type);
 	f *= glm::abs(glm::dot(isect.normal, wi));
 	if (f != glm::vec3(0.0f) && scattering_pdf > 0.0f)
 	{
@@ -84,7 +85,7 @@ glm::vec3 EstimateDirect(const Scene& scene, const AreaLight* area_light, const 
 		{
 			Ld += f * Li * weight / scattering_pdf;
 		}
-	}
+	}*/
 
 	return Ld;
 }

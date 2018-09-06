@@ -25,9 +25,9 @@ float DiffuseAreaLight::PdfLi(const SurfaceInteraction& isect, const glm::vec3& 
 }
 
 //p.845
-glm::vec3 DiffuseAreaLight::SampleLi(const SurfaceInteraction& isect, const float u[2], glm::vec3* sample_point, glm::vec3* wi, float* pdf) const
+glm::vec3 DiffuseAreaLight::SampleLi(RNG& rng, const SurfaceInteraction& isect, const float u[2], glm::vec3* sample_point, glm::vec3* wi, float* pdf) const
 {
-	*sample_point = shape->Sample(u); //Intersection point to sample point on light
+	*sample_point = shape->Sample(rng, u); //Intersection point to sample point on light
 	*wi = glm::normalize(*sample_point - isect.point);;
 	*pdf = PdfLi(isect, *wi);
 	return L(*sample_point, -*wi);

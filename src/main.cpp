@@ -1,27 +1,23 @@
 #include "BSDF.h"
 #include "Camera.h"
-#include "glm/common.hpp"
+#include "ImageIO.h"
 #include "IntegratorUtilities.h"
 #include "Logger.h"
+#include <omp.h>
 #include "Ray.h"
 #include "RNG.h"
 #include "Scene.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-//#define STBI_MSC_SECURE_CRT
-#include "stb/stb_image_write.h"
 #include "SurfaceInteraction.h"
 #include "Timer.h"
 
 int main(int argc, char** argv)
 {
 	//Init stuff
-	float u;
-	RNG::Uniform1D(&u); //Get the first one out of the way....!
-	
+	RNG rngs[omp_get_max_threads()];
 	const int width = 720, height = 480;
-	const int ssp = 128;
-	unsigned char* image = new unsigned char[width * height * 4];
-	
+	const int ssp = 64;
+	float* image = new float[width * height * 3];
+
 	auto start = GetTime();
 	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 70.0f, float(width) / float(height));
 	Scene* scene = new Scene();
@@ -53,29 +49,22 @@ int main(int argc, char** argv)
 						{
 							L += scene->area_lights[isect.shape->area_light_index]->L(isect.point, -isect.ray->dir);
 						}
-						L += UniformSampleOne(*scene, isect);
+						L += UniformSampleOne(*scene, isect, rngs[omp_get_thread_num()]);
 					}
 				}
 			}
-			
-			
 			L /= float(ssp);
-			L = glm::clamp(L, 0.0f, 1.0f);
-
-			int idx = (y * width + x) * 4;
-			image[idx+0] = (unsigned char)(L.x * 255.0f);
-			image[idx+1] = (unsigned char)(L.y * 255.0f);
-			image[idx+2] = (unsigned char)(L.z * 255.0f);
-			image[idx+3] = 255;
+			
+			int idx = (y * width + x) * 3;
+			image[idx+0] = L.x;
+			image[idx+1] = L.y;
+			image[idx+2] = L.z;
 		}
 	}
 	end = GetTime();
 	LogElapsedTime("Render time: ", start, end);
 
-	if (!stbi_write_bmp("IMAGE.bmp", width, height, 4, (void*)image))
-	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Error writing image\n");
-	}
+	WriteImage(image, width, height);
 	
 	delete scene;
 	delete camera;

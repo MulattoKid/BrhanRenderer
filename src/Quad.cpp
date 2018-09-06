@@ -52,7 +52,7 @@ float Quad::Area() const
 	return triangle_v0v1v2_area + triangle_v2v3v0_area;
 }
 
-glm::vec3 Quad::Sample(const float u[2]) const
+glm::vec3 Quad::Sample(RNG& rng, const float u[2]) const
 {
 	//Compute area of each triangle and entire quad
 	const float triangle_v0v1v2_area = glm::length(glm::cross(v[0] - v[1], v[2] - v[1])) / 2.0f;
@@ -65,7 +65,7 @@ glm::vec3 Quad::Sample(const float u[2]) const
 
 	//Choose triangle
 	Triangle tri;
-	const float triangle_seed = RNG::Uniform1D();
+	const float triangle_seed = rng.Uniform1D();
 	if (triangle_seed <= triangle_v0v1v2_prob)
 	{
 		tri.v[0] = v[0];
@@ -79,7 +79,7 @@ glm::vec3 Quad::Sample(const float u[2]) const
 		tri.v[2] = v[0];
 	}
 	
-	return tri.Sample(u);
+	return tri.Sample(rng, u);
 }
 
 bool Quad::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const

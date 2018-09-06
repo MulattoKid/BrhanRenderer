@@ -25,7 +25,7 @@ float Sphere::Area() const
 	return 4.0f * glm::pi<float>() * glm::pow(radius, 2);
 }
 
-glm::vec3 Sphere::Sample(const float u[2]) const
+glm::vec3 Sphere::Sample(RNG& rng, const float u[2]) const
 {
 	const float param0 = 1.0f - glm::pow(u[0], 2);
 	const float param1 = glm::two_pi<float>() * u[1];

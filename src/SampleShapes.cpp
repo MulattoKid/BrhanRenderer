@@ -1,7 +1,6 @@
 #include "glm/gtc/constants.hpp"
 #include "glm/trigonometric.hpp"
 #include "glm/geometric.hpp"
-#include "RNG.h"
 #include "SampleShapes.h"
 
 glm::vec3 UniformSampleUnitDisk(const float u[2])
@@ -12,9 +11,9 @@ glm::vec3 UniformSampleUnitDisk(const float u[2])
 	return glm::vec3(r * glm::cos(theta), r * glm::sin(theta), 0.0f);
 }
 
-glm::vec3 UniformSampleUnitDisk()
+glm::vec3 UniformSampleUnitDisk(RNG& rng)
 {
 	float u[2];
-	RNG::Uniform2D(u);
+	rng.Uniform2D(u);
 	return UniformSampleUnitDisk(u);
 }
