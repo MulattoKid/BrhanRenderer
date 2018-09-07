@@ -1,0 +1,3 @@
+src/main.cpp:						L += scene->area_lights[isect.shape->area_light_index]->L(isect.point, -isect.ray->dir);
+src/IntegratorUtilities.cpp:		glm::vec3 f = isect.bsdf->f(-isect.ray->dir, wi, BxDFType(BSDF_ALL & ~BSDF_SPECULAR));
+src/IntegratorUtilities.cpp:	glm::vec3 f = isect.bsdf->Samplef(rng, -isect.ray->dir, u_scattering, BxDFType(BSDF_ALL & ~BSDF_SPECULAR), isect.normal, &wi, &scattering_pdf, &sampled_type);
