@@ -39,6 +39,22 @@ int BSDF::NumMatchingComponents(const BxDFType type) const
 	return matching;
 }
 
+float BSDF::Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal, BxDFType flags)
+{
+	int matching_comp = 0;
+	float pdf = 0;
+	for (int i = 0; i < num_bxdfs; i++)
+	{
+		if (bxdfs[i]->MatchesFlags(flags))
+		{
+			pdf += bxdfs[i]->Pdf(wo, wi, normal);
+			matching_comp++;
+		}
+	}
+	
+	return matching_comp > 0 ? pdf / float(matching_comp) : 0.0f;
+}
+
 glm::vec3 BSDF::f(const glm::vec3& wo, const glm::vec3& wi, BxDFType flags) const
 {
 	glm::vec3 f(0.0f);

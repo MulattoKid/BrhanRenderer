@@ -13,6 +13,7 @@ struct SurfaceInteraction
 	Shape* shape = NULL;
 	glm::vec3 point;
 	glm::vec3 normal;
+	glm::vec3 wo; //Points away from point
 	BSDF* bsdf = NULL;
 	
 	~SurfaceInteraction();

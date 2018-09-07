@@ -8,12 +8,15 @@ float Shape::Pdf(const SurfaceInteraction& isect, const glm::vec3& wi) const
 {
 	Ray ray(isect.point, wi);
 	SurfaceInteraction isect_light;
-	if (!Intersect(&ray, &isect_light, 0.0f, FLT_MAX)) { return 0.0f; }
+	if (!Intersect(&ray, &isect_light, 0.0f, 10000.0f)) { return 0.0f; }
 	isect_light.point = ray.At();
 	isect_light.normal = isect_light.shape->Normal(isect_light.point);
+	isect_light.wo = -ray.dir;
 	
-	const float distance_squared = glm::pow(glm::length(ray.origin - isect_light.point), 2);
-	return distance_squared / (glm::abs(glm::dot(isect_light.normal, -wi)) * Area());
+	float pdf = 1.0f / Area();
+	pdf *= glm::pow(glm::length(ray.origin - isect_light.point), 2) / glm::abs(glm::dot(isect_light.normal, isect_light.wo));
+	
+	return pdf;
 }
 
 void Shape::ComputeScatteringFunctions(SurfaceInteraction* isect) const

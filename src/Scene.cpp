@@ -239,6 +239,7 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, co
 		isect->ray = ray;
 		isect->point = ray->At();
 		isect->normal = isect->shape->Normal(isect->point);
+		isect->wo = -ray->dir;
 		isect->ComputeScatteringFunctions();
 	}
 	
@@ -258,6 +259,7 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_th
 		isect->ray = ray;
 		isect->point = ray->At();
 		isect->normal = isect->shape->Normal(isect->point);
+		isect->wo = -ray->dir;
 		isect->ComputeScatteringFunctions();
 	}
 	

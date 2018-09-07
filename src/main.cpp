@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 	//Init stuff
 	RNG rngs[omp_get_max_threads()];
 	const int width = 720, height = 480;
-	const int ssp = 512;
+	const int ssp = 2048;
 	float* image = new float[width * height * 3];
 
 	auto start = GetTime();
@@ -42,12 +42,15 @@ int main(int argc, char** argv)
 				{
 					if (isect.shape->IsAreaLight())
 					{
-						L += scene->area_lights[isect.shape->area_light_index]->L(isect.point, -isect.ray->dir);
+						L += scene->area_lights[isect.shape->area_light_index]->L(isect.point, isect.wo);
 					}
-					L += UniformSampleOne(*scene, isect, rngs[omp_get_thread_num()]);
+					else
+					{
+						L += UniformSampleOne(*scene, isect, rngs[omp_get_thread_num()]);
+					}
 				}
+				L /= float(ssp);
 			}
-			L /= float(ssp);
 			
 			int idx = (y * width + x) * 3;
 			image[idx+0] = L.x;
