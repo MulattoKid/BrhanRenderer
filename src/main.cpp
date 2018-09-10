@@ -12,16 +12,15 @@
 
 int main(int argc, char** argv)
 {
+	auto start = GetTime();
 	BrhanSystem system(argc, argv);
 	RNG rngs[omp_get_max_threads()];
 	float* image = new float[system.render_width * system.render_height * 3];
-
-	auto start = GetTime();
 	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 70.0f, float(system.render_width) / float(system.render_height));
 	Scene* scene = new Scene();
 	scene->Load(system.render_file);
 	auto end = GetTime();
-	LogElapsedTime("Load time: ", start, end);
+	LogElapsedTime("Intialization time: ", start, end);
 	
 	start = GetTime();
 	for (unsigned int y = 0; y < system.render_height; y++)
@@ -39,14 +38,7 @@ int main(int argc, char** argv)
 			{
 				for (unsigned int s = 0; s < system.spp; s++)
 				{
-					if (isect.shape->IsAreaLight())
-					{
-						L += scene->area_lights[isect.shape->area_light_index]->L(isect.point, isect.wo);
-					}
-					else
-					{
-						L += UniformSampleOne(*scene, isect, rngs[omp_get_thread_num()]);
-					}
+					L += system.integrator->Li(*scene, isect, rngs[omp_get_thread_num()]);
 				}
 				L /= float(system.spp);
 			}
