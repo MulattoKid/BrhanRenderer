@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 	start = GetTime();
 	for (unsigned int y = 0; y < system.render_height; y++)
 	{
-#pragma omp parallel for
+		#pragma omp parallel for
 		for (unsigned int x = 0; x < system.render_width; x++)
 		{
 			float u = float(x) / float(system.render_width);
@@ -56,9 +56,11 @@ int main(int argc, char** argv)
 			image[idx+1] = L.y;
 			image[idx+2] = L.z;
 		}
+		
+		system.UpdateProgress(y + 1);
 	}
 	end = GetTime();
-	LogElapsedTime("Render time: ", start, end);
+	LogElapsedTime("\nRender time: ", start, end);
 
 	WriteImage(image, system.render_width, system.render_height);
 	

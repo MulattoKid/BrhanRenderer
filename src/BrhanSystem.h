@@ -9,6 +9,7 @@ struct BrhanSystem
 	char* render_file;
 	
 	BrhanSystem(const int argc, char** argv);
+	void UpdateProgress(unsigned int y) const;
 };
 
 #endif

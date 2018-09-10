@@ -1,7 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "Material.h"
+#include "GlossyMaterial.h"
 #include "MatteMaterial.h"
 #include "MirrorMaterial.h"
 #include "MTL.h"
@@ -20,6 +20,7 @@ struct Model
 	std::vector<Shape*> shapes;
 	std::vector<MatteMaterial> matte_materials;
 	std::vector<MirrorMaterial> mirror_materials;
+	std::vector<GlossyMaterial> glossy_materials;
 	std::vector<Material*> materials;
 	std::vector<MTL> mtls;
 	bool has_uvs;
