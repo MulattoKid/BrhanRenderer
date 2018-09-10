@@ -69,6 +69,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 
 	//Convert tinyobj::material:_t to MTL
 	std::vector<int> matte_material_indices;
+	std::vector<int> mirror_material_indices;
 	for (size_t i = 0; i < material_ts.size(); i++)
 	{
 		tinyobj::material_t* material = &material_ts[i];
@@ -85,16 +86,32 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 		mtl->dissolve = material->dissolve;
 		mtl->illumination_model = material->illum;
 		
-		//TODO: only matte material for now
-		model->matte_materials.push_back(MatteMaterial(mtl->diffuse));
-		matte_material_indices.push_back(i);
+		//TODO: cover all supported materials
+		if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular == glm::vec3(0.0f))
+		{
+			model->matte_materials.push_back(MatteMaterial(mtl->diffuse));
+			matte_material_indices.push_back(i);
+		}
+		else if (mtl->diffuse == glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
+		{
+			model->mirror_materials.push_back(MirrorMaterial(mtl->specular));
+			mirror_material_indices.push_back(i);
+		}
+		else
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported material\n");
+		}
 	}
 	
-	//TODO: only matte material for now
+	//TODO: cover all supported materials
 	//Copy over pointers to model->materials
 	for (size_t i = 0; i < model->matte_materials.size(); i++)
 	{
 		model->materials[matte_material_indices[i]] = (Material*)(&model->matte_materials[i]);
+	}
+	for (size_t i = 0; i < model->mirror_materials.size(); i++)
+	{
+		model->materials[mirror_material_indices[i]] = (Material*)(&model->mirror_materials[i]);
 	}
 
 	//Loop over shapes - remember that what I call a Shape is NOT the same as the OBJ view of a shape

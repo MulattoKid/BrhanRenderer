@@ -24,10 +24,10 @@ int main(int argc, char** argv)
 	LogElapsedTime("Load time: ", start, end);
 	
 	start = GetTime();
-	for (int y = 0; y < system.render_height; y++)
+	for (unsigned int y = 0; y < system.render_height; y++)
 	{
 #pragma omp parallel for
-		for (int x = 0; x < system.render_width; x++)
+		for (unsigned int x = 0; x < system.render_width; x++)
 		{
 			float u = float(x) / float(system.render_width);
 			float v = float(y) / float(system.render_height);
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 			glm::vec3 L(0.0f);
 			if (scene->Intersect(&ray, &isect, camera->NEAR_PLANE, camera->FAR_PLANE))
 			{
-				for (int s = 0; s < system.spp; s++)
+				for (unsigned int s = 0; s < system.spp; s++)
 				{
 					if (isect.shape->IsAreaLight())
 					{

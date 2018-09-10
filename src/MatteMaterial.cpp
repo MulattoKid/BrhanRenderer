@@ -15,4 +15,8 @@ void MatteMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 	{
 		isect->bsdf->Add(new LambertianBRDF(Kd));
 	}
+	else
+	{
+		LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "Kd of MatteMaterial %p is (0,0,0)\n", this);
+	}
 }

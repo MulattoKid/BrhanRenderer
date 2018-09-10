@@ -71,11 +71,12 @@ newmtl shortBox
   
 #the mirror mtl
 newmtl tallBox 
- Ka 0.01 0.01 0.01
-   Kd 0.01 0.01 0.01
-   Ks 0.950 0.95 0.95
-   Ns 1000
-   illum 5
+  Ka 0.01 0.01 0.01
+  #Kd 0.01 0.01 0.01
+  Kd 0 0 0
+  Ks 0.950 0.95 0.95
+  Ns 1000
+  illum 5
 
 newmtl light
   Ns 10.0000
