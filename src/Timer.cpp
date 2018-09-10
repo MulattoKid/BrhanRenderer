@@ -17,5 +17,5 @@ void LogElapsedTime(const char* msg, std::chrono::high_resolution_clock::time_po
 	et.s = s - (et.m * 60);
 	et.ms = ms - (et.s * 1000);
 	
-	LOG_MESSAGE(false, "%s%lum %lus %lums\n", msg, et.m, et.s, et.ms);
+	LOG_MESSAGE(true, "\n%s%lum %lus %lums\n", msg, et.m, et.s, et.ms);
 }

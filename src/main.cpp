@@ -28,20 +28,15 @@ int main(int argc, char** argv)
 		#pragma omp parallel for
 		for (unsigned int x = 0; x < system.render_width; x++)
 		{
-			float u = float(x) / float(system.render_width);
-			float v = float(y) / float(system.render_height);
-			Ray ray = camera->GenerateRay(u, v);
-			SurfaceInteraction isect;
-			
 			glm::vec3 L(0.0f);
-			if (scene->Intersect(&ray, &isect, camera->NEAR_PLANE, camera->FAR_PLANE))
+			for (unsigned int s = 0; s < system.spp; s++)
 			{
-				for (unsigned int s = 0; s < system.spp; s++)
-				{
-					L += system.integrator->Li(*scene, isect, rngs[omp_get_thread_num()]);
-				}
-				L /= float(system.spp);
+				const float u = float(x) / float(system.render_width);
+				const float v = float(y) / float(system.render_height);
+				Ray ray = camera->GenerateRay(u, v);
+				L += system.integrator->Li(*scene, &ray, rngs[omp_get_thread_num()], 0, system.depth);
 			}
+			L /= float(system.spp);
 			
 			int idx = (y * system.render_width + x) * 3;
 			image[idx+0] = L.x;
@@ -52,7 +47,7 @@ int main(int argc, char** argv)
 		system.UpdateProgress(y + 1);
 	}
 	end = GetTime();
-	LogElapsedTime("\nRender time: ", start, end);
+	LogElapsedTime("Render time: ", start, end);
 
 	WriteImage(image, system.render_width, system.render_height);
 	

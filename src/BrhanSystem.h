@@ -8,6 +8,7 @@ struct BrhanSystem
 	unsigned int render_width;
 	unsigned int render_height;
 	unsigned int spp;
+	unsigned int depth;
 	char* render_file;
 	Integrator* integrator;
 	IntegratorType integrator_type;

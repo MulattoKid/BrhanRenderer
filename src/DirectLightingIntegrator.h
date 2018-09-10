@@ -5,7 +5,8 @@
 
 struct DirectLightingIntegrator : Integrator
 {
-	glm::vec3 Li(const Scene& scene, const SurfaceInteraction& isect, RNG& rng) const;
+	~DirectLightingIntegrator();
+	glm::vec3 Li(const Scene& scene, Ray* ray, RNG& rng, const unsigned int depth, const unsigned int max_depth) const;
 };
 
 #endif

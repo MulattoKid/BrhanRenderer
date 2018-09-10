@@ -6,26 +6,35 @@
 
 BrhanSystem::BrhanSystem(const int argc, char** argv)
 {
-	if (argc != 6)
+	const unsigned int num_args = 7;
+	const unsigned int arg_render_width = 1;
+	const unsigned int arg_render_height = 2;
+	const unsigned int arg_spp = 3;
+	const unsigned int arg_depth = 4;
+	const unsigned int arg_integrator = 5;
+	const unsigned int arg_file = 6;
+
+	if (argc != num_args)
 	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "5 arguments must be passed, missing %i\n", 5 - argc);
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "%lu arguments must be passed\n", num_args - 1);
 	}
 	
-	render_width = std::atoi(argv[1]);
-	render_height = std::atoi(argv[2]);
-	spp = std::atoi(argv[3]);
+	render_width = std::atoi(argv[arg_render_width]);
+	render_height = std::atoi(argv[arg_render_height]);
+	spp = std::atoi(argv[arg_spp]);
+	depth = std::atoi(argv[arg_depth]);
 	
-	if (std::strcmp(argv[4], "direct") == 0)
+	if (std::strcmp(argv[arg_integrator], "direct") == 0)
 	{
 		integrator = new DirectLightingIntegrator();
 		integrator_type = DIRECT_LIGHTING_INTEGRATOR;
 	}
 	else
 	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Integrator '%s' is not supported\n", argv[4]);
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Integrator '%s' is not supported\n", argv[arg_integrator]);
 	}
 	
-	render_file = argv[5];
+	render_file = argv[arg_file];
 }
 
 BrhanSystem::~BrhanSystem()
@@ -41,14 +50,11 @@ void BrhanSystem::UpdateProgress(unsigned int y) const
 {
 	unsigned int total_effort = render_width * render_height;
 	unsigned int progress = (unsigned int)((render_width * y) / float(total_effort) * 100.0f);
-	std::string output = "";
+	std::string output;
+	output.resize(100, ' ');
 	for (unsigned int i = 0; i < progress; i++)
 	{
-		output += "-";
-	}
-	for (unsigned int i = progress; i < 100; i++)
-	{
-		output += " ";
+		output[i] = '-';
 	}
 	LOG_MESSAGE(true, "\rRender progress (%lu\%): [%s]", progress, output.c_str());
 }
