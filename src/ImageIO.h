@@ -1,6 +1,8 @@
 #ifndef IMAGEIO_H
 #define IMAGEIO_H
 
-void WriteImage(const float* result, const int width, const int height);
+#include "BrhanSystem.h"
+
+void WriteImage(const float* result, const BrhanSystem& system);
 
 #endif

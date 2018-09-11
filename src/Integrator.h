@@ -8,7 +8,8 @@
 
 enum IntegratorType
 {
-	DIRECT_LIGHTING_INTEGRATOR
+	DIRECT_LIGHTING_INTEGRATOR,
+	PATH_INTEGRATOR
 };
 
 struct Integrator

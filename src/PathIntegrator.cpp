@@ -1,3 +1,8 @@
+#include "BSDF.h"
+#include "BxDF.h"
+#include "glm/geometric.hpp"
+#include "IntegratorUtilities.h"
+#include "Logger.h"
 #include "PathIntegrator.h"
 
 PathIntegrator::~PathIntegrator()
@@ -5,5 +10,59 @@ PathIntegrator::~PathIntegrator()
 
 glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsigned int depth, const unsigned int max_depth) const
 {
-	//TODO
+	glm::vec3 L(0.0f);
+	glm::vec3 path_throughput(1.0f);
+	bool specular_bounce = false;
+	
+	glm::vec3 Ls[max_depth];
+	for (unsigned int b = 0; b < max_depth; b++)
+	{
+		SurfaceInteraction isect;
+		bool intersected = scene.Intersect(ray, &isect, 0.0001f, 10000.0f);
+	
+		//depth==0: this is the first bounce and direct illumination from light
+		//			sources haven't been accounted for yet
+		//specular_bounce==true: the previous iteration had no way of evaluating
+		//			the direct illumination as it's a delta function
+		if (b == 0 || specular_bounce)
+		{
+			if (intersected)
+			{
+				if (isect.shape->IsAreaLight())
+				{
+					L += path_throughput * isect.Le(scene);
+				}
+			}
+			//TODO: account for infitie area lights (no geometry)
+		}
+		
+		if (!intersected || b >= max_depth) { break; }
+		
+		//Sample direct illumination from lights
+		glm::vec3 Ld = path_throughput * UniformSampleOne(scene, isect, rng);
+		//glm::vec3 Ld = UniformSampleOne(scene, isect, rng);
+		L += Ld;
+		Ls[b] = Ld;
+		
+		//Sample BSDF to get new direction
+		float u[2];
+		rng.Uniform2D(u);
+		glm::vec3 wi(0.0f);
+		float pdf;
+		BxDFType sampled_type;
+		glm::vec3 f = isect.bsdf->Samplef(rng, isect.wo, u, BSDF_ALL, isect.normal, &wi, &pdf, &sampled_type);
+		if (pdf != 0.0f && f != glm::vec3(0.0f))
+		{
+			path_throughput *= f * glm::abs(glm::dot(isect.normal, wi)) / pdf; 
+			specular_bounce = (sampled_type & BSDF_SPECULAR) != 0;
+			*ray = Ray(isect.point, wi);
+		}
+		
+		if (b == 1)
+		{
+			return Ls[1];
+		}
+	}
+	
+	return L;
 }

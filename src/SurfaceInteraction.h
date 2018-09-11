@@ -5,6 +5,7 @@
 
 struct BSDF;
 struct Ray;
+struct Scene;
 struct Shape;
 
 struct SurfaceInteraction
@@ -18,6 +19,7 @@ struct SurfaceInteraction
 	
 	~SurfaceInteraction();
 	void ComputeScatteringFunctions();
+	glm::vec3 Le(const Scene& scene);
 };
 
 #endif

@@ -5,6 +5,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 //#define STBI_MSC_SECURE_CRT
 #include "stb/stb_image_write.h"
+#include <string>
 
 float GammaCorrect(float v)
 {
@@ -19,16 +20,16 @@ unsigned char ToUnsignedChar(float v)
 	return (unsigned char)(tmp);
 }
 
-void WriteImage(const float* result, const int width, const int height)
+void WriteImage(const float* result, const BrhanSystem& system)
 {
-	unsigned char* image = new unsigned char[width * height * 4];
+	unsigned char* image = new unsigned char[system.render_width * system.render_height * 4];
 
-	for (int y = 0; y < height; y++)
+	for (unsigned int y = 0; y < system.render_height; y++)
 	{
-		for (int x = 0; x < width; x++)
+		for (unsigned int x = 0; x < system.render_width; x++)
 		{
-			int result_idx =(y * width + x) * 3; 
-			int image_idx = (y * width + x) * 4;
+			int result_idx = (y * system.render_width + x) * 3; 
+			int image_idx = (y * system.render_width + x) * 4;
 			for (int i = 0; i < 3; i++)
 			{
 				image[image_idx + i] = ToUnsignedChar(result[result_idx + i]);
@@ -37,7 +38,18 @@ void WriteImage(const float* result, const int width, const int height)
 		}
 	}
 
-	if (!stbi_write_bmp("IMAGE.bmp", width, height, 4, (void*)image))
+	std::string filename = std::to_string(system.render_width) + "x" + std::to_string(system.render_height) + "_" + std::to_string(system.spp) + "SPP_";
+	if (system.integrator_type == IntegratorType::DIRECT_LIGHTING_INTEGRATOR)
+	{
+		filename += "DIRECT";
+	}
+	else if (system.integrator_type == IntegratorType::PATH_INTEGRATOR)
+	{
+		filename += "PATH";
+	}
+	filename += "_" + std::to_string(system.depth) + "DEPTH.bmp";
+	
+	if (!stbi_write_bmp(filename.c_str(), system.render_width, system.render_height, 4, (void*)image))
 	{
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Error writing image\n");
 	}

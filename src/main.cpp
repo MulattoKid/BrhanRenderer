@@ -46,10 +46,31 @@ int main(int argc, char** argv)
 		
 		system.UpdateProgress(y + 1);
 	}
+	/*for (unsigned int y = 237; y < 238; y++)
+	{
+		for (unsigned int x = 354; x < 355; x++)
+		{
+			glm::vec3 L(0.0f);
+			for (unsigned int s = 0; s < system.spp; s++)
+			{
+				const float u = float(x) / float(system.render_width);
+				const float v = float(y) / float(system.render_height);
+				Ray ray = camera->GenerateRay(u, v);
+				glm::vec3 path_throughput(1.0f);
+				L += system.integrator->Li(*scene, &ray, rngs[omp_get_thread_num()], 0, system.depth);
+			}
+			L /= float(system.spp);
+			
+			int idx = (y * system.render_width + x) * 3;
+			image[idx+0] = L.x;
+			image[idx+1] = L.y;
+			image[idx+2] = L.z;
+		}
+	}*/
 	end = GetTime();
 	LogElapsedTime("Render time: ", start, end);
 
-	WriteImage(image, system.render_width, system.render_height);
+	WriteImage(image, system);
 	
 	delete scene;
 	delete camera;

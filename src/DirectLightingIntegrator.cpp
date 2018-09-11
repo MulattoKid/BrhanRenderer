@@ -4,8 +4,6 @@
 #include "glm/geometric.hpp"
 #include "IntegratorUtilities.h"
 
-#include "Logger.h"
-
 DirectLightingIntegrator::~DirectLightingIntegrator()
 {}
 
@@ -18,7 +16,7 @@ glm::vec3 DirectLightingIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, c
 	
 	if (isect.shape->IsAreaLight())
 	{
-		L += scene.area_lights[isect.shape->area_light_index]->L(isect.point, isect.wo);
+		L += isect.Le(scene);
 	}
 	L += UniformSampleOne(scene, isect, rng);
 	
@@ -33,8 +31,7 @@ glm::vec3 DirectLightingIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, c
 	if (pdf != 0.0f && f != glm::vec3(0.0f))
 	{
 		Ray r(isect.point, wi);
-		//L += (f * Li(scene, &r, rng, depth + 1, max_depth)) / pdf;
-		return (f * Li(scene, &r, rng, depth + 1, max_depth)) / pdf;
+		L += (f * Li(scene, &r, rng, depth + 1, max_depth)) / pdf;
 	}
 	
 	return L;

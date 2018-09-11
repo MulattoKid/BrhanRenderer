@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include "DirectLightingIntegrator.h"
 #include "Logger.h"
+#include "PathIntegrator.h"
 #include <string>
 
 BrhanSystem::BrhanSystem(const int argc, char** argv)
@@ -28,6 +29,11 @@ BrhanSystem::BrhanSystem(const int argc, char** argv)
 	{
 		integrator = new DirectLightingIntegrator();
 		integrator_type = DIRECT_LIGHTING_INTEGRATOR;
+	}
+	else if (std::strcmp(argv[arg_integrator], "path") == 0)
+	{
+		integrator = new PathIntegrator();
+		integrator_type = PATH_INTEGRATOR;
 	}
 	else
 	{
