@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	BrhanSystem system(argc, argv);
 	RNG rngs[omp_get_max_threads()];
 	float* image = new float[system.render_width * system.render_height * 3];
-	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 70.0f, float(system.render_width) / float(system.render_height));
+	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 63.0f, float(system.render_width) / float(system.render_height));
 	Scene* scene = new Scene();
 	scene->Load(system.render_file);
 	auto end = GetTime();

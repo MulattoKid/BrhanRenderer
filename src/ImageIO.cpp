@@ -20,6 +20,41 @@ unsigned char ToUnsignedChar(float v)
 	return (unsigned char)(tmp);
 }
 
+std::string ExtractFileNameOnly(const std::string& path)
+{
+	int file_ext_pos = -1;
+	int slash_pos = -1;
+	for (size_t i = 0; i < path.length(); i++)
+	{
+		if (path[i] == '.')
+		{
+			file_ext_pos = i;
+		}
+		else if (path[i] == '/')
+		{
+			slash_pos = i;
+		}
+	}
+	
+	unsigned int end = path.length();
+	if (file_ext_pos == -1)
+	{
+		LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "Input file does not have an extension\n");
+	}
+	else
+	{
+		end = file_ext_pos;
+	}
+	
+	unsigned int start = 0;
+	if (slash_pos != -1) 
+	{
+		start = slash_pos + 1;
+	}
+	
+	return path.substr(start, end - start);
+}
+
 void WriteImage(const float* result, const BrhanSystem& system)
 {
 	unsigned char* image = new unsigned char[system.render_width * system.render_height * 4];
@@ -38,7 +73,8 @@ void WriteImage(const float* result, const BrhanSystem& system)
 		}
 	}
 
-	std::string filename = std::to_string(system.render_width) + "x" + std::to_string(system.render_height) + "_" + std::to_string(system.spp) + "SPP_";
+	std::string filename = ExtractFileNameOnly(system.render_file) + "@" + std::to_string(system.render_width) + "x" + std::to_string(system.render_height) + "_" + std::to_string(system.spp) + "SPP_";
+	filename += std::to_string(system.depth) + "DEPTH_";
 	if (system.integrator_type == IntegratorType::DIRECT_LIGHTING_INTEGRATOR)
 	{
 		filename += "DIRECT";
@@ -47,7 +83,7 @@ void WriteImage(const float* result, const BrhanSystem& system)
 	{
 		filename += "PATH";
 	}
-	filename += "_" + std::to_string(system.depth) + "DEPTH.bmp";
+	filename += ".bmp";
 	
 	if (!stbi_write_bmp(filename.c_str(), system.render_width, system.render_height, 4, (void*)image))
 	{
