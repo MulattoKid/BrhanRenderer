@@ -13,12 +13,11 @@
 int main(int argc, char** argv)
 {
 	auto start = GetTime();
-	BrhanSystem system(argc, argv);
-	RNG rngs[omp_get_max_threads()];
-	float* image = new float[system.render_width * system.render_height * 3];
-	Camera* camera = new Camera(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, -1.0f), 63.0f, float(system.render_width) / float(system.render_height));
-	Scene* scene = new Scene();
-	scene->Load(system.render_file);
+	Camera* camera = NULL;
+	Scene* scene = NULL;
+	float* image = NULL;
+	RNG* rngs = NULL;
+	BrhanSystem system(argc, argv, &camera, &scene, &image, &rngs);
 	auto end = GetTime();
 	LogElapsedTime("Intialization time: ", start, end);
 	
@@ -34,7 +33,7 @@ int main(int argc, char** argv)
 				const float u = float(x) / float(system.render_width);
 				const float v = float(y) / float(system.render_height);
 				Ray ray = camera->GenerateRay(u, v);
-				L += system.integrator->Li(*scene, &ray, rngs[omp_get_thread_num()], 0, system.depth);
+				L += system.integrator->Li(*scene, &ray, rngs[omp_get_thread_num()], 0, system.max_depth);
 			}
 			L /= float(system.spp);
 			

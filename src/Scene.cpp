@@ -4,13 +4,17 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tinyobjloader/tiny_obj_loader.h"
 
-bool Scene::Load(const std::string& file)
+Scene::Scene(const std::vector<std::string>& model_files)
 {
-	//TODO: load scene file - only one obj file for now
-	const int num_models = 1;
-	models.resize(num_models);
+	models.resize(model_files.size());
 	
-	bool success = LoadOBJ(file, 0);
+	for (const std::string& file : model_files)
+	{
+		if (!LoadOBJ(file.c_str(), 0))
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to load model %s\n", file.c_str());
+		}
+	}
 	
 	//Create area lights
 	for (DiffuseAreaLight& dal : diffuse_area_lights)
@@ -21,18 +25,16 @@ bool Scene::Load(const std::string& file)
 
 	if (models.size() == 0) { LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "No models have been loaded\n"); }
 	if (area_lights.size() == 0) { LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "No lights have been loaded\n"); }
-	
-	return success;
 }
 
-bool Scene::LoadOBJ(const std::string& file, const int model_index)
+bool Scene::LoadOBJ(const char* file, const int model_index)
 {
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> material_ts;
 
 	std::string err;
-	bool success = tinyobj::LoadObj(&attrib, &shapes, &material_ts, &err, file.c_str()); 
+	bool success = tinyobj::LoadObj(&attrib, &shapes, &material_ts, &err, file); 
 	if (!err.empty()) //`err` may contain warning message
 	{
 	  printf("%s\n", err.c_str());
@@ -43,7 +45,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 	}
 	if (material_ts.empty())
 	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "No material detected for object '%s' - nothing to render\n", file.c_str());
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "No material detected for object '%s' - nothing to render\n", file);
 	}
 	
 	//Count number of triangles and quads to resize Model::shapes
@@ -246,7 +248,7 @@ bool Scene::LoadOBJ(const std::string& file, const int model_index)
 				"\t\t%lu matte\n"
 				"\t\t%lu mirror\n"
 				"\t\t%lu glossy\n",
-				file.c_str(),
+				file,
 				model->spheres.size(),
 				model->triangles.size(),
 				model->quads.size(),

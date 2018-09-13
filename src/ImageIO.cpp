@@ -73,8 +73,8 @@ void WriteImage(const float* result, const BrhanSystem& system)
 		}
 	}
 
-	std::string filename = ExtractFileNameOnly(system.render_file) + "@" + std::to_string(system.render_width) + "x" + std::to_string(system.render_height) + "_" + std::to_string(system.spp) + "SPP_";
-	filename += std::to_string(system.depth) + "DEPTH_";
+	std::string filename = ExtractFileNameOnly(system.scene_file) + "@" + std::to_string(system.render_width) + "x" + std::to_string(system.render_height) + "_" + std::to_string(system.spp) + "SPP_";
+	filename += std::to_string(system.max_depth) + "DEPTH_";
 	if (system.integrator_type == IntegratorType::DIRECT_LIGHTING_INTEGRATOR)
 	{
 		filename += "DIRECT";

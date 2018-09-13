@@ -2,7 +2,6 @@
 #include "BxDF.h"
 #include "glm/geometric.hpp"
 #include "IntegratorUtilities.h"
-#include "Logger.h"
 #include "PathIntegrator.h"
 
 PathIntegrator::~PathIntegrator()

@@ -2,6 +2,7 @@
 #include "glm/geometric.hpp"
 #include "glm/gtc/constants.hpp"
 #include "glm/trigonometric.hpp"
+#include "Logger.h"
 #include "SampleShapes.h"
 
 #include <stdio.h>
@@ -39,6 +40,14 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& view_direction, const
 	this->vertical_end = lens_height * (-this->up);
 	this->NEAR_PLANE = 0.0001f;
 	this->FAR_PLANE = 10000.0f;
+	
+	LOG_MESSAGE(true, "Loaded camera:\n"
+					  "\tposition [%f %f %f]\n"
+					  "\tview_direction [%f %f %f]\n"
+					  "\tvertical_fov [%f]\n",
+					  position.x, position.y, position.z,
+					  view_direction.x, view_direction.y, view_direction.z,
+					  vertical_fov);
 }
 
 

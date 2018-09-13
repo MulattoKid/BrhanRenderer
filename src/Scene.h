@@ -15,8 +15,8 @@ struct Scene
 	std::vector<DiffuseAreaLight> diffuse_area_lights;
 	std::vector<AreaLight*> area_lights;
 	
-	bool Load(const std::string& scene_file);
-	bool LoadOBJ(const std::string& file, const int model_index);
+	Scene(const std::vector<std::string>& model_files);
+	bool LoadOBJ(const char* file, const int model_index);
 	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const;
 	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const;
 };
