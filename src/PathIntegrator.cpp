@@ -40,28 +40,26 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		
 		//Sample direct illumination from lights
 		glm::vec3 Ld = path_throughput * UniformSampleOne(scene, isect, rng);
-		//glm::vec3 Ld = UniformSampleOne(scene, isect, rng);
 		L += Ld;
 		Ls[b] = Ld;
 		
 		//Sample BSDF to get new direction
 		float u[2];
 		rng.Uniform2D(u);
-		glm::vec3 wi(0.0f);
+		glm::vec3 wi;
 		float pdf;
 		BxDFType sampled_type;
 		glm::vec3 f = isect.bsdf->Samplef(rng, isect.wo, u, BSDF_ALL, isect.normal, &wi, &pdf, &sampled_type);
-		if (pdf != 0.0f && f != glm::vec3(0.0f))
-		{
-			path_throughput *= f * glm::abs(glm::dot(isect.normal, wi)) / pdf; 
-			specular_bounce = (sampled_type & BSDF_SPECULAR) != 0;
-			*ray = Ray(isect.point, wi);
-		}
+		if (pdf == 0.0f && f == glm::vec3(0.0f)) { break; }
+		path_throughput *= f * glm::abs(glm::dot(isect.normal, wi)) / pdf;
+		if (path_throughput.x <= 0.0f && path_throughput.y <= 0.0f && path_throughput.z <= 0.0f) { break; }
+		specular_bounce = (sampled_type & BSDF_SPECULAR) != 0;
+		*ray = Ray(isect.point, wi);
 		
-		if (b == 1)
+		/*if (b == 1)
 		{
 			return Ls[1];
-		}
+		}*/
 	}
 	
 	return L;
