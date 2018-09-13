@@ -14,7 +14,6 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 	glm::vec3 path_throughput(1.0f);
 	bool specular_bounce = false;
 	
-	glm::vec3 Ls[max_depth];
 	for (unsigned int b = 0; b < max_depth; b++)
 	{
 		SurfaceInteraction isect;
@@ -41,7 +40,6 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		//Sample direct illumination from lights
 		glm::vec3 Ld = path_throughput * UniformSampleOne(scene, isect, rng);
 		L += Ld;
-		Ls[b] = Ld;
 		
 		//Sample BSDF to get new direction
 		float u[2];
@@ -55,11 +53,6 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		if (path_throughput.x <= 0.0f && path_throughput.y <= 0.0f && path_throughput.z <= 0.0f) { break; }
 		specular_bounce = (sampled_type & BSDF_SPECULAR) != 0;
 		*ray = Ray(isect.point, wi);
-		
-		/*if (b == 1)
-		{
-			return Ls[1];
-		}*/
 	}
 	
 	return L;
