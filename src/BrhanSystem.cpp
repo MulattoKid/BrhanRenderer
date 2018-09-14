@@ -8,56 +8,23 @@
 #include "PathIntegrator.h"
 #include <string>
 
-/*BrhanSystem::BrhanSystem(const int argc, char** argv)
-{
-	const unsigned int num_args = 7;
-	const unsigned int arg_render_width = 1;
-	const unsigned int arg_render_height = 2;
-	const unsigned int arg_spp = 3;
-	const unsigned int arg_depth = 4;
-	const unsigned int arg_integrator = 5;
-	const unsigned int arg_file = 6;
-
-	if (argc != num_args)
-	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "%lu arguments must be passed\n", num_args - 1);
-	}
-	
-	render_width = std::atoi(argv[arg_render_width]);
-	render_height = std::atoi(argv[arg_render_height]);
-	spp = std::atoi(argv[arg_spp]);
-	depth = std::atoi(argv[arg_depth]);
-	
-	if (std::strcmp(argv[arg_integrator], "direct") == 0)
-	{
-		integrator = new DirectLightingIntegrator();
-		integrator_type = DIRECT_LIGHTING_INTEGRATOR;
-	}
-	else if (std::strcmp(argv[arg_integrator], "path") == 0)
-	{
-		integrator = new PathIntegrator();
-		integrator_type = PATH_INTEGRATOR;
-	}
-	else
-	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Integrator '%s' is not supported\n", argv[arg_integrator]);
-	}
-	
-	render_file = argv[arg_file];
-}*/
-
 void BrhanSystem::LoadCamera(const std::string& line)
 {
 	static const std::string position_str = "position";
 	glm::vec3 position(0.0f);
+	bool found_position = false;
 	static const std::string view_direction_str = "view_direction";
 	glm::vec3 view_direction(0.0f);
+	bool found_view_direction = false;
 	static const std::string vertical_fov_str = "vertical_fov";
 	float vertical_fov = 0.0f;
+	bool found_vertical_fov = false;
 	static const std::string width_str = "width";
 	unsigned int width = 0;
+	bool found_width = false;
 	static const std::string height_str = "height";
 	unsigned int height = 0;
+	bool found_height = false;
 	
 	unsigned int index = 7; //Eat "Camera "
 	while (index < line.length())
@@ -72,6 +39,7 @@ void BrhanSystem::LoadCamera(const std::string& line)
 				position[i] = std::stof(line.substr(index, end - index));
 				index = end + 1; //+1 to eat space
 			}
+			found_position = true;
 		}
 		else if (line.compare(index, view_direction_str.length(), view_direction_str) == 0)
 		{
@@ -83,6 +51,7 @@ void BrhanSystem::LoadCamera(const std::string& line)
 				view_direction[i] = std::stof(line.substr(index, end - index));
 				index = end + 1; //+1 to eat space
 			}
+			found_view_direction = true;
 		}
 		else if (line.compare(index, vertical_fov_str.length(), vertical_fov_str) == 0)
 		{
@@ -91,6 +60,7 @@ void BrhanSystem::LoadCamera(const std::string& line)
 			while (line[end] != ']') { end++; }
 			vertical_fov = std::stof(line.substr(index, end - index));
 			index = end + 1; //+1 to eat space
+			found_vertical_fov = true;
 		}
 		else if (line.compare(index, width_str.length(), width_str) == 0)
 		{
@@ -99,6 +69,7 @@ void BrhanSystem::LoadCamera(const std::string& line)
 			while (line[end] != ']') { end++; }
 			width = std::stoi(line.substr(index, end - index));
 			index = end + 1; //+1 to eat space
+			found_width = true;
 		}
 		else if (line.compare(index, height_str.length(), height_str) == 0)
 		{
@@ -107,24 +78,49 @@ void BrhanSystem::LoadCamera(const std::string& line)
 			while (line[end] != ']') { end++; }
 			height = std::stoi(line.substr(index, end - index));
 			index = end + 1; //+1 to eat space
+			found_height = true;
 		}
 		
 		index++;
 	}
 	
+	if (!found_position)
+  	{
+  		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to locate camera position\n");
+  	}
+  	if (!found_view_direction)
+  	{
+  		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to locate camera view direction\n");
+  	}
+  	if (!found_vertical_fov)
+  	{
+  		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to locate camera vertical FOV\n");
+  	}
+  	if (!found_width)
+  	{
+  		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to locate camera film width\n");
+  	}
+  	if (!found_height)
+  	{
+  		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to locate camera film height\n");
+  	}
+	
 	camera_position = position;
 	camera_view_direction = view_direction;
 	camera_vertical_fov = vertical_fov;
-	render_width = width;
-	render_height = height;
+	film_width = width;
+	film_height = height;
 }
 
 void BrhanSystem::LoadIntegrator(const std::string& line)
 {
 	static const std::string type_str = "type";
 	std::string type = "";
+	bool found_type = false;
 	static const std::string spp_str = "spp";
+	bool found_spp = false;
 	static const std::string max_depth_str = "max_depth";
+	bool found_max_depth = false;
 	
 	unsigned int index = 11; //Eat "Integrator "
 	while (index < line.length())
@@ -149,6 +145,7 @@ void BrhanSystem::LoadIntegrator(const std::string& line)
 			{
 				LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Integrator type %s is not supported\n", type.c_str());
 			}
+			found_type = true;
 		}
 		else if (line.compare(index, spp_str.length(), spp_str) == 0)
 		{
@@ -156,6 +153,7 @@ void BrhanSystem::LoadIntegrator(const std::string& line)
 			unsigned int end = index + 1;
 			while (line[end] != ']') { end++; }
 			spp = std::stoi(line.substr(index, end - index));
+			found_spp = true;
 		}
 		else if (line.compare(index, max_depth_str.length(), max_depth_str) == 0)
 		{
@@ -163,10 +161,24 @@ void BrhanSystem::LoadIntegrator(const std::string& line)
 			unsigned int end = index + 1;
 			while (line[end] != ']') { end++; }
 			max_depth = std::stoi(line.substr(index, end - index));
+			found_max_depth = true;
 		}
 	
 		index ++;
 	}
+	
+	if (!found_type)
+  	{
+  		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to locate integrator type\n");
+  	}
+  	if (!found_spp)
+  	{
+  		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to locate spp (samples-per-pixel)\n");
+  	}
+  	if (!found_max_depth)
+  	{
+  		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to locate max depth (number of bounces)\n");
+  	}
 	
 	LOG_MESSAGE(true, "Loaded integrator:\n"
 					  "\ttype %s\n"
@@ -230,7 +242,7 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   	}
 }
 
-BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** image, RNG** rngs)
+BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, PixelSampler** pixel_sampler)
 {
 	const unsigned int num_args = 2;
 	const unsigned int arg_file = 1;
@@ -243,10 +255,11 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 	scene_file = argv[arg_file];
 	LoadSceneFile(scene_file);
 	
-	*camera = new Camera(camera_position, camera_view_direction, camera_vertical_fov, float(render_width) / float(render_height));
-	*scene = new Scene(model_files);
-	*image = new float[render_width * render_height * 3];
+	*camera = new Camera(camera_position, camera_view_direction, camera_vertical_fov, float(film_width) / float(film_height));
+	*film = new float[film_width * film_height * 3];
 	*rngs = new RNG[omp_get_max_threads()];
+	*pixel_sampler = new PixelSampler(spp, film_width, film_height);
+	*scene = new Scene(model_files);
 }
 
 BrhanSystem::~BrhanSystem()
@@ -260,8 +273,8 @@ BrhanSystem::~BrhanSystem()
 
 void BrhanSystem::UpdateProgress(unsigned int y) const
 {
-	unsigned int total_effort = render_width * render_height;
-	unsigned int progress = (unsigned int)((render_width * y) / float(total_effort) * 100.0f);
+	unsigned int total_effort = film_width * film_height;
+	unsigned int progress = (unsigned int)((film_width * y) / float(total_effort) * 100.0f);
 	std::string output;
 	output.resize(100, ' ');
 	for (unsigned int i = 0; i < progress; i++)

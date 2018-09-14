@@ -55,25 +55,25 @@ std::string ExtractFileNameOnly(const std::string& path)
 	return path.substr(start, end - start);
 }
 
-void WriteImage(const float* result, const BrhanSystem& system)
+void WriteImage(const float* film, const BrhanSystem& system)
 {
-	unsigned char* image = new unsigned char[system.render_width * system.render_height * 4];
+	unsigned char* image = new unsigned char[system.film_width * system.film_height * 4];
 
-	for (unsigned int y = 0; y < system.render_height; y++)
+	for (unsigned int y = 0; y < system.film_height; y++)
 	{
-		for (unsigned int x = 0; x < system.render_width; x++)
+		for (unsigned int x = 0; x < system.film_width; x++)
 		{
-			int result_idx = (y * system.render_width + x) * 3; 
-			int image_idx = (y * system.render_width + x) * 4;
+			int film_idx = (y * system.film_width + x) * 3; 
+			int image_idx = (y * system.film_width + x) * 4;
 			for (int i = 0; i < 3; i++)
 			{
-				image[image_idx + i] = ToUnsignedChar(result[result_idx + i]);
+				image[image_idx + i] = ToUnsignedChar(film[film_idx + i]);
 			}
 			image[image_idx+3] = 255;
 		}
 	}
 
-	std::string filename = ExtractFileNameOnly(system.scene_file) + "@" + std::to_string(system.render_width) + "x" + std::to_string(system.render_height) + "_" + std::to_string(system.spp) + "SPP_";
+	std::string filename = ExtractFileNameOnly(system.scene_file) + "@" + std::to_string(system.film_width) + "x" + std::to_string(system.film_height) + "_" + std::to_string(system.spp) + "SPP_";
 	filename += std::to_string(system.max_depth) + "DEPTH_";
 	if (system.integrator_type == IntegratorType::DIRECT_LIGHTING_INTEGRATOR)
 	{
@@ -85,7 +85,7 @@ void WriteImage(const float* result, const BrhanSystem& system)
 	}
 	filename += ".bmp";
 	
-	if (!stbi_write_bmp(filename.c_str(), system.render_width, system.render_height, 4, (void*)image))
+	if (!stbi_write_bmp(filename.c_str(), system.film_width, system.film_height, 4, (void*)image))
 	{
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Error writing image\n");
 	}

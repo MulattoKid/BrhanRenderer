@@ -3,6 +3,6 @@
 
 #include "BrhanSystem.h"
 
-void WriteImage(const float* result, const BrhanSystem& system);
+void WriteImage(const float* film, const BrhanSystem& system);
 
 #endif
