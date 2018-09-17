@@ -25,7 +25,11 @@ int main(int argc, char** argv)
 	for (unsigned int y = 0; y < system.film_height; y++)
 	{
 		#pragma omp parallel for
+#ifdef _WIN32
+		for (int x = 0; x < int(system.film_width); x++)
+#else
 		for (unsigned int x = 0; x < system.film_width; x++)
+#endif
 		{
 			//Center coordinates of pixel
 			const float u = (float(x) + 0.5f) / float(system.film_width);
