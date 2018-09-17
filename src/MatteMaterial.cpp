@@ -8,6 +8,11 @@ MatteMaterial::MatteMaterial(const glm::vec3& Kd)
 	this->Kd = Kd;
 }
 
+void MatteMaterial::Info() const
+{
+	LOG_MESSAGE(true, "Matte material: Kd=(%f %f %f)\n", Kd.x, Kd.y, Kd.z);
+}
+
 void MatteMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 {
 	isect->bsdf = new BSDF();

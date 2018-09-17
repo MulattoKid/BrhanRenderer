@@ -22,7 +22,7 @@ glm::vec3 SpecularBRDF::f(const glm::vec3& wo, const glm::vec3& wi) const
 glm::vec3 SpecularBRDF::Samplef(const glm::vec3& wo, const float u[2], const glm::vec3& normal,
 							    glm::vec3* wi, float* pdf, BxDFType* sampled_type) const
 {
-	*wi = glm::reflect(-wo, normal); //GLM expects the idnicent vector to be incoming - flip wo
+	*wi = glm::reflect(-wo, normal); //GLM expects the incident vector to be incoming -> flip wo
 	*pdf = 1.0f;
 	*sampled_type = type;
 	return R;

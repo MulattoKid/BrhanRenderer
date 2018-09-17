@@ -72,7 +72,7 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 	//Convert tinyobj::material:_t to MTL
 	std::vector<int> matte_material_indices;
 	std::vector<int> mirror_material_indices;
-	std::vector<int> glossy_material_indices;
+	std::vector<int> plastic_material_indices;
 	for (size_t i = 0; i < material_ts.size(); i++)
 	{
 		tinyobj::material_t* material = &material_ts[i];
@@ -102,8 +102,8 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 		}
 		else if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
 		{
-			model->glossy_materials.push_back(GlossyMaterial(mtl->diffuse, mtl->specular));
-			glossy_material_indices.push_back(i);
+			model->plastic_materials.push_back(PlasticMaterial(mtl->diffuse, mtl->specular));
+			plastic_material_indices.push_back(i);
 		}
 		else
 		{
@@ -121,9 +121,9 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 	{
 		model->materials[mirror_material_indices[i]] = (Material*)(&model->mirror_materials[i]);
 	}
-	for (size_t i = 0; i < model->glossy_materials.size(); i++)
+	for (size_t i = 0; i < model->plastic_materials.size(); i++)
 	{
-		model->materials[glossy_material_indices[i]] = (Material*)(&model->glossy_materials[i]);
+		model->materials[plastic_material_indices[i]] = (Material*)(&model->plastic_materials[i]);
 	}
 
 	//Loop over shapes - remember that what I call a Shape is NOT the same as the OBJ view of a shape
@@ -247,7 +247,7 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				"\t%lu materials\n"
 				"\t\t%lu matte\n"
 				"\t\t%lu mirror\n"
-				"\t\t%lu glossy\n",
+				"\t\t%lu plastic\n",
 				file,
 				model->spheres.size(),
 				model->triangles.size(),
@@ -256,7 +256,7 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				model->materials.size(),
 				model->matte_materials.size(),
 				model->mirror_materials.size(),
-				model->glossy_materials.size());
+				model->plastic_materials.size());
 	
 	return true;
 }

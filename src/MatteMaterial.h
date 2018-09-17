@@ -8,6 +8,7 @@ struct MatteMaterial : Material
 	glm::vec3 Kd;
 
 	MatteMaterial(const glm::vec3& Kd);
+	void Info() const;
 	void ComputeScatteringFunctions(SurfaceInteraction* isect) const;
 };
 

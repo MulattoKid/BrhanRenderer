@@ -1,16 +1,21 @@
 #include "BSDF.h"
-#include "GlossyMaterial.h"
+#include "PlasticMaterial.h"
 #include "LambertianBRDF.h"
 #include "Logger.h"
 #include "SpecularBRDF.h"
 
-GlossyMaterial::GlossyMaterial(const glm::vec3& Kd, const glm::vec3& Ks)
+PlasticMaterial::PlasticMaterial(const glm::vec3& Kd, const glm::vec3& Ks)
 {
 	this->Kd = Kd;
 	this->Ks = Ks;
 }
 
-void GlossyMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
+void PlasticMaterial::Info() const
+{
+	LOG_MESSAGE(true, "Plastic material: Kd=(%f %f %f) Ks=(%f %f %f)\n", Kd.x, Kd.y, Kd.z, Ks.x, Ks.y, Ks.z);
+}
+
+void PlasticMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 {
 	isect->bsdf = new BSDF();
 	if (Kd != glm::vec3(0.0f))

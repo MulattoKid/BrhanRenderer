@@ -5,6 +5,7 @@
 
 struct Material
 {
+	virtual void Info() const = 0;
 	virtual void ComputeScatteringFunctions(SurfaceInteraction* isect) const = 0;
 };
 

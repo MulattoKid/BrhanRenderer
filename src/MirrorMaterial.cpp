@@ -8,6 +8,11 @@ MirrorMaterial::MirrorMaterial(const glm::vec3& Ks)
 	this->Ks = Ks;
 }
 
+void MirrorMaterial::Info() const
+{
+	LOG_MESSAGE(true, "Mirror material: Ks=(%f %f %f)\n", Ks.x, Ks.y, Ks.z);
+}
+
 void MirrorMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 {
 	isect->bsdf = new BSDF();

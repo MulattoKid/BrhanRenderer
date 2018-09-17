@@ -66,7 +66,9 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 	f *= glm::abs(glm::dot(isect.normal, wi));
 	if (scattering_pdf > 0.0f && f != glm::vec3(0.0f)) //Light has a probability of being reflected from wi, via the point, and out wo, and some light will due to the material at the point
 	{
-		bool sampled_specular = sampled_type & BSDF_SPECULAR;
+		Li = glm::vec3(0.0f); //Reset
+		weight = 1.0f; //Reset
+		bool sampled_specular = (sampled_type & BSDF_SPECULAR) != 0;
 		if (!sampled_specular) //Multiple-importance sampling shouldn't be applied as there's only one direction that can be sampled
 		{
 			light_pdf = area_light->PdfLi(isect, wi);
@@ -76,7 +78,6 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 			}
 			weight = PowerHeuristic(1, scattering_pdf, 1, light_pdf);
 		}
-		Li = glm::vec3(0.0f); //Reset
 		//Check if the sampled direction intersects the light source's geometry before anything else (direct light)
 		Ray light_ray(isect.point, wi);
 		SurfaceInteraction light_isect;

@@ -26,10 +26,7 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		{
 			if (intersected)
 			{
-				if (isect.shape->IsAreaLight())
-				{
-					L += path_throughput * isect.Le(scene);
-				}
+				L += path_throughput * isect.Le(scene);
 			}
 			//TODO: account for infitie area lights (no geometry)
 		}
