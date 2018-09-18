@@ -195,6 +195,103 @@ void BrhanSystem::AddModel(const std::string& line)
 	model_files.push_back(line.substr(index, end - index).c_str());
 }
 
+void BrhanSystem::AddSphere(const std::string& line)
+{
+	SphereLoad sphere;
+	static const std::string center_str = "center";
+	bool found_center = false;
+	static const std::string radius_str = "radius";
+	bool found_radius = false;
+	static const std::string material_str = "material";
+	bool found_material = false;
+	static const std::string diffuse_str = "diffuse";
+	bool found_diffuse = false;
+	static const std::string specular_str = "specular";
+	bool found_specular = false;
+	
+	unsigned int index = 7; //Eat "Sphere "
+	while (index < line.length())
+	{
+		if (line.compare(index, center_str.length(), center_str) == 0)
+		{
+			index += 7; //Eat "center["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				sphere.center[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			found_center = true;
+		}
+		else if (line.compare(index, radius_str.length(), radius_str) == 0)
+		{
+			index += 7; //Eat "radius["
+			unsigned int end = index + 1;
+			while (line[end] != ']') { end++; }
+			sphere.radius = std::stof(line.substr(index, end - index));
+			found_radius = true;
+		}
+		else if (line.compare(index, material_str.length(), material_str) == 0)
+		{
+			index += 9; //Eat "material["
+			unsigned int end = index + 1;
+			while (line[end] != ']') { end++; }
+			sphere.material = line.substr(index, end - index);
+			found_material = true;
+		}
+		else if (line.compare(index, diffuse_str.length(), diffuse_str) == 0)
+		{
+			index += 8; //Eat "diffuse["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				sphere.diffuse[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			found_diffuse = true;
+		}
+		else if (line.compare(index, specular_str.length(), specular_str) == 0)
+		{
+			index += 9; //Eat "specular["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				sphere.specular[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			found_specular = true;
+		}
+	
+		index++;
+	}
+	
+	if (!found_center)
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find center of sphere\n");
+	}
+	if (!found_radius)
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find radius of sphere\n");
+	}
+	if (!found_material)
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find material of sphere\n");
+	}
+	if (!found_diffuse)
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse spectrum of sphere\n");
+	}
+	if (!found_specular)
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of sphere\n");
+	}
+	
+	spheres.push_back(sphere);
+}
+
 void BrhanSystem::LoadSceneFile(const std::string& scene_file)
 {
 	std::ifstream file(scene_file.c_str());
@@ -209,6 +306,7 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   	static const std::string integrator_str = "Integrator";
   	bool found_integrator = false;
   	static const std::string model_str = "Model";
+  	static const std::string sphere_str = "Sphere";
   	
   	std::string line;
   	while (std::getline(file, line))
@@ -227,6 +325,10 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   		else if (line.compare(0, model_str.length(), model_str) == 0)
   		{
   			AddModel(line);
+  		}
+  		else if (line.compare(0, sphere_str.length(), sphere_str) == 0)
+  		{
+  			AddSphere(line);
   		}
   	}
   	
@@ -259,7 +361,7 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 	*film = new float[film_width * film_height * 3];
 	*rngs = new RNG[omp_get_max_threads()];
 	*pixel_sampler = new PixelSampler(spp, film_width, film_height);
-	*scene = new Scene(model_files);
+	*scene = new Scene(model_files, spheres);
 }
 
 BrhanSystem::~BrhanSystem()

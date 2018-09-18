@@ -2,10 +2,12 @@
 #define SPECULARBRDF_H
 
 #include "BxDF.h"
+#include "Fresnel.h"
 
 struct SpecularBRDF : BxDF
 {
 	glm::vec3 R;
+	Fresnel* fresnel; //TODO
 
 	SpecularBRDF(const glm::vec3& R);
 	~SpecularBRDF();

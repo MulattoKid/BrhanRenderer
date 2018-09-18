@@ -1,11 +1,12 @@
 #include "FresnelDielectric.h"
 
-FresnelDielectric::FresnelDielectric()
+FresnelDielectric::FresnelDielectric(const float eta_i, const float eta_t)
 {
-	//TODO
+	this->eta_i = eta_i;
+	this->eta_t = eta_t;
 }
 
-glm::vec3 FresnelDielectric::Evaluate() const
+glm::vec3 FresnelDielectric::Evaluate(const glm::vec3& wi, const glm::vec3& normal) const
 {
-	//TODO
+	return Dielectric(wi, normal, eta_i, eta_t);
 }

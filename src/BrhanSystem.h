@@ -8,6 +8,15 @@
 #include "RNG.h"
 #include "Scene.h"
 
+struct SphereLoad
+{
+	glm::vec3 center;
+	float radius;
+	std::string material;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+};
+
 struct BrhanSystem
 {
 	glm::vec3 camera_position;
@@ -21,12 +30,14 @@ struct BrhanSystem
 	IntegratorType integrator_type;
 	char* scene_file;
 	std::vector<std::string> model_files;
+	std::vector<SphereLoad> spheres;
 	
 	BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, PixelSampler** pixel_sampler);
 	~BrhanSystem();
 	void LoadCamera(const std::string& line);
 	void LoadIntegrator(const std::string& line);
 	void AddModel(const std::string& line);
+	void AddSphere(const std::string& line);
 	void LoadSceneFile(const std::string& scene_file);
 	void UpdateProgress(unsigned int y) const;
 };

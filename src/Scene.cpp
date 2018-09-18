@@ -1,19 +1,32 @@
+#include "BrhanSystem.h"
 #include "glm/geometric.hpp"
 #include "Logger.h"
 #include "Scene.h"
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tinyobjloader/tiny_obj_loader.h"
 
-Scene::Scene(const std::vector<std::string>& model_files)
-{
-	models.resize(model_files.size());
-	
+Scene::Scene(const std::vector<std::string>& model_files, const std::vector<SphereLoad>& spheres)
+{	
+	models.resize(model_files.size() + spheres.size());
+
+	//Load obj files
 	for (const std::string& file : model_files)
 	{
 		if (!LoadOBJ(file.c_str(), 0))
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to load model %s\n", file.c_str());
 		}
+	}
+	
+	//Load spheres
+	unsigned int sphere_index = 0;
+	for (const SphereLoad& sphere : spheres)
+	{
+		if (!LoadSphere(sphere, model_files.size() + sphere_index))
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to load sphere number %lu\n", sphere_index);
+		}
+		sphere_index++;
 	}
 	
 	//Create area lights
@@ -258,6 +271,51 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				model->mirror_materials.size(),
 				model->plastic_materials.size());
 	
+	return true;
+}
+
+bool Scene::LoadSphere(const SphereLoad& sphere, const int model_index)
+{
+	Model* model = &models[model_index];
+	model->spheres.push_back(Sphere(sphere.center, sphere.radius));
+	
+	//TODO: cover all supported materials
+	if (sphere.material == "matte")
+	{
+		model->matte_materials.push_back(MatteMaterial(sphere.diffuse));
+		model->materials.push_back(&model->matte_materials[0]);
+	}
+	else if (sphere.material == "mirror")
+	{
+		model->mirror_materials.push_back(MirrorMaterial(sphere.specular));
+		model->materials.push_back(&model->mirror_materials[0]);
+	}
+	else if (sphere.material == "plastic")
+	{
+		model->plastic_materials.push_back(PlasticMaterial(sphere.diffuse, sphere.specular));
+		model->materials.push_back(&model->plastic_materials[0]);
+	}
+	else
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Material %s is not supported\n", sphere.material);
+	}
+	
+	model->spheres[0].material = model->materials[0];
+	model->shapes.push_back(&model->spheres[0]);
+	
+	LOG_MESSAGE(true,
+				"Successfully loaded sphere:\n"
+				"\t[%f %f %f] center\n"
+				"\t%f radius\n"
+				"\t%s material\n"
+				"\t\t[%f %f %f] Kd\n"
+				"\t\t[%f %f %f] Ks\n",
+				model->spheres[0].center.x, model->spheres[0].center.y, model->spheres[0].center.z,
+				model->spheres[0].radius,
+				sphere.material.c_str(),
+				sphere.diffuse.x, sphere.diffuse.y, sphere.diffuse.z,
+				sphere.specular.x, sphere.specular.y, sphere.specular.z);
+				
 	return true;
 }
 
