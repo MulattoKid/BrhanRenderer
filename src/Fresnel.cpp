@@ -3,6 +3,9 @@
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
 
+Fresnel::~Fresnel()
+{}
+
 glm::vec3 Dielectric(const glm::vec3& wi, const glm::vec3& normal, float eta_i, float eta_t)
 {
 	//Find outgoing angle theta_t using Snell's Law

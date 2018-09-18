@@ -6,6 +6,7 @@
 struct FresnelConductor : Fresnel
 {
 	FresnelConductor();
+	~FresnelConductor();
 	glm::vec3 Evaluate(const glm::vec3& wi, const glm::vec3& normal) const;
 };
 

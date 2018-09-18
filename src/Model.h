@@ -9,6 +9,7 @@
 #include "Shape.h"
 #include "Sphere.h"
 #include "SurfaceInteraction.h"
+#include "TranslucentMaterial.h"
 #include "Triangle.h"
 #include <vector>
 
@@ -21,6 +22,7 @@ struct Model
 	std::vector<MatteMaterial> matte_materials;
 	std::vector<MirrorMaterial> mirror_materials;
 	std::vector<PlasticMaterial> plastic_materials;
+	std::vector<TranslucentMaterial> translucent_materials;
 	std::vector<Material*> materials;
 	std::vector<MTL> mtls;
 	bool has_uvs;

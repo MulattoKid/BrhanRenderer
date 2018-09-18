@@ -5,6 +5,7 @@
 
 struct Fresnel
 {
+	virtual ~Fresnel();
 	virtual glm::vec3 Evaluate(const glm::vec3& wi, const glm::vec3& normal) const = 0;
 };
 

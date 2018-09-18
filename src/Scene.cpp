@@ -295,6 +295,11 @@ bool Scene::LoadSphere(const SphereLoad& sphere, const int model_index)
 		model->plastic_materials.push_back(PlasticMaterial(sphere.diffuse, sphere.specular));
 		model->materials.push_back(&model->plastic_materials[0]);
 	}
+	else if (sphere.material == "translucent")
+	{
+		model->translucent_materials.push_back(TranslucentMaterial(sphere.specular, 1.0f, 1.0f));
+		model->materials.push_back(&model->translucent_materials[0]);
+	}
 	else
 	{
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Material %s is not supported\n", sphere.material);
