@@ -1,7 +1,8 @@
 #include "BSDF.h"
-#include "PlasticMaterial.h"
+#include "FresnelNoOp.h"
 #include "LambertianBRDF.h"
 #include "Logger.h"
+#include "PlasticMaterial.h"
 #include "SpecularBRDF.h"
 
 PlasticMaterial::PlasticMaterial(const glm::vec3& Kd, const glm::vec3& Ks)
@@ -29,7 +30,7 @@ void PlasticMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) cons
 	
 	if (Ks != glm::vec3(0.0f))
 	{
-		isect->bsdf->Add(new SpecularBRDF(Ks));
+		isect->bsdf->Add(new SpecularBRDF(Ks, new FresnelNoOp()));
 	}
 	else
 	{

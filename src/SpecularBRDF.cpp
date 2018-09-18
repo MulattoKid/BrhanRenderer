@@ -1,13 +1,16 @@
 #include "glm/geometric.hpp"
 #include "SpecularBRDF.h"
 
-SpecularBRDF::SpecularBRDF(const glm::vec3& R) : BxDF(BxDFType(BSDF_REFLECTION | BSDF_SPECULAR))
+SpecularBRDF::SpecularBRDF(const glm::vec3& R, Fresnel* fresnel) : BxDF(BxDFType(BSDF_REFLECTION | BSDF_SPECULAR))
 {
 	this->R = R;
+	this->fresnel = fresnel;
 }
 
 SpecularBRDF::~SpecularBRDF()
-{}
+{
+	delete fresnel;
+}
 
 float SpecularBRDF::Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal) const
 {
@@ -25,5 +28,5 @@ glm::vec3 SpecularBRDF::Samplef(const glm::vec3& wo, const float u[2], const glm
 	*wi = glm::reflect(-wo, normal); //GLM expects the incident vector to be incoming -> flip wo
 	*pdf = 1.0f;
 	*sampled_type = type;
-	return R;
+	return fresnel->Evaluate(wo, normal) * R / glm::abs(glm::dot(wo, normal));
 }

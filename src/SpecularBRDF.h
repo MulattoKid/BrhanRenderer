@@ -7,9 +7,9 @@
 struct SpecularBRDF : BxDF
 {
 	glm::vec3 R;
-	Fresnel* fresnel; //TODO
+	Fresnel* fresnel;
 
-	SpecularBRDF(const glm::vec3& R);
+	SpecularBRDF(const glm::vec3& R, Fresnel* fresnel);
 	~SpecularBRDF();
 	float Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal) const;
 	glm::vec3 f(const glm::vec3& wo, const glm::vec3& wi) const;

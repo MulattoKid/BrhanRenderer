@@ -1,4 +1,5 @@
 #include "BSDF.h"
+#include "FresnelNoOp.h"
 #include "MirrorMaterial.h"
 #include "Logger.h"
 #include "SpecularBRDF.h"
@@ -18,7 +19,7 @@ void MirrorMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 	isect->bsdf = new BSDF();
 	if (Ks != glm::vec3(0.0f))
 	{
-		isect->bsdf->Add(new SpecularBRDF(Ks));
+		isect->bsdf->Add(new SpecularBRDF(Ks, new FresnelNoOp()));
 	}
 	else
 	{
