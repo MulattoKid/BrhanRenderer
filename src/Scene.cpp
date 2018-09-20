@@ -34,10 +34,15 @@ Scene::Scene(const std::vector<std::string>& model_files, const std::vector<Sphe
 	{
 		area_lights.push_back((AreaLight*)(&dal));
 	}
-	LOG_MESSAGE(true, "%lu area lights\n", area_lights.size());
 
 	if (models.size() == 0) { LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "No models have been loaded\n"); }
 	if (area_lights.size() == 0) { LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "No lights have been loaded\n"); }
+	
+	LOG_MESSAGE(true, "Scene:\n"
+					  "\t%lu models\n"
+					  "\t%lu area lights\n",
+					  models.size(),
+					  area_lights.size());
 }
 
 bool Scene::LoadOBJ(const char* file, const int model_index)
@@ -297,7 +302,8 @@ bool Scene::LoadSphere(const SphereLoad& sphere, const int model_index)
 	}
 	else if (sphere.material == "translucent")
 	{
-		model->translucent_materials.push_back(TranslucentMaterial(sphere.specular, 1.0f, 1.0f));
+		//TODO: input eta_i and eta_t
+		model->translucent_materials.push_back(TranslucentMaterial(sphere.specular, 1.0f, 1.5f));
 		model->materials.push_back(&model->translucent_materials[0]);
 	}
 	else

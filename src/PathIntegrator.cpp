@@ -17,7 +17,7 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 	{
 		SurfaceInteraction isect;
 		bool intersected = scene.Intersect(ray, &isect, 0.0001f, 10000.0f);
-	
+		
 		//depth==0: this is the first bounce and direct illumination from light
 		//			sources haven't been accounted for yet
 		//specular_bounce==true: the previous iteration had no way of evaluating
@@ -32,6 +32,11 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		}
 		
 		if (!intersected || b >= max_depth) { break; }
+		
+		if (b == 0 && isect.shape == &scene.models[1].spheres[0])
+		{
+			int a = 2;
+		}
 		
 		//Sample direct illumination from lights
 		glm::vec3 Ld = path_throughput * UniformSampleOne(scene, isect, rng);

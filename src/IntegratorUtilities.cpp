@@ -22,6 +22,7 @@ glm::vec3 UniformSampleAll()
 
 glm::vec3 UniformSampleOne(const Scene& scene, const SurfaceInteraction& isect, RNG& rng)
 {
+	if (scene.area_lights.size() == 0) { return glm::vec3(0.0f); }
 	const unsigned int area_light_index = rng.Uniform1D() * scene.area_lights.size();
 	const AreaLight* area_light = scene.area_lights[area_light_index];
 	float u_light[2], u_scattering[2];
