@@ -6,6 +6,11 @@
 MatteMaterial::MatteMaterial(const glm::vec3& Kd)
 {
 	this->Kd = Kd;
+	
+	if (Kd == glm::vec3(0.0f))
+	{
+		LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "Kd of MatteMaterial %p is (0,0,0)\n", this);
+	}
 }
 
 void MatteMaterial::Info() const
@@ -19,9 +24,5 @@ void MatteMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 	if (Kd != glm::vec3(0.0f))
 	{
 		isect->bsdf->Add(new LambertianBRDF(Kd));
-	}
-	else
-	{
-		LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "Kd of MatteMaterial %p is (0,0,0)\n", this);
 	}
 }

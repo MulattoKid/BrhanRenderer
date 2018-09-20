@@ -302,9 +302,13 @@ bool Scene::LoadSphere(const SphereLoad& sphere, const int model_index)
 	}
 	else if (sphere.material == "translucent")
 	{
-		//TODO: input eta_i and eta_t
-		model->translucent_materials.push_back(TranslucentMaterial(sphere.specular, 1.0f, 1.5f));
+		model->translucent_materials.push_back(TranslucentMaterial(sphere.transmittance));
 		model->materials.push_back(&model->translucent_materials[0]);
+	}
+	else if (sphere.material == "glass")
+	{
+		model->glass_materials.push_back(GlassMaterial(sphere.reflectance, sphere.transmittance));
+		model->materials.push_back(&model->glass_materials[0]);
 	}
 	else
 	{
@@ -320,12 +324,16 @@ bool Scene::LoadSphere(const SphereLoad& sphere, const int model_index)
 				"\t%f radius\n"
 				"\t%s material\n"
 				"\t\t[%f %f %f] Kd\n"
-				"\t\t[%f %f %f] Ks\n",
+				"\t\t[%f %f %f] Ks\n"
+				"\t\t[%f %f %f] Kr\n"
+				"\t\t[%f %f %f] Kt\n",
 				model->spheres[0].center.x, model->spheres[0].center.y, model->spheres[0].center.z,
 				model->spheres[0].radius,
 				sphere.material.c_str(),
 				sphere.diffuse.x, sphere.diffuse.y, sphere.diffuse.z,
-				sphere.specular.x, sphere.specular.y, sphere.specular.z);
+				sphere.specular.x, sphere.specular.y, sphere.specular.z,
+				sphere.reflectance.x, sphere.reflectance.y, sphere.reflectance.z,
+				sphere.transmittance.x, sphere.transmittance.y, sphere.transmittance.z);
 				
 	return true;
 }

@@ -1,16 +1,16 @@
-#ifndef TRANSLUCENTMATERIAL_H
-#define TRANSLUCENTMATERIAL_H
+#ifndef GLASSMATERIAL_H
+#define GLASSMATERIAL_H
 
-#include "glm/vec3.hpp"
 #include "Material.h"
 
-struct TranslucentMaterial : Material
+struct GlassMaterial : Material
 {
+	glm::vec3 R;
 	glm::vec3 T;
 	float eta_outside;
 	float eta_inside;
 
-	TranslucentMaterial(const glm::vec3& T);
+	GlassMaterial(const glm::vec3& R, const glm::vec3& T);
 	void Info() const;
 	void ComputeScatteringFunctions(SurfaceInteraction* isect) const;
 };

@@ -1,7 +1,0 @@
-Camera position[0.0 1.0 2.0] view_direction[0.0 0.0 -1.0] vertical_fov[63.0] width[1024] height[1024]
-
-Integrator type[path] spp[256] max_depth[4]
-
-#Model file[models/CornellBox/CornellBox-Empty-RG.obj]
-Model file[models/CornellBox/CornellBox-Original.obj]
-Sphere center[0.0 1.0 1.0] radius[0.25] material[translucent] diffuse[0 0 0] specular[1, 1, 1]

@@ -8,6 +8,12 @@
 #include "PathIntegrator.h"
 #include <string>
 
+SphereLoad::SphereLoad() : diffuse(0.0f),
+						   specular(0.0f),
+						   reflectance(0.0f),
+						   transmittance(0.0f)
+{}
+
 void BrhanSystem::LoadCamera(const std::string& line)
 {
 	static const std::string position_str = "position";
@@ -208,6 +214,10 @@ void BrhanSystem::AddSphere(const std::string& line)
 	bool found_diffuse = false;
 	static const std::string specular_str = "specular";
 	bool found_specular = false;
+	static const std::string reflectance_str = "reflectance";
+	bool found_reflectance = false;
+	static const std::string transmittance_str = "transmittance";
+	bool found_transmittance = false;
 	
 	unsigned int index = 7; //Eat "Sphere "
 	while (index < line.length())
@@ -264,6 +274,30 @@ void BrhanSystem::AddSphere(const std::string& line)
 			}
 			found_specular = true;
 		}
+		else if (line.compare(index, reflectance_str.length(), reflectance_str) == 0)
+		{
+			index += 12; //Eat "reflectance["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				sphere.reflectance[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			found_reflectance = true;
+		}
+		else if (line.compare(index, transmittance_str.length(), transmittance_str) == 0)
+		{
+			index += 14; //Eat "transmittance["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				sphere.transmittance[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			found_transmittance = true;
+		}
 	
 		index++;
 	}
@@ -280,13 +314,25 @@ void BrhanSystem::AddSphere(const std::string& line)
 	{
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find material of sphere\n");
 	}
-	if (!found_diffuse)
+	if (sphere.material == "matte" && !found_diffuse)
 	{
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse spectrum of sphere\n");
 	}
-	if (!found_specular)
+	if (sphere.material == "mirror" && !found_specular)
 	{
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of sphere\n");
+	}
+	if (sphere.material == "plastic" && (!found_specular || !found_specular))
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse or specular spectrum of sphere\n");
+	}
+	if (sphere.material == "translucent" && !found_transmittance)
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find transmittance spectrum of sphere\n");
+	}
+	if (sphere.material == "glass" && (!found_reflectance || !found_transmittance))
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of sphere\n");
 	}
 	
 	spheres.push_back(sphere);

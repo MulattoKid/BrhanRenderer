@@ -7,6 +7,11 @@
 MirrorMaterial::MirrorMaterial(const glm::vec3& Ks)
 {
 	this->Ks = Ks;
+	
+	if (Ks == glm::vec3(0.0f))
+	{
+		LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "Ks of MirrorMaterial %p is (0,0,0)\n", this);
+	}
 }
 
 void MirrorMaterial::Info() const
@@ -20,9 +25,5 @@ void MirrorMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 	if (Ks != glm::vec3(0.0f))
 	{
 		isect->bsdf->Add(new SpecularBRDF(Ks, new FresnelNoOp()));
-	}
-	else
-	{
-		LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "Ks of MirrorMaterial %p is (0,0,0)\n", this);
 	}
 }

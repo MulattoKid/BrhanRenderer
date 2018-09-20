@@ -10,11 +10,15 @@
 
 struct SphereLoad
 {
+	SphereLoad();
+
 	glm::vec3 center;
 	float radius;
 	std::string material;
 	glm::vec3 diffuse;
 	glm::vec3 specular;
+	glm::vec3 reflectance;
+	glm::vec3 transmittance;
 };
 
 struct BrhanSystem

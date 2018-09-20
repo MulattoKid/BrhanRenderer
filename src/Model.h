@@ -1,10 +1,11 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "PlasticMaterial.h"
+#include "GlassMaterial.h"
 #include "MatteMaterial.h"
 #include "MirrorMaterial.h"
 #include "MTL.h"
+#include "PlasticMaterial.h"
 #include "Quad.h"
 #include "Shape.h"
 #include "Sphere.h"
@@ -23,6 +24,7 @@ struct Model
 	std::vector<MirrorMaterial> mirror_materials;
 	std::vector<PlasticMaterial> plastic_materials;
 	std::vector<TranslucentMaterial> translucent_materials;
+	std::vector<GlassMaterial> glass_materials;
 	std::vector<Material*> materials;
 	std::vector<MTL> mtls;
 	bool has_uvs;
