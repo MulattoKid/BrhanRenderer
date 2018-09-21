@@ -91,6 +91,8 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 	std::vector<int> matte_material_indices;
 	std::vector<int> mirror_material_indices;
 	std::vector<int> plastic_material_indices;
+	std::vector<int> glass_material_indices;
+	std::vector<int> translucent_material_indices;
 	for (size_t i = 0; i < material_ts.size(); i++)
 	{
 		tinyobj::material_t* material = &material_ts[i];
@@ -108,24 +110,44 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 		mtl->illumination_model = material->illum;
 		
 		//TODO: cover all supported materials
-		if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular == glm::vec3(0.0f))
+		if (mtl->dissolve == 1.0f) //Fully opaque materials
 		{
-			model->matte_materials.push_back(MatteMaterial(mtl->diffuse));
-			matte_material_indices.push_back(i);
+			if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular == glm::vec3(0.0f))
+			{
+				model->matte_materials.push_back(MatteMaterial(mtl->diffuse));
+				matte_material_indices.push_back(i);
+			}
+			else if (mtl->diffuse == glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
+			{
+				model->mirror_materials.push_back(MirrorMaterial(mtl->specular));
+				mirror_material_indices.push_back(i);
+			}
+			else if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
+			{
+				model->plastic_materials.push_back(PlasticMaterial(mtl->diffuse, mtl->specular));
+				plastic_material_indices.push_back(i);
+			}
+			else
+			{
+				LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported material\n");
+			}
 		}
-		else if (mtl->diffuse == glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
+		else //Some transparency materials
 		{
-			model->mirror_materials.push_back(MirrorMaterial(mtl->specular));
-			mirror_material_indices.push_back(i);
-		}
-		else if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
-		{
-			model->plastic_materials.push_back(PlasticMaterial(mtl->diffuse, mtl->specular));
-			plastic_material_indices.push_back(i);
-		}
-		else
-		{
-			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported material\n");
+			if (mtl->index_of_refraction == 1.0f)
+			{
+				model->translucent_materials.push_back(TranslucentMaterial(mtl->transmittance));
+				translucent_material_indices.push_back(i);
+			}
+			else if (mtl->index_of_refraction >= 1.5f && mtl->index_of_refraction <= 1.6f)
+			{
+				model->glass_materials.push_back(GlassMaterial(mtl->specular, mtl->transmittance));
+				glass_material_indices.push_back(i);
+			}
+			else
+			{
+				LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported material\n");
+			}
 		}
 	}
 	
@@ -142,6 +164,14 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 	for (size_t i = 0; i < model->plastic_materials.size(); i++)
 	{
 		model->materials[plastic_material_indices[i]] = (Material*)(&model->plastic_materials[i]);
+	}
+	for (size_t i = 0; i < model->translucent_materials.size(); i++)
+	{
+		model->materials[translucent_material_indices[i]] = (Material*)(&model->translucent_materials[i]);
+	}
+	for (size_t i = 0; i < model->glass_materials.size(); i++)
+	{
+		model->materials[glass_material_indices[i]] = (Material*)(&model->glass_materials[i]);
 	}
 
 	//Loop over shapes - remember that what I call a Shape is NOT the same as the OBJ view of a shape
@@ -265,7 +295,9 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				"\t%lu materials\n"
 				"\t\t%lu matte\n"
 				"\t\t%lu mirror\n"
-				"\t\t%lu plastic\n",
+				"\t\t%lu plastic\n"
+				"\t\t%lu translucent\n"
+				"\t\t%lu glass\n",
 				file,
 				model->spheres.size(),
 				model->triangles.size(),
@@ -274,7 +306,9 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				model->materials.size(),
 				model->matte_materials.size(),
 				model->mirror_materials.size(),
-				model->plastic_materials.size());
+				model->plastic_materials.size(),
+				model->translucent_materials.size(),
+				model->glass_materials.size());
 	
 	return true;
 }

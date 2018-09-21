@@ -29,15 +29,15 @@ glm::vec3 SpecularBTDF::Samplef(const glm::vec3& wo, const float u[2], const glm
 					            glm::vec3* wi, float* pdf, BxDFType* sampled_type) const
 {
 	const bool exiting = glm::dot(wo, normal) <= 0.0f;
-	const float eta_i = exiting ? eta_inside : eta_outside;
-	const float eta_t = exiting ? eta_outside : eta_inside;
+	const float eta_from = exiting ? eta_inside : eta_outside;
+	const float eta_to = exiting ? eta_outside : eta_inside;
 	const glm::vec3 normal_wo_side = exiting ? -normal : normal;
 	
-	*wi = glm::refract(-wo, normal_wo_side, eta_i / eta_t); //GLM expects I to be incident -> flip wo
+	*wi = glm::refract(-wo, normal_wo_side, eta_from / eta_to); //GLM expects I to be incident -> flip wo
 	*pdf = 1.0f;
 	*sampled_type = type;
 	
 	const glm::vec3 Fr = fresnel_dielectric.Evaluate(wo, normal_wo_side);
-	const glm::vec3 Ft = T * (glm::vec3(1.0f) - Fr);
-	return Ft / glm::abs(glm::dot(*wi, -normal_wo_side));
+	const glm::vec3 Ft = glm::vec3(1.0f) - Fr;
+	return T * Ft / glm::abs(glm::dot(wo, normal_wo_side));
 }

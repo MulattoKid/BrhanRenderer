@@ -12,6 +12,15 @@ bool SameHemisphere(const glm::vec3& a, const glm::vec3& b, const glm::vec3& nor
 	return false;
 }
 
+glm::vec3 FlipNegativeZerosVec3(const glm::vec3& v)
+{
+	glm::vec3 f(v);
+	if (f.x == -0.0f) { f.x = 0.0f; }
+	if (f.y == -0.0f) { f.y = 0.0f; }
+	if (f.z == -0.0f) { f.z = 0.0f; }
+	return f;
+}
+
 glm::vec3 UniformSampleHemisphere(const float u[2], const glm::vec3& normal)
 {	
 	//Transform sampled point to be around supplied normal,
@@ -34,13 +43,14 @@ glm::vec3 UniformSampleHemisphere(const float u[2], const glm::vec3& normal)
 	// y's domain is [-1,1]
 	// z's domain is [0,1]
 	const glm::vec3 sampled_space_normal(0.0f, 0.0f, 1.0f);
+	if (FlipNegativeZerosVec3(normal) == sampled_space_normal) { return sample_point; } //No rotation is required
 	const glm::vec3 v = glm::cross(sampled_space_normal, normal);
 	const float s = glm::length(v);
 	const float c = glm::dot(sampled_space_normal, normal);
 	const glm::mat3 m(glm::vec3(0.0f, v[2], -v[1]), glm::vec3(-v[2], 0.0f, v[0]), glm::vec3(v[1], -v[0], 0.0f));
-	const glm::mat3 R = glm::mat3(1.0f) + m + ((m * m) * ((1.0f - c) / (s * s)));
+	const glm::mat3 rotation = glm::mat3(1.0f) + m + ((m * m) * ((1.0f - c) / (s * s)));
 	
-	return glm::normalize(R * sample_point);
+	return glm::normalize(rotation * sample_point);
 }
 
 float UniformHemispherePdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal)

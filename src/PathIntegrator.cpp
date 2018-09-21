@@ -33,11 +33,6 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		
 		if (!intersected || b >= max_depth) { break; }
 		
-		if (b == 0 && isect.shape == &scene.models[1].spheres[0])
-		{
-			int a = 2;
-		}
-		
 		//Sample direct illumination from lights
 		glm::vec3 Ld = path_throughput * UniformSampleOne(scene, isect, rng);
 		L += Ld;
@@ -49,8 +44,10 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		float pdf;
 		BxDFType sampled_type;
 		glm::vec3 f = isect.bsdf->Samplef(rng, isect.wo, u, BSDF_ALL, isect.normal, &wi, &pdf, &sampled_type);
+		
 		if (pdf == 0.0f && f == glm::vec3(0.0f)) { break; }
 		path_throughput *= f * glm::abs(glm::dot(isect.normal, wi)) / pdf;
+		
 		if (path_throughput.x <= 0.0f && path_throughput.y <= 0.0f && path_throughput.z <= 0.0f) { break; }
 		specular_bounce = (sampled_type & BSDF_SPECULAR) != 0;
 		*ray = Ray(isect.point, wi);
