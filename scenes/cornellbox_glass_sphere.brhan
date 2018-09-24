@@ -3,4 +3,4 @@ Camera position[0.0 1.0 2.0] view_direction[0.0 0.0 -1.0] vertical_fov[63.0] wid
 Integrator type[path] spp[64] max_depth[8]
 
 Model file[models/CornellBox/CornellBox-Empty-RG.obj]
-Sphere center[0.0 1.0 -0.03] radius[0.25] material[glass] reflectance[1 1 1] transmittance[1 1 1]
+Sphere center[0 1 0] radius[0.5] material[glass] reflectance[1 1 1] transmittance[1 1 1]

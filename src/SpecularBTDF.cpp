@@ -1,7 +1,7 @@
 #include "glm/geometric.hpp"
 #include "SpecularBTDF.h"
 
-#include "Logger.h"
+#include "glm/trigonometric.hpp"
 
 SpecularBTDF::SpecularBTDF(const glm::vec3& T, const float eta_outside, const float eta_inside) :
 														BxDF(BxDFType(BSDF_TRANSMISSION | BSDF_SPECULAR)),
@@ -37,7 +37,9 @@ glm::vec3 SpecularBTDF::Samplef(const glm::vec3& wo, const float u[2], const glm
 	*pdf = 1.0f;
 	*sampled_type = type;
 	
-	const glm::vec3 Fr = fresnel_dielectric.Evaluate(wo, normal_wo_side);
-	const glm::vec3 Ft = glm::vec3(1.0f) - Fr;
-	return T * Ft / glm::abs(glm::dot(wo, normal_wo_side));
+	const glm::vec3 Fr = fresnel_dielectric.Evaluate(*wi, normal_wo_side);
+	glm::vec3 Ft = glm::vec3(1.0f) - Fr;
+	//Account for non-symmetry with transmission to different medium p.961
+	//Ft *= glm::pow(eta_from, 2) / glm::pow(eta_to, 2);
+	return T * Ft / glm::abs(glm::dot(*wi, -normal_wo_side));
 }

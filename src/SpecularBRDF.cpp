@@ -28,5 +28,5 @@ glm::vec3 SpecularBRDF::Samplef(const glm::vec3& wo, const float u[2], const glm
 	*wi = glm::reflect(-wo, normal); //GLM expects the incident vector to be incoming -> flip wo
 	*pdf = 1.0f;
 	*sampled_type = type;
-	return fresnel->Evaluate(wo, normal) * R / glm::abs(glm::dot(wo, normal));
+	return fresnel->Evaluate(*wi, normal) * R / glm::abs(glm::dot(*wi, normal));
 }

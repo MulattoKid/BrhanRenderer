@@ -32,7 +32,7 @@ void GlassMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 	isect->bsdf = new BSDF();
 	if (R != glm::vec3(0.0f))
 	{
-		//isect->bsdf->Add(new SpecularBRDF(R, new FresnelDielectric(eta_outside, eta_inside)));
+		isect->bsdf->Add(new SpecularBRDF(R, new FresnelDielectric(eta_outside, eta_inside)));
 	}
 	if (T != glm::vec3(0.0f))
 	{
