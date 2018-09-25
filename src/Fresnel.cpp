@@ -20,11 +20,14 @@ glm::vec3 Dielectric(const glm::vec3& wo, const glm::vec3& normal, float eta_fro
 		normal_wo_side *= -1;
 		cos_theta_from = glm::abs(cos_theta_from);
 	}
+	float a = glm::acos(glm::dot(wo, normal_wo_side));
 	
 	//Find sine of outgoing angle theta_to using Snell's Law
 	//and sin²x + cos²x = 1
 	const float sin_theta_from = glm::sqrt(float(1.0f - glm::pow(cos_theta_from, 2)));
+	float b = glm::sin(a);
 	const float sin_theta_to = (eta_from * sin_theta_from) / eta_to;
+	float c = eta_from * sin_theta_from;
 	
 	//Check for total internal/external reflection
 	if (sin_theta_to >= 1.0f)

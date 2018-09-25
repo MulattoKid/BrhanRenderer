@@ -37,9 +37,9 @@ glm::vec3 SpecularBTDF::Samplef(const glm::vec3& wo, const float u[2], const glm
 	*pdf = 1.0f;
 	*sampled_type = type;
 	
-	const glm::vec3 Fr = fresnel_dielectric.Evaluate(*wi, normal_wo_side);
+	const glm::vec3 Fr = fresnel_dielectric.Evaluate(*wi, normal);
 	glm::vec3 Ft = glm::vec3(1.0f) - Fr;
 	//Account for non-symmetry with transmission to different medium p.961
-	//Ft *= glm::pow(eta_from, 2) / glm::pow(eta_to, 2);
+	Ft *= glm::pow(eta_from, 2) / glm::pow(eta_to, 2);
 	return T * Ft / glm::abs(glm::dot(*wi, -normal_wo_side));
 }
