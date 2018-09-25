@@ -92,6 +92,7 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 	std::vector<int> mirror_material_indices;
 	std::vector<int> plastic_material_indices;
 	std::vector<int> glass_material_indices;
+	std::vector<int> water_material_indices;
 	std::vector<int> translucent_material_indices;
 	for (size_t i = 0; i < material_ts.size(); i++)
 	{
@@ -139,6 +140,11 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				model->translucent_materials.push_back(TranslucentMaterial(mtl->transmittance));
 				translucent_material_indices.push_back(i);
 			}
+			else if (mtl->index_of_refraction >= 1.32f && mtl->index_of_refraction >= 1.35f)
+			{
+				model->water_materials.push_back(WaterMaterial(mtl->specular, mtl->transmittance));
+				water_material_indices.push_back(i);
+			}
 			else if (mtl->index_of_refraction >= 1.5f && mtl->index_of_refraction <= 1.6f)
 			{
 				model->glass_materials.push_back(GlassMaterial(mtl->specular, mtl->transmittance));
@@ -168,6 +174,10 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 	for (size_t i = 0; i < model->translucent_materials.size(); i++)
 	{
 		model->materials[translucent_material_indices[i]] = (Material*)(&model->translucent_materials[i]);
+	}
+	for (size_t i = 0; i < model->water_materials.size(); i++)
+	{
+		model->materials[water_material_indices[i]] = (Material*)(&model->water_materials[i]);
 	}
 	for (size_t i = 0; i < model->glass_materials.size(); i++)
 	{
@@ -297,6 +307,7 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				"\t\t%lu mirror\n"
 				"\t\t%lu plastic\n"
 				"\t\t%lu translucent\n"
+				"\t\t%lu water\n"
 				"\t\t%lu glass\n",
 				file,
 				model->spheres.size(),
@@ -308,6 +319,7 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				model->mirror_materials.size(),
 				model->plastic_materials.size(),
 				model->translucent_materials.size(),
+				model->water_materials.size(),
 				model->glass_materials.size());
 	
 	return true;
@@ -338,6 +350,11 @@ bool Scene::LoadSphere(const SphereLoad& sphere, const int model_index)
 	{
 		model->translucent_materials.push_back(TranslucentMaterial(sphere.transmittance));
 		model->materials.push_back(&model->translucent_materials[0]);
+	}
+	else if (sphere.material == "water")
+	{
+		model->water_materials.push_back(WaterMaterial(sphere.reflectance, sphere.transmittance));
+		model->materials.push_back(&model->water_materials[0]);
 	}
 	else if (sphere.material == "glass")
 	{

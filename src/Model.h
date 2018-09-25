@@ -13,6 +13,7 @@
 #include "TranslucentMaterial.h"
 #include "Triangle.h"
 #include <vector>
+#include "WaterMaterial.h"
 
 struct Model
 {
@@ -24,6 +25,7 @@ struct Model
 	std::vector<MirrorMaterial> mirror_materials;
 	std::vector<PlasticMaterial> plastic_materials;
 	std::vector<TranslucentMaterial> translucent_materials;
+	std::vector<WaterMaterial> water_materials;
 	std::vector<GlassMaterial> glass_materials;
 	std::vector<Material*> materials;
 	std::vector<MTL> mtls;
