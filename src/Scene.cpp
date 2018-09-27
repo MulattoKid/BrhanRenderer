@@ -140,7 +140,7 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				model->translucent_materials.push_back(TranslucentMaterial(mtl->transmittance));
 				translucent_material_indices.push_back(i);
 			}
-			else if (mtl->index_of_refraction >= 1.32f && mtl->index_of_refraction >= 1.35f)
+			else if (mtl->index_of_refraction >= 1.32f && mtl->index_of_refraction <= 1.35f)
 			{
 				model->water_materials.push_back(WaterMaterial(mtl->specular, mtl->transmittance));
 				water_material_indices.push_back(i);
@@ -237,6 +237,8 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 					//TODO: only diffuse area light for now
 					DiffuseAreaLight dal;
 					dal.shape = (Shape*)(tri);
+					//NOTE: double-sided lights are not allowed
+					dal.shape->double_sided = false;
 					dal.L_emit = tri->mtl->emission;
 					diffuse_area_lights.push_back(dal);
 					tri->area_light_index = diffuse_area_lights.size() - 1;
@@ -287,6 +289,8 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 					//TODO: only diffuse area light for now
 					DiffuseAreaLight dal;
 					dal.shape = (Shape*)(quad);
+					//NOTE: double-sided lights are not allowed
+					dal.shape->double_sided = false;
 					dal.L_emit = quad->mtl->emission;
 					diffuse_area_lights.push_back(dal);
 					quad->area_light_index = diffuse_area_lights.size() - 1;

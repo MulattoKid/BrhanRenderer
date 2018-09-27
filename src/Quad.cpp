@@ -3,6 +3,9 @@
 #include "RNG.h"
 #include "Triangle.h"
 
+Quad::Quad() : Shape(true)
+{}
+
 glm::vec3 Quad::Normal(const glm::vec3& point) const
 {
 	//Check if the point lies within the first triangle making up the quad

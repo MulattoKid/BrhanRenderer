@@ -9,6 +9,7 @@ struct Triangle : Shape
 	glm::vec3 n[3];
 	glm::vec2 uv[3];
 	
+	Triangle();
 	glm::vec3 BarycentricCoefficients(const glm::vec3& point) const;
 	glm::vec3 Normal(const glm::vec3& point) const;
 	glm::vec2 UV(const glm::vec3& point) const;

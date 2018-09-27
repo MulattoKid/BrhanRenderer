@@ -14,7 +14,7 @@ float RNG::Uniform1D()
 	float rng_f = float(rng_d);
 	if (rng_f > rng_d)
 	{
-		rng_f = std::nextafter(rng_f, -std::numeric_limits<float>::infinity());
+		rng_f = std::nextafterf(rng_f, -std::numeric_limits<float>::infinity());
 	}
 	
 	return rng_f;

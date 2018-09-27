@@ -9,6 +9,9 @@
 #include "Scene.h"
 #include "Timer.h"
 
+#include "Triangle.h"
+#include "glm/geometric.hpp"
+
 int main(int argc, char** argv)
 {
 	auto start = GetTime();
@@ -21,11 +24,26 @@ int main(int argc, char** argv)
 	auto end = GetTime();
 	LogElapsedTime("Intialization time: ", start, end);
 	
+	/*Triangle t;
+	t.v[0] = glm::vec3(0.0f, 1.0f, -1.0f);
+	t.v[1] = glm::vec3(-1.0f, -1.0f, -1.0f);
+	t.v[2] = glm::vec3(1.0f, -1.0f, -1.0f);
+	t.n[0] = glm::vec3(0.0f, 0.0f, 1.0f);
+	t.n[1] = glm::vec3(0.0f, 0.0f, 1.0f);
+	t.n[2] = glm::vec3(0.0f, 0.0f, 1.0f);
+	Ray ray(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+	SurfaceInteraction isect;
+	t.Intersect(&ray, &isect, 0.0001f, 1000.0f);
+	isect.point = ray.origin + (ray.dir * ray.t);
+	ray = SpawnRayWithOffset(isect.point, glm::normalize(glm::vec3(0.05f, 0.0f, 0.95f)), t.Normal(isect.point));
+	t.Intersect(&ray, &isect, 0.0001f, 1000.0f);
+	return 0;*/
+	
 	start = GetTime();
 	//for (unsigned int y = system.film_height / 2; y < system.film_height / 2 + 1; y++)
 	for (unsigned int y = 0; y < system.film_height; y++)
 	{
-		#pragma omp parallel for
+		//#pragma omp parallel for
 #ifdef _WIN32
 		for (int x = 0; x < int(system.film_width); x++)
 #else

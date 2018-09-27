@@ -14,7 +14,9 @@ struct Shape
 	Material* material = NULL;
 	MTL* mtl = NULL;
 	int area_light_index = -1;
+	bool double_sided;
 
+	Shape(const bool double_sided);
 	virtual glm::vec3 Normal(const glm::vec3& point) const = 0;
 	virtual glm::vec2 UV(const glm::vec3& point) const = 0;
 	virtual float Area() const = 0;

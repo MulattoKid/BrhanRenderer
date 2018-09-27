@@ -15,4 +15,6 @@ struct Ray
 	glm::vec3 At(float t) const;
 };
 
+Ray SpawnRayWithOffset(const glm::vec3& origin, const glm::vec3 dir, const glm::vec3& normal);
+
 #endif

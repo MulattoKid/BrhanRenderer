@@ -51,7 +51,7 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 			//Check for visibility to light
 			//TODO: I NEED TO MAKE A STABLE WAY OF MAKING SURE THAT A RAY WILL HIT THE GEOMETRY THAT IT SPAWNED ON
 			//		USING DOUBLE-SIDED GEOMETRY IS A WASTEFUL TECHNIQUE
-			Ray vis_ray(isect.point + (isect.normal * 0.0001f), wi);
+			Ray vis_ray = SpawnRayWithOffset(isect.point, wi, isect.normal);
 			SurfaceInteraction light_isect;
 			if (!scene.Intersect(&vis_ray, &light_isect, 0.0001f, 10000.0f) || light_isect.shape == area_light->shape)
 			{		

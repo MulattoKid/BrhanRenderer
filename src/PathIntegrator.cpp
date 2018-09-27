@@ -4,6 +4,8 @@
 #include "IntegratorUtilities.h"
 #include "PathIntegrator.h"
 
+#include "Logger.h"
+
 PathIntegrator::~PathIntegrator()
 {}
 
@@ -12,6 +14,10 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 	glm::vec3 L(0.0f);
 	glm::vec3 path_throughput(1.0f);
 	bool specular_bounce = false;
+	
+	Shape* ps = NULL;
+	glm::vec3 pp(0.0f);
+	glm::vec3 pn(0.0f);
 	
 	for (unsigned int b = 0; b < max_depth; b++)
 	{
@@ -32,6 +38,19 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		}
 		
 		if (!intersected || b >= max_depth) { break; }
+		if (isect.point.y == 1.99000025f)
+		{
+			ray->t = 10000.0f;
+			scene.Intersect(ray, &isect, 0.0001f, 10000.0f);
+		}
+		if (isect.shape == ps)
+		{
+			SpawnRayWithOffset(pp, ray->dir, pn);
+			isect.shape->Intersect(ray, &isect, 0.0001f, 10000.0f);
+		}
+		pp = isect.point;
+		pn = isect.normal;
+		ps = isect.shape;
 		
 		//Sample direct illumination from lights
 		glm::vec3 Ld = path_throughput * UniformSampleOne(scene, isect, rng);
@@ -50,7 +69,8 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		
 		if (path_throughput.x <= 0.0f && path_throughput.y <= 0.0f && path_throughput.z <= 0.0f) { break; }
 		specular_bounce = (sampled_type & BSDF_SPECULAR) != 0;
-		*ray = Ray(isect.point, wi);
+		
+		*ray = SpawnRayWithOffset(isect.point, wi, isect.normal);
 	}
 	
 	return L;

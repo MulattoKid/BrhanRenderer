@@ -3,6 +3,11 @@
 #include "Logger.h"
 #include "Shape.h"
 
+Shape::Shape(const bool double_sided)
+{
+	this->double_sided = double_sided;
+}
+
 //p.838
 float Shape::Pdf(const SurfaceInteraction& isect, const glm::vec3& wi) const
 {

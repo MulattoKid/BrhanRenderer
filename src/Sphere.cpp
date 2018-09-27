@@ -3,7 +3,7 @@
 #include "glm/trigonometric.hpp"
 #include "Sphere.h"
 
-Sphere::Sphere(const glm::vec3& center, const float radius)
+Sphere::Sphere(const glm::vec3& center, const float radius) : Shape(false)
 {
 	this->center = center;
 	this->radius = radius;

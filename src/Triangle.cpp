@@ -1,6 +1,10 @@
+#include "glm/common.hpp"
 #include "glm/geometric.hpp"
 #include "RNG.h"
 #include "Triangle.h"
+
+Triangle::Triangle() : Shape(true)
+{}
 
 glm::vec3 Triangle::BarycentricCoefficients(const glm::vec3& point) const
 {
@@ -63,14 +67,22 @@ bool Triangle::PointIn(const glm::vec3& point) const
 	return true;
 }
 
+
+//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
 bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const
 {
-	//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
 	glm::vec3 v0v1 = v[1] - v[0];
 	glm::vec3 v0v2 = v[2] - v[0];
 	glm::vec3 pvec = glm::cross(ray->dir, v0v2);
 	float det = glm::dot(v0v1, pvec);
-	if (det < 0.00001f) return false;
+	if (double_sided)
+	{
+		if (glm::abs(det) < 0.00001f) return false;
+	}
+	else
+	{
+		if (det < 0.00001f) return false;
+	}
 	float invDet = 1 / det;
 
 	glm::vec3 tvec = ray->origin - v[0];
@@ -94,7 +106,6 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min,
 
 bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const
 {
-	//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
 	glm::vec3 v0v1 = v[1] - v[0];
 	glm::vec3 v0v2 = v[2] - v[0];
 	glm::vec3 pvec = glm::cross(ray->dir, v0v2);

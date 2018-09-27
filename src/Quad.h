@@ -9,6 +9,7 @@ struct Quad : Shape
 	glm::vec3 n[4];
 	glm::vec2 uv[4];
 
+	Quad();
 	glm::vec3 Normal(const glm::vec3& point) const;
 	glm::vec2 UV(const glm::vec3& point) const;
 	float Area() const;
