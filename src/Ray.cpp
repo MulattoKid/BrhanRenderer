@@ -26,6 +26,11 @@ glm::vec3 Ray::At(float t) const
 	return origin + (t * glm::normalize(dir));
 }
 
+Ray SpawnRayWithOffsetNoFlip(const glm::vec3& origin, const glm::vec3 dir, const glm::vec3& normal)
+{	
+	return Ray(origin + (normal * 0.0001f), dir);
+}
+
 Ray SpawnRayWithOffset(const glm::vec3& origin, const glm::vec3 dir, const glm::vec3& normal)
 {
 	glm::vec3 normal_wi_side = normal;
@@ -34,19 +39,7 @@ Ray SpawnRayWithOffset(const glm::vec3& origin, const glm::vec3 dir, const glm::
 	{
 		normal_wi_side = -normal_wi_side;
 	}
+	normal_wi_side *= 0.0001f;
 	
-	glm::vec3 offset_origin(0.0f);
-	for (int i = 0; i < 3; i++)
-	{
-		if (normal_wi_side[i] > 0.0f)
-		{
-			offset_origin[i] = std::nextafterf(origin[i], std::numeric_limits<float>::infinity());
-		}
-		else if (normal_wi_side[i] < 0.0f)
-		{
-			offset_origin[i] = std::nextafterf(origin[i], -std::numeric_limits<float>::infinity());
-		}
-	}
-	
-	return Ray(offset_origin, dir);
+	return Ray(origin + normal_wi_side, dir);
 }

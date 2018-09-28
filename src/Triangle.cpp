@@ -83,6 +83,7 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min,
 	{
 		if (det < 0.00001f) return false;
 	}
+	//if (det < 0.00001f) return false;
 	float invDet = 1 / det;
 
 	glm::vec3 tvec = ray->origin - v[0];

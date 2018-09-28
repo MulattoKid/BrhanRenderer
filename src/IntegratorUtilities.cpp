@@ -51,7 +51,7 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 			//Check for visibility to light
 			//TODO: I NEED TO MAKE A STABLE WAY OF MAKING SURE THAT A RAY WILL HIT THE GEOMETRY THAT IT SPAWNED ON
 			//		USING DOUBLE-SIDED GEOMETRY IS A WASTEFUL TECHNIQUE
-			Ray vis_ray = SpawnRayWithOffset(isect.point, wi, isect.normal);
+			Ray vis_ray = SpawnRayWithOffsetNoFlip(isect.point, wi, isect.normal);
 			SurfaceInteraction light_isect;
 			if (!scene.Intersect(&vis_ray, &light_isect, 0.0001f, 10000.0f) || light_isect.shape == area_light->shape)
 			{		
@@ -61,7 +61,7 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 		}
 	}
 	
-	//Sample BRDF of intersection point
+	//Sample BxDF of intersection point
 	BxDFType sampled_type;
 	glm::vec3 f = isect.bsdf->Samplef(rng, isect.wo, u_scattering, BxDFType(BSDF_ALL & ~BSDF_SPECULAR), isect.normal, &wi, &scattering_pdf, &sampled_type);
 	f *= glm::abs(glm::dot(isect.normal, wi));
@@ -80,7 +80,7 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 			weight = PowerHeuristic(1, scattering_pdf, 1, light_pdf);
 		}
 		//Check if the sampled direction intersects the light source's geometry before anything else (direct light)
-		Ray light_ray(isect.point, wi);
+		Ray light_ray = SpawnRayWithOffset(isect.point, wi, isect.normal);
 		SurfaceInteraction light_isect;
 		if (scene.Intersect(&light_ray, &light_isect, 0.0001f, 10000.0f) && light_isect.shape == area_light->shape)
 		{
