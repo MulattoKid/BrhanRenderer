@@ -9,9 +9,6 @@
 #include "Scene.h"
 #include "Timer.h"
 
-#include "Triangle.h"
-#include "glm/geometric.hpp"
-
 int main(int argc, char** argv)
 {
 	auto start = GetTime();

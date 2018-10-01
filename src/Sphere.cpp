@@ -1,6 +1,7 @@
 #include "glm/geometric.hpp"
 #include "glm/gtc/constants.hpp"
 #include "glm/trigonometric.hpp"
+#include "Math.h"
 #include "Sphere.h"
 
 Sphere::Sphere(const glm::vec3& center, const float radius) : Shape(false)
@@ -43,28 +44,35 @@ glm::vec3 Sphere::Sample(RNG& rng, const float u[2]) const
 
 bool Sphere::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const
 {
+	//Convert to local math objects
+	Vec3 center_m(center);
+	Float radius_m(radius);
+	Vec3 ray_origin(ray->origin);
+	Vec3 ray_dir(ray->dir);
+	static const Float ZERO(0.0f);
+
 	//t²dot(ray->dir, ray->dir) + 2tdot(ray->dir, ray->origin - center) + dot(ray->origin - center, ray->origin - center) - radius² = 0
-	const float a = glm::dot(ray->dir, ray->dir);
-	const glm::vec3 center_to_ray_origin = ray->origin - center;
-	const float b = 2.0f * glm::dot(ray->dir, center_to_ray_origin);
-	const float c = glm::dot(center_to_ray_origin, center_to_ray_origin) - glm::pow(radius, 2);
+	const Float a = Dot(ray_dir, ray_dir);
+	const Vec3 center_to_ray_origin = ray_origin - center_m;
+	const Float b = 2.0f * Dot(ray_dir, center_to_ray_origin);
+	const Float c = Dot(center_to_ray_origin, center_to_ray_origin) - Pow(radius_m, 2.0f);
 	
-	const float discriminant = glm::pow(b, 2) - 4.0f * a * c;
-	if (discriminant <= 0.0f) { return false; }
+	const Float discriminant = Pow(b, 2.0f) - 4.0f * a * c;
+	if (discriminant <= ZERO) { return false; }
 	
-	const float denomiator = 2.0f * a;
-	const float t2 = (-b - glm::sqrt(discriminant)) / denomiator;
-	if (t2 >= t_min && t2 <= t_max && t2 < ray->t)
+	const Float denomiator = 2.0f * a;
+	const Float t2 = (-b - Sqrt(discriminant)) / denomiator;
+	if (t2.f >= t_min && t2.f <= t_max && t2.f < ray->t)
 	{
-		ray->t = t2;
+		ray->t = t2.f;
 		isect->shape = (Shape*)(this);
 		return true;
 	}
 	
-	const float t1 = (-b + glm::sqrt(discriminant)) / denomiator;
-	if (t1 >= t_min && t1 <= t_max && t1 < ray->t)
+	const Float t1 = (-b + Sqrt(discriminant)) / denomiator;
+	if (t1.f >= t_min && t1.f <= t_max && t1.f < ray->t)
 	{
-		ray->t = t1;
+		ray->t = t1.f;
 		isect->shape = (Shape*)(this);
 		return true;
 	}

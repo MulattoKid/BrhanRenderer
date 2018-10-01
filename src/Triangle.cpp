@@ -1,5 +1,6 @@
 #include "glm/common.hpp"
 #include "glm/geometric.hpp"
+#include "Math.h"
 #include "RNG.h"
 #include "Triangle.h"
 
@@ -71,33 +72,43 @@ bool Triangle::PointIn(const glm::vec3& point) const
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
 bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const
 {
-	glm::vec3 v0v1 = v[1] - v[0];
-	glm::vec3 v0v2 = v[2] - v[0];
-	glm::vec3 pvec = glm::cross(ray->dir, v0v2);
-	float det = glm::dot(v0v1, pvec);
-	if (double_sided)
+	//Convert all to local math objects
+	Vec3 ray_origin(ray->origin);
+	Vec3 ray_dir(ray->dir);
+	const glm::vec3 glm_v0v1 = v[1] - v[0];
+	const glm::vec3 glm_v0v2 = v[2] - v[0];
+	Vec3 v0(v[0]);
+	Vec3 v0v1(glm_v0v1);
+	Vec3 v0v2(glm_v0v2);
+	static const Float ZERO(0.0f);
+	static const Float ONE(1.0f);
+	static const Float EPSILON(0.00001f);
+	
+	Vec3 pvec = Cross(ray_dir, v0v2);
+	Float det = Dot(v0v1, pvec);
+	/*if (double_sided)
 	{
-		if (glm::abs(det) < 0.00001f) return false;
+		if (Abs(det) < EPSILON) return false;
 	}
 	else
 	{
-		if (det < 0.00001f) return false;
-	}
-	//if (det < 0.00001f) return false;
-	float invDet = 1 / det;
+		if (det < EPSILON) return false;
+	}*/
+	if (det < EPSILON) return false;
+	Float invDet = ONE / det;
 
-	glm::vec3 tvec = ray->origin - v[0];
-	float u = glm::dot(tvec, pvec) * invDet;
-	if (u < 0 || u > 1) return false;
+	Vec3 tvec = ray_origin - v0;
+	Float u = Dot(tvec, pvec) * invDet;
+	if (u < ZERO || u > ONE) return false;
 
-	glm::vec3 qvec = glm::cross(tvec, v0v1);
-	float v = glm::dot(ray->dir, qvec) * invDet;
-	if (v < 0 || u + v > 1) return false;
+	Vec3 qvec = Cross(tvec, v0v1);
+	Float v = Dot(ray_dir, qvec) * invDet;
+	if (v < ZERO || u + v > ONE) return false;
 
-	float t = glm::dot(v0v2, qvec) * invDet;
-	if (t < ray->t && t >= t_min && t <= t_max)
+	Float t = Dot(v0v2, qvec) * invDet;
+	if (t.f < ray->t && t.f >= t_min && t.f <= t_max)
 	{
-		ray->t = t;
+		ray->t = t.f;
 		isect->shape = (Shape*)(this);
 		return true;
 	}
