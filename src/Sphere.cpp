@@ -46,22 +46,22 @@ bool Sphere::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, c
 {
 	//Convert to local math objects
 	Vec3 center_m(center);
-	Float radius_m(radius);
+	EFloat radius_m(radius);
 	Vec3 ray_origin(ray->origin);
 	Vec3 ray_dir(ray->dir);
-	static const Float ZERO(0.0f);
+	static const EFloat ZERO(0.0f);
 
 	//t²dot(ray->dir, ray->dir) + 2tdot(ray->dir, ray->origin - center) + dot(ray->origin - center, ray->origin - center) - radius² = 0
-	const Float a = Dot(ray_dir, ray_dir);
+	const EFloat a = Dot(ray_dir, ray_dir);
 	const Vec3 center_to_ray_origin = ray_origin - center_m;
-	const Float b = 2.0f * Dot(ray_dir, center_to_ray_origin);
-	const Float c = Dot(center_to_ray_origin, center_to_ray_origin) - Pow(radius_m, 2.0f);
+	const EFloat b = 2.0f * Dot(ray_dir, center_to_ray_origin);
+	const EFloat c = Dot(center_to_ray_origin, center_to_ray_origin) - Pow(radius_m, 2.0f);
 	
-	const Float discriminant = Pow(b, 2.0f) - 4.0f * a * c;
+	const EFloat discriminant = Pow(b, 2.0f) - 4.0f * a * c;
 	if (discriminant <= ZERO) { return false; }
 	
-	const Float denomiator = 2.0f * a;
-	const Float t2 = (-b - Sqrt(discriminant)) / denomiator;
+	const EFloat denomiator = 2.0f * a;
+	const EFloat t2 = (-b - Sqrt(discriminant)) / denomiator;
 	if (t2.f >= t_min && t2.f <= t_max && t2.f < ray->t)
 	{
 		ray->t = t2.f;
@@ -69,7 +69,7 @@ bool Sphere::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, c
 		return true;
 	}
 	
-	const Float t1 = (-b + Sqrt(discriminant)) / denomiator;
+	const EFloat t1 = (-b + Sqrt(discriminant)) / denomiator;
 	if (t1.f >= t_min && t1.f <= t_max && t1.f < ray->t)
 	{
 		ray->t = t1.f;

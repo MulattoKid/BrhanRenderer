@@ -432,29 +432,3 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_th
 	
 	return intersected;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

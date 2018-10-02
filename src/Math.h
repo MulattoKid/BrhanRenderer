@@ -2,101 +2,115 @@
 #define MATH_H
 
 #include "glm/vec3.hpp"
+#include <limits>
 
-struct Float
+//p.214
+static const float machine_epsilon = std::numeric_limits<float>::epsilon() * 0.5f;
+//p.217
+inline float Gamma(int n)
+{
+	return (n * machine_epsilon) / (1.0f - n * machine_epsilon);
+}
+
+struct EFloat
 {
 	float f;
+	float err;
 	
-	Float() { this->f = 0.0f; }
-	Float(float f) { this->f = f; }
-	Float& operator+=(const Float& F)
+	EFloat() { this->f = 0.0f; this->err = 0.0f; }
+	EFloat(float f) { this->f = f;  this->err = 0.0f; }
+	EFloat& operator+=(const EFloat& F)
 	{
 		f += F.f;
+		err += F.err + (Gamma(1) * (std::abs(f + F.f) + err + F.err));
 		return *this;
 	}
-	Float& operator-=(const Float& F)
+	EFloat& operator-=(const EFloat& F)
 	{
 		f -= F.f;
+		err += F.err + (Gamma(1) * (std::abs(f - F.f) + err + F.err));
 		return *this;
 	}
-	Float& operator*=(const Float& F)
+	EFloat& operator*=(const EFloat& F)
 	{
 		f *= F.f;
+		err += F.err + (Gamma(1) * (std::abs(f * F.f) + err + F.err));
 		return *this;
 	}
-	Float& operator/=(const Float& F)
+	EFloat& operator/=(const EFloat& F)
 	{
 		f /= F.f;
+		err += F.err + (Gamma(1) * (std::abs(f / F.f) + err + F.err));
 		return *this;
 	}
 };
-inline Float operator+(Float lhs, const Float& rhs)
+inline EFloat operator+(EFloat lhs, const EFloat& rhs)
 {
 	lhs += rhs;
 	return lhs;
 }
-inline Float operator-(Float F)
+inline EFloat operator-(EFloat F)
 {
 	F.f = -F.f;
 	return F;
 }
-inline Float operator-(Float lhs, const Float& rhs)
+inline EFloat operator-(EFloat lhs, const EFloat& rhs)
 {
 	lhs -= rhs;
 	return lhs;
 }
-inline Float operator*(Float lhs, const Float& rhs)
+inline EFloat operator*(EFloat lhs, const EFloat& rhs)
 {
 	lhs *= rhs;
 	return lhs;
 }
-inline Float operator/(Float lhs, const Float& rhs)
+inline EFloat operator/(EFloat lhs, const EFloat& rhs)
 {
 	lhs /= rhs;
 	return lhs;
 }
-inline bool operator<(const Float& lhs, const Float& rhs)
+inline bool operator<(const EFloat& lhs, const EFloat& rhs)
 {
 	return lhs.f < rhs.f ? true : false;
 }
-inline bool operator<=(const Float& lhs, const Float& rhs)
+inline bool operator<=(const EFloat& lhs, const EFloat& rhs)
 {
 	return lhs.f <= rhs.f ? true : false;
 }
-inline bool operator>(const Float& lhs, const Float& rhs)
+inline bool operator>(const EFloat& lhs, const EFloat& rhs)
 {
 	return lhs.f > rhs.f ? true : false;
 }
-inline bool operator>=(const Float& lhs, const Float& rhs)
+inline bool operator>=(const EFloat& lhs, const EFloat& rhs)
 {
 	return lhs.f >= rhs.f ? true : false;
 }
-inline bool operator==(const Float& lhs, const Float& rhs)
+inline bool operator==(const EFloat& lhs, const EFloat& rhs)
 {
 	return lhs.f == rhs.f ? true : false;
 }
-inline bool operator!=(const Float& lhs, const Float& rhs)
+inline bool operator!=(const EFloat& lhs, const EFloat& rhs)
 {
 	return lhs.f != rhs.f ? true : false;
 }
 
 struct Vec3
 {
-	Float x, y, z;
+	EFloat x, y, z;
 	
 	Vec3()
 	{
-		this->x = Float(0.0f);
-		this->y = Float(0.0f);
-		this->z = Float(0.0f);
+		this->x = EFloat(0.0f);
+		this->y = EFloat(0.0f);
+		this->z = EFloat(0.0f);
 	}
-	Vec3(Float v)
+	Vec3(EFloat v)
 	{
 		this->x = v;
 		this->y = v;
 		this->z = v;
 	}
-	Vec3(Float x, Float y, Float z)
+	Vec3(EFloat x, EFloat y, EFloat z)
 	{
 		this->x = x;
 		this->y = y;
@@ -138,28 +152,28 @@ struct Vec3
 		return *this;
 	}
 	
-	Vec3& operator+=(const Float& v)
+	Vec3& operator+=(const EFloat& v)
 	{
 		x += v;
 		y += v;
 		z += v;
 		return *this;
 	}
-	Vec3& operator-=(const Float& v)
+	Vec3& operator-=(const EFloat& v)
 	{
 		x -= v;
 		y -= v;
 		z -= v;
 		return *this;
 	}
-	Vec3& operator*=(const Float& v)
+	Vec3& operator*=(const EFloat& v)
 	{
 		x *= v;
 		y *= v;
 		z *= v;
 		return *this;
 	}
-	Vec3& operator/=(const Float& v)
+	Vec3& operator/=(const EFloat& v)
 	{
 		x /= v;
 		y /= v;
@@ -194,62 +208,62 @@ inline Vec3 operator/(Vec3 lhs, const Vec3& rhs)
 	lhs /= rhs;
 	return lhs;
 }
-inline Vec3 operator+(Vec3 lhs, const Float& rhs)
+inline Vec3 operator+(Vec3 lhs, const EFloat& rhs)
 {
 	lhs += rhs;
 	return lhs;
 }
-inline Vec3 operator-(Vec3 lhs, const Float& rhs)
+inline Vec3 operator-(Vec3 lhs, const EFloat& rhs)
 {
 	lhs -= rhs;
 	return lhs;
 }
-inline Vec3 operator*(Vec3 lhs, const Float& rhs)
+inline Vec3 operator*(Vec3 lhs, const EFloat& rhs)
 {
 	lhs *= rhs;
 	return lhs;
 }
-inline Vec3 operator/(Vec3 lhs, const Float& rhs)
+inline Vec3 operator/(Vec3 lhs, const EFloat& rhs)
 {
 	lhs /= rhs;
 	return lhs;
 }
 
-inline Float Pow(const Float& F, const float p)
+inline EFloat Pow(const EFloat& F, const float p)
 {
-	return Float(std::pow(F.f, p));
+	return EFloat(std::pow(F.f, p));
 }
-inline Float Sqrt(const Float& F)
+inline EFloat Sqrt(const EFloat& F)
 {
-	return Float(std::sqrt(F.f));
+	return EFloat(std::sqrt(F.f));
 }
-inline Float Sin(const Float& F)
+inline EFloat Sin(const EFloat& F)
 {
-	return Float(std::sin(F.f));
+	return EFloat(std::sin(F.f));
 }
-inline Float ASin(const Float& F)
+inline EFloat ASin(const EFloat& F)
 {
-	return Float(std::asin(F.f));
+	return EFloat(std::asin(F.f));
 }
-inline Float Cos(const Float& F)
+inline EFloat Cos(const EFloat& F)
 {
-	return Float(std::cos(F.f));
+	return EFloat(std::cos(F.f));
 }
-inline Float ACos(const Float& F)
+inline EFloat ACos(const EFloat& F)
 {
-	return Float(std::acos(F.f));
+	return EFloat(std::acos(F.f));
 }
-inline Float Abs(const Float& F)
+inline EFloat Abs(const EFloat& F)
 {
-	return Float(std::abs(F.f));
+	return EFloat(std::abs(F.f));
 }
 inline Vec3 Abs(const Vec3& v)
 {
 	return Vec3(Abs(v.x), Abs(v.y), Abs(v.z));
 }
-inline Float Length(const Vec3& v)
+inline EFloat Length(const Vec3& v)
 {
-	return Float(Sqrt(Pow(v.x, 2.0f) + Pow(v.y, 2.0f) + Pow(v.z, 2.0f)));
+	return EFloat(Sqrt(Pow(v.x, 2.0f) + Pow(v.y, 2.0f) + Pow(v.z, 2.0f)));
 }
 inline Vec3 Normalize(const Vec3& v)
 {
@@ -258,15 +272,15 @@ inline Vec3 Normalize(const Vec3& v)
 //https://www.mathsisfun.com/algebra/vectors-cross-product.html
 inline Vec3 Cross(const Vec3& v0, const Vec3& v1)
 {
-	Float x = (v0.y * v1.z) - (v0.z * v1.y);
-	Float y = (v0.z * v1.x) - (v0.x * v1.z);
-	Float z = (v0.x * v1.y) - (v0.y * v1.x);
+	EFloat x = (v0.y * v1.z) - (v0.z * v1.y);
+	EFloat y = (v0.z * v1.x) - (v0.x * v1.z);
+	EFloat z = (v0.x * v1.y) - (v0.y * v1.x);
 	return Vec3(x, y, z);
 }
 //https://www.mathsisfun.com/algebra/vectors-dot-product.html
-inline Float Dot(const Vec3& v0, const Vec3& v1)
+inline EFloat Dot(const Vec3& v0, const Vec3& v1)
 {
-	return Float((v0.x * v1.x) + (v0.y * v1.y) + (v0.z * v1.z));
+	return EFloat((v0.x * v1.x) + (v0.y * v1.y) + (v0.z * v1.z));
 }
 
 #endif
