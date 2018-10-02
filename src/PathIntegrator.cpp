@@ -2,9 +2,8 @@
 #include "BxDF.h"
 #include "glm/geometric.hpp"
 #include "IntegratorUtilities.h"
+#include "Math.h"
 #include "PathIntegrator.h"
-
-#include "Logger.h"
 
 PathIntegrator::~PathIntegrator()
 {}
@@ -56,8 +55,7 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		if (path_throughput.x <= 0.0f && path_throughput.y <= 0.0f && path_throughput.z <= 0.0f) { break; }
 		specular_bounce = (sampled_type & BSDF_SPECULAR) != 0;
 		
-		*ray = Ray(isect.point, wi);//SpawnRayWithOffset(isect.point, wi, isect.normal);
-		previous_shape_hit = isect.shape;
+		*ray = SpawnRayWithOffset(isect.point, wi, isect.normal, ray->t);
 	}
 	
 	return L;

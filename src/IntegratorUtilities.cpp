@@ -80,7 +80,7 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 			weight = PowerHeuristic(1, scattering_pdf, 1, light_pdf);
 		}
 		//Check if the sampled direction intersects the light source's geometry before anything else (direct light)
-		Ray light_ray = SpawnRayWithOffset(isect.point, wi, isect.normal);
+		Ray light_ray = SpawnRayWithOffset(isect.point, wi, isect.normal, light_ray.t);
 		SurfaceInteraction light_isect;
 		if (scene.Intersect(&light_ray, &light_isect, 0.0001f, 10000.0f) && light_isect.shape == area_light->shape)
 		{

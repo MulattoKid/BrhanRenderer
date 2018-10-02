@@ -1,8 +1,10 @@
 #ifndef MATH_H
 #define MATH_H
 
+#include <cmath>
 #include "glm/vec3.hpp"
 #include <limits>
+#include <math.h>
 
 //p.214
 static const float machine_epsilon = std::numeric_limits<float>::epsilon() * 0.5f;
