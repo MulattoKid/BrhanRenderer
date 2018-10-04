@@ -20,7 +20,7 @@ glm::vec3 SurfaceInteraction::Le(const Scene& scene)
 {
 	if (shape->IsAreaLight())
 	{
-		return scene.area_lights[shape->area_light_index]->L(point, wo);
+		return scene.area_lights[shape->area_light_index]->L(Point(), wo);
 	}
 	
 	return glm::vec3(0.0f);

@@ -237,8 +237,8 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 					//TODO: only diffuse area light for now
 					DiffuseAreaLight dal;
 					dal.shape = (Shape*)(tri);
-					//NOTE: double-sided lights are not allowed
-					dal.shape->double_sided = false;
+					//NOTE: double-sided lights are not allowed??
+					//dal.shape->double_sided = false;
 					dal.L_emit = tri->mtl->emission;
 					diffuse_area_lights.push_back(dal);
 					tri->area_light_index = diffuse_area_lights.size() - 1;
@@ -289,8 +289,8 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 					//TODO: only diffuse area light for now
 					DiffuseAreaLight dal;
 					dal.shape = (Shape*)(quad);
-					//NOTE: double-sided lights are not allowed
-					dal.shape->double_sided = false;
+					//NOTE: double-sided lights are not allowed??
+					//dal.shape->double_sided = false;
 					dal.L_emit = quad->mtl->emission;
 					diffuse_area_lights.push_back(dal);
 					quad->area_light_index = diffuse_area_lights.size() - 1;
@@ -404,8 +404,8 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, co
 	if (intersected)
 	{
 		isect->ray = ray;
-		isect->point = ray->At();
-		isect->normal = isect->shape->Normal(isect->point);
+		isect->point = ray->AtError();
+		isect->normal = isect->shape->Normal(isect->Point());
 		isect->wo = -ray->dir;
 		isect->ComputeScatteringFunctions();
 	}
@@ -424,8 +424,8 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_th
 	if (intersected)
 	{
 		isect->ray = ray;
-		isect->point = ray->At();
-		isect->normal = isect->shape->Normal(isect->point);
+		isect->point = ray->AtError();
+		isect->normal = isect->shape->Normal(isect->Point());
 		isect->wo = -ray->dir;
 		isect->ComputeScatteringFunctions();
 	}

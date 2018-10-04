@@ -9,6 +9,8 @@
 #include "Scene.h"
 #include "Timer.h"
 
+#include "Math.h"
+
 int main(int argc, char** argv)
 {
 	auto start = GetTime();
@@ -25,7 +27,7 @@ int main(int argc, char** argv)
 	//for (unsigned int y = system.film_height / 2; y < system.film_height / 2 + 1; y++)
 	for (unsigned int y = 0; y < system.film_height; y++)
 	{
-		//#pragma omp parallel for
+		#pragma omp parallel for
 #ifdef _WIN32
 		for (int x = 0; x < int(system.film_width); x++)
 #else

@@ -14,6 +14,7 @@ inline float Gamma(int n)
 	return (n * machine_epsilon) / (1.0f - n * machine_epsilon);
 }
 
+//https://github.com/mmp/pbrt-v3/blob/5c81f476136d7ccb94feb300cb6aa34532746bca/src/core/efloat.h
 struct EFloat
 {
 	float f;
@@ -24,25 +25,28 @@ struct EFloat
 	EFloat& operator+=(const EFloat& F)
 	{
 		f += F.f;
-		err += F.err + (Gamma(1) * (std::abs(f + F.f) + err + F.err));
+		err += F.err + Gamma(1) * (std::abs(f + F.f) + err + F.err);
 		return *this;
 	}
 	EFloat& operator-=(const EFloat& F)
 	{
 		f -= F.f;
-		err += F.err + (Gamma(1) * (std::abs(f - F.f) + err + F.err));
+		err += F.err + Gamma(1) * (std::abs(f - F.f) + err + F.err);
 		return *this;
 	}
 	EFloat& operator*=(const EFloat& F)
 	{
 		f *= F.f;
-		err += F.err + (Gamma(1) * (std::abs(f * F.f) + err + F.err));
+		//err += F.err + Gamma(1) * (std::abs(f * F.f) + err + F.err);
+		err += std::abs(F.f * err) + std::abs(f * F.err) + Gamma(1) * (std::abs(f * F.f) + (err * F.err));
 		return *this;
 	}
 	EFloat& operator/=(const EFloat& F)
 	{
 		f /= F.f;
-		err += F.err + (Gamma(1) * (std::abs(f / F.f) + err + F.err));
+		//err += F.err + Gamma(1) * (std::abs(f / F.f) + err + F.err);
+		err += (std::abs(f) + err) / (std::abs(F.f) - F.err) - std::abs(f / F.f) +
+				Gamma(1) * (std::abs(f) + err) / (std::abs(F.f) - F.err);
 		return *this;
 	}
 };

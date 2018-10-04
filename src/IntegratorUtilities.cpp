@@ -2,10 +2,6 @@
 #include "glm/geometric.hpp"
 #include "IntegratorUtilities.h"
 #include <math.h>
-#include "Logger.h"
-#include "RNG.h"
-
-#include <stdio.h>
 
 float PowerHeuristic(int nf, float f_pdf, int ng, float g_pdf)
 {
@@ -53,7 +49,7 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 			//		USING DOUBLE-SIDED GEOMETRY IS A WASTEFUL TECHNIQUE
 			Ray vis_ray = SpawnRayWithOffsetNoFlip(isect.point, wi, isect.normal);
 			SurfaceInteraction light_isect;
-			if (!scene.Intersect(&vis_ray, &light_isect, 0.0001f, 10000.0f) || light_isect.shape == area_light->shape)
+			if (!scene.Intersect(&vis_ray, &light_isect, 0.01f, 10000.0f) || light_isect.shape == area_light->shape)
 			{		
 				weight = PowerHeuristic(1, light_pdf, 1, scattering_pdf);
 				Ld += (f * Li * weight) / light_pdf;
@@ -80,11 +76,11 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 			weight = PowerHeuristic(1, scattering_pdf, 1, light_pdf);
 		}
 		//Check if the sampled direction intersects the light source's geometry before anything else (direct light)
-		Ray light_ray = SpawnRayWithOffset(isect.point, wi, isect.normal, light_ray.t);
+		Ray light_ray = SpawnRayWithOffset(isect.point, wi, isect.normal);
 		SurfaceInteraction light_isect;
-		if (scene.Intersect(&light_ray, &light_isect, 0.0001f, 10000.0f) && light_isect.shape == area_light->shape)
+		if (scene.Intersect(&light_ray, &light_isect, 0.01f, 10000.0f) && light_isect.shape == area_light->shape)
 		{
-			Li = area_light->L(light_isect.point, -wi);
+			Li = area_light->L(light_isect.Point(), -wi);
 		}
 		else //TODO: Account for InifiteAreaLights that don't have geometry: p.861
 		{}

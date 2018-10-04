@@ -75,11 +75,11 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min,
 	//Convert all to local math objects
 	Vec3 ray_origin(ray->origin);
 	Vec3 ray_dir(ray->dir);
-	const glm::vec3 glm_v0v1 = v[1] - v[0];
-	const glm::vec3 glm_v0v2 = v[2] - v[0];
 	Vec3 v0(v[0]);
-	Vec3 v0v1(glm_v0v1);
-	Vec3 v0v2(glm_v0v2);
+	Vec3 v1(v[1]);
+	Vec3 v2(v[2]);
+	Vec3 v0v1 = v1 - v0;
+	Vec3 v0v2 = v2 - v0;
 	static const EFloat ZERO(0.0f);
 	static const EFloat ONE(1.0f);
 	static const EFloat EPSILON(0.00001f);
@@ -108,7 +108,7 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min,
 	EFloat t = Dot(v0v2, qvec) * invDet;
 	if (t.f < ray->t && t.f >= t_min && t.f <= t_max)
 	{
-		ray->t = t.f;
+		ray->t = t;
 		isect->shape = (Shape*)(this);
 		return true;
 	}
@@ -118,22 +118,40 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min,
 
 bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const
 {
-	glm::vec3 v0v1 = v[1] - v[0];
-	glm::vec3 v0v2 = v[2] - v[0];
-	glm::vec3 pvec = glm::cross(ray->dir, v0v2);
-	float det = glm::dot(v0v1, pvec);
-	if (det < 0.00001f) return false;
-	float invDet = 1 / det;
+	//Convert all to local math objects
+	Vec3 ray_origin(ray->origin);
+	Vec3 ray_dir(ray->dir);
+	Vec3 v0(v[0]);
+	Vec3 v1(v[1]);
+	Vec3 v2(v[2]);
+	Vec3 v0v1 = v1 - v0;
+	Vec3 v0v2 = v2 - v0;
+	static const EFloat ZERO(0.0f);
+	static const EFloat ONE(1.0f);
+	static const EFloat EPSILON(0.00001f);
+	
+	Vec3 pvec = Cross(ray_dir, v0v2);
+	EFloat det = Dot(v0v1, pvec);
+	if (double_sided)
+	{
+		if (Abs(det) < EPSILON) return false;
+	}
+	else
+	{
+		if (det < EPSILON) return false;
+	}
+	//if (det < EPSILON) return false;
+	EFloat invDet = ONE / det;
 
-	glm::vec3 tvec = ray->origin - v[0];
-	float u = glm::dot(tvec, pvec) * invDet;
-	if (u < 0 || u > 1) return false;
+	Vec3 tvec = ray_origin - v0;
+	EFloat u = Dot(tvec, pvec) * invDet;
+	if (u < ZERO || u > ONE) return false;
 
-	glm::vec3 qvec = glm::cross(tvec, v0v1);
-	float v = glm::dot(ray->dir, qvec) * invDet;
-	if (v < 0 || u + v > 1) return false;
+	Vec3 qvec = Cross(tvec, v0v1);
+	EFloat v = Dot(ray_dir, qvec) * invDet;
+	if (v < ZERO || u + v > ONE) return false;
 
-	float t = glm::dot(v0v2, qvec) * invDet;
+	EFloat t = Dot(v0v2, qvec) * invDet;
 	if (t < ray->t && t >= 0.0f && t < t_less_than)
 	{
 		ray->t = t;

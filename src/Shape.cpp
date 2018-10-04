@@ -11,15 +11,15 @@ Shape::Shape(const bool double_sided)
 //p.838
 float Shape::Pdf(const SurfaceInteraction& isect, const glm::vec3& wi) const
 {
-	Ray ray(isect.point, wi);
+	Ray ray = SpawnRayWithOffsetNoFlip(isect.point, wi, isect.normal);
 	SurfaceInteraction isect_light;
 	if (!Intersect(&ray, &isect_light, 0.0f, 10000.0f)) { return 0.0f; }
-	isect_light.point = ray.At();
-	isect_light.normal = isect_light.shape->Normal(isect_light.point);
+	isect_light.point = ray.AtError();
+	isect_light.normal = isect_light.shape->Normal(isect_light.Point());
 	isect_light.wo = -ray.dir;
 	
 	float pdf = 1.0f / Area();
-	pdf *= glm::pow(glm::length(ray.origin - isect_light.point), 2) / glm::abs(glm::dot(isect_light.normal, isect_light.wo));
+	pdf *= glm::pow(glm::length(ray.origin - isect_light.Point()), 2) / glm::abs(glm::dot(isect_light.normal, isect_light.wo));
 	
 	return pdf;
 }

@@ -14,12 +14,10 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 	glm::vec3 path_throughput(1.0f);
 	bool specular_bounce = false;
 	
-	Shape* previous_shape_hit = NULL;
-	
 	for (unsigned int b = 0; b < max_depth; b++)
 	{
 		SurfaceInteraction isect;
-		bool intersected = scene.Intersect(ray, &isect, 0.0001f, 10000.0f);
+		bool intersected = scene.Intersect(ray, &isect, 0.0f, 10000.0f);
 		
 		//depth==0: this is the first bounce and direct illumination from light
 		//			sources haven't been accounted for yet
@@ -35,10 +33,13 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		}
 		
 		if (!intersected || b >= max_depth) { break; }
-		if (previous_shape_hit == isect.shape) { break; }
 		
 		//Sample direct illumination from lights
 		glm::vec3 Ld = path_throughput * UniformSampleOne(scene, isect, rng);
+		if (Ld.x == std::numeric_limits<float>::infinity())
+		{
+			assert(0);
+		}
 		L += Ld;
 		
 		//Sample BSDF to get new direction
@@ -49,13 +50,13 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		BxDFType sampled_type;
 		glm::vec3 f = isect.bsdf->Samplef(rng, isect.wo, u, BSDF_ALL, isect.normal, &wi, &pdf, &sampled_type);
 		
-		if (pdf == 0.0f && f == glm::vec3(0.0f)) { break; }
+		if (pdf == 0.0f || f == glm::vec3(0.0f)) { break; }
 		path_throughput *= f * glm::abs(glm::dot(isect.normal, wi)) / pdf;
 		
 		if (path_throughput.x <= 0.0f && path_throughput.y <= 0.0f && path_throughput.z <= 0.0f) { break; }
 		specular_bounce = (sampled_type & BSDF_SPECULAR) != 0;
 		
-		*ray = SpawnRayWithOffset(isect.point, wi, isect.normal, ray->t);
+		*ray = SpawnRayWithOffset(isect.point, wi, isect.normal);
 	}
 	
 	return L;

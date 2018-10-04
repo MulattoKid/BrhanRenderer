@@ -1,6 +1,11 @@
+#include "glm/geometric.hpp"
 #include "Ray.h"
 
-#include "glm/geometric.hpp"
+Ray::Ray()
+{
+	this->origin = glm::vec3(0.0f);
+	this->dir = glm::vec3(0.0f);
+}
 
 Ray::Ray(const glm::vec3& origin, const glm::vec3& dir)
 {
@@ -9,17 +14,21 @@ Ray::Ray(const glm::vec3& origin, const glm::vec3& dir)
 	this->t = EFloat(std::numeric_limits<float>::max());
 }
 
-glm::vec3 Ray::At() const
+Vec3 Ray::AtError() const
 {
-	return origin + (t.f * glm::normalize(dir));
+	return Vec3(origin) + (t * Normalize(Vec3(dir)));
 }
 
-Ray SpawnRayWithOffsetNoFlip(const glm::vec3& origin, const glm::vec3 dir, const glm::vec3& normal)
+Ray SpawnRayWithOffsetNoFlip(const Vec3& origin, const glm::vec3 dir, const glm::vec3& normal)
 {	
-	return Ray(origin + (normal * 0.0001f), dir);
+	glm::vec3 error(origin.x.err, origin.y.err, origin.z.err);
+	float d = glm::dot(glm::abs(normal), glm::abs(error));
+	glm::vec3 offset = d * normal;
+	
+	return Ray(glm::vec3(origin.x.f, origin.y.f, origin.z.f) + offset, dir);
 }
 
-Ray SpawnRayWithOffset(const glm::vec3& origin, const glm::vec3 dir, const glm::vec3& normal, const EFloat t)
+Ray SpawnRayWithOffset(const Vec3& origin, const glm::vec3 dir, const glm::vec3& normal)
 {
 	glm::vec3 normal_wi_side = normal;
 	//Ray direction is on the opposite side of the normal for the surface it's spawned from
@@ -28,8 +37,9 @@ Ray SpawnRayWithOffset(const glm::vec3& origin, const glm::vec3 dir, const glm::
 		normal_wi_side = -normal_wi_side;
 	}
 	
-	Vec3 ray_at(origin);
-	normal_wi_side *= 0.0001f;
+	glm::vec3 error(origin.x.err, origin.y.err, origin.z.err);
+	float d = glm::dot(glm::abs(normal), glm::abs(error));
+	glm::vec3 offset = d * normal_wi_side;
 	
-	return Ray(origin + normal_wi_side, dir);
+	return Ray(glm::vec3(origin.x.f, origin.y.f, origin.z.f) + offset, dir);
 }
