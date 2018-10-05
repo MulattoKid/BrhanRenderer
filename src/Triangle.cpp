@@ -94,7 +94,6 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min,
 	{
 		if (det < EPSILON) return false;
 	}
-	//if (det < EPSILON) return false;
 	EFloat invDet = ONE / det;
 
 	Vec3 tvec = ray_origin - v0;
@@ -140,7 +139,6 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less
 	{
 		if (det < EPSILON) return false;
 	}
-	//if (det < EPSILON) return false;
 	EFloat invDet = ONE / det;
 
 	Vec3 tvec = ray_origin - v0;

@@ -17,5 +17,6 @@ struct Ray
 
 Ray SpawnRayWithOffsetNoFlip(const Vec3& origin, const glm::vec3 dir, const glm::vec3& normal);
 Ray SpawnRayWithOffset(const Vec3& origin, const glm::vec3 dir, const glm::vec3& normal);
+Ray SpawnRayWithOffsetVisibility(const Vec3& origin, const glm::vec3 dir, const glm::vec3& normal, const glm::vec3& incoming_dir);
 
 #endif

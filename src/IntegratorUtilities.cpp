@@ -42,14 +42,14 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 		glm::vec3 f = isect.bsdf->f(isect.wo, wi, BxDFType(BSDF_ALL & ~BSDF_SPECULAR));
 		f *= glm::abs(glm::dot(isect.normal, wi));
 		scattering_pdf = isect.bsdf->Pdf(isect.wo, wi, isect.normal, BxDFType(BSDF_ALL & ~BSDF_SPECULAR));
-		if (f != glm::vec3(0.0f)) //Some light is reflected from the intersection point
+		if (f != glm::vec3(0.0f)) //Some light is reflected/transmitted from the intersection point
 		{
 			//Check for visibility to light
-			//TODO: I NEED TO MAKE A STABLE WAY OF MAKING SURE THAT A RAY WILL HIT THE GEOMETRY THAT IT SPAWNED ON
-			//		USING DOUBLE-SIDED GEOMETRY IS A WASTEFUL TECHNIQUE
-			Ray vis_ray = SpawnRayWithOffsetNoFlip(isect.point, wi, isect.normal);
+			Ray vis_ray = SpawnRayWithOffsetVisibility(isect.point, wi, isect.normal, isect.wo);
 			SurfaceInteraction light_isect;
-			if (!scene.Intersect(&vis_ray, &light_isect, 0.01f, 10000.0f) || light_isect.shape == area_light->shape)
+			//if (!scene.Intersect(&vis_ray, &light_isect, 0.01f, 10000.0f) || light_isect.shape == area_light->shape)
+			scene.Intersect(&vis_ray, &light_isect, 0.0f, 10000.0f);
+			if (light_isect.shape == area_light->shape)
 			{		
 				weight = PowerHeuristic(1, light_pdf, 1, scattering_pdf);
 				Ld += (f * Li * weight) / light_pdf;
@@ -78,7 +78,9 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 		//Check if the sampled direction intersects the light source's geometry before anything else (direct light)
 		Ray light_ray = SpawnRayWithOffset(isect.point, wi, isect.normal);
 		SurfaceInteraction light_isect;
-		if (scene.Intersect(&light_ray, &light_isect, 0.01f, 10000.0f) && light_isect.shape == area_light->shape)
+		//if (scene.Intersect(&light_ray, &light_isect, 0.01f, 10000.0f) && light_isect.shape == area_light->shape)
+		scene.Intersect(&light_ray, &light_isect, 0.0f, 10000.0f);
+		if (light_isect.shape == area_light->shape)
 		{
 			Li = area_light->L(light_isect.Point(), -wi);
 		}

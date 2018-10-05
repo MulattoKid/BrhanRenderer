@@ -33,13 +33,13 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		}
 		
 		if (!intersected || b >= max_depth) { break; }
+		if (!isect.shape->IsAreaLight() && b == 0)// && (isect.shape == (void*)(0x681a50) || isect.shape == (void*)(0x681ad0)))
+		{
+			int a = 2;
+		}
 		
 		//Sample direct illumination from lights
 		glm::vec3 Ld = path_throughput * UniformSampleOne(scene, isect, rng);
-		if (Ld.x == std::numeric_limits<float>::infinity())
-		{
-			assert(0);
-		}
 		L += Ld;
 		
 		//Sample BSDF to get new direction
