@@ -3,7 +3,58 @@
 #include "glm/gtc/constants.hpp"
 #include "glm/mat3x3.hpp"
 #include "glm/trigonometric.hpp"
-#include <stdio.h>
+#include "Logger.h"
+
+//https://math.stackexchange.com/questions/133177/finding-a-unit-vector-perpendicular-to-another-vector
+glm::vec3 PickVectorPerpendicularTo(const glm::vec3& v)
+{
+	glm::vec3 nv = glm::normalize(v);
+	
+	//Special cases
+	//All components are zero
+	if (nv == glm::vec3(0.0f))
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Vector nv is glm::vec3(0.0f)\n");
+	}
+	//Two components are zero
+	if (nv.x == 0.0f && nv.y == 0.0f) //nv=(0,0,1)
+	{
+		return glm::vec3(1.0f, 0.0f, 0.0f);
+	}
+	if (nv.x == 0.0f && nv.z == 0.0f) //nv=(0,1,0)
+	{
+		return glm::vec3(1.0f, 0.0f, 0.0f);
+	}
+	if (nv.y == 0.0f && nv.z == 0.0f) //nv=(1,0,0)
+	{
+		return glm::vec3(0.0f, 0.0f, 1.0f);
+	}
+	//One component is zero
+	if (nv.x == 0.0f)
+	{
+		float b = 1.0f;
+		float c = -nv.y / nv.z;
+		return glm::normalize(glm::vec3(1.0f, b, c));
+	}
+	if (nv.y == 0.0f)
+	{
+		float a = 1.0f;
+		float c = -nv.x / nv.z;
+		return glm::normalize(glm::vec3(a, 1.0f, c));
+	}
+	if (nv.z == 0.0f)
+	{
+		float a = 1.0f;
+		float b = -nv.x / nv.y;
+		return glm::normalize(glm::vec3(a, b, 1.0f));
+	}
+	
+	//No components are zero
+	float a = 1.0f;
+	float b = 1.0f;
+	float c = (-nv.x - nv.y) / nv.z;
+	return glm::normalize(glm::vec3(a, b, c));
+}
 
 bool SameHemisphere(const glm::vec3& a, const glm::vec3& b, const glm::vec3& normal)
 {

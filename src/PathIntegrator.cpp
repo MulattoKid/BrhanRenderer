@@ -17,7 +17,7 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 	for (unsigned int b = 0; b < max_depth; b++)
 	{
 		SurfaceInteraction isect;
-		bool intersected = scene.Intersect(ray, &isect, 0.0f, 10000.0f);
+		bool intersected = scene.Intersect(ray, &isect, 0.00001f, 10000.0f);
 		
 		//depth==0: this is the first bounce and direct illumination from light
 		//			sources haven't been accounted for yet
@@ -33,10 +33,6 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		}
 		
 		if (!intersected || b >= max_depth) { break; }
-		if (!isect.shape->IsAreaLight() && b == 0)// && (isect.shape == (void*)(0x681a50) || isect.shape == (void*)(0x681ad0)))
-		{
-			int a = 2;
-		}
 		
 		//Sample direct illumination from lights
 		glm::vec3 Ld = path_throughput * UniformSampleOne(scene, isect, rng);
