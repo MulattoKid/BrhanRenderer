@@ -20,7 +20,7 @@ float SpecularBTDF::Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec
 	return 0.0f;
 }
 
-glm::vec3 SpecularBTDF::f(const glm::vec3& wo, const glm::vec3& wi) const
+glm::vec3 SpecularBTDF::f(const glm::vec3& wo, const glm::vec3& normal, const glm::vec3& wi) const
 {
 	return glm::vec3(0.0f);
 }

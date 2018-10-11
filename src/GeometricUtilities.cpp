@@ -56,6 +56,35 @@ glm::vec3 PickVectorPerpendicularTo(const glm::vec3& v)
 	return glm::normalize(glm::vec3(a, b, c));
 }
 
+inline glm::vec3 FlipNegativeZerosVec3(const glm::vec3& v)
+{
+	glm::vec3 f(v);
+	if (f.x == -0.0f) { f.x = 0.0f; }
+	if (f.y == -0.0f) { f.y = 0.0f; }
+	if (f.z == -0.0f) { f.z = 0.0f; }
+	return f;
+}
+
+//https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
+glm::mat3 RotationToAlignAToB(const glm::vec3& a, const glm::vec3& b)
+{
+	if (FlipNegativeZerosVec3(b) == a) { return glm::mat3(1.0f); } //No rotation is required
+	const glm::vec3 v = glm::cross(a, b);
+	const float s = glm::length(v);
+	const float c = glm::dot(a, b);
+	const glm::mat3 m(glm::vec3(0.0f, v[2], -v[1]), glm::vec3(-v[2], 0.0f, v[0]), glm::vec3(v[1], -v[0], 0.0f));
+	const glm::mat3 rotation = glm::mat3(1.0f) + m + ((m * m) * ((1.0f - c) / (s * s)));
+	return rotation;
+}
+
+//https://answers.unity.com/questions/1456941/project-a-vector-onto-a-plane.html
+//https://www.opengl.org/discussion_boards/showthread.php/159739-Projection-of-a-3d-vector-on-a-plane
+glm::vec3 ProjectVectorOntoPlane(const glm::vec3& v, const glm::vec3& plane_normal)
+{
+	const glm::vec3 r = v - (glm::dot(plane_normal, v) * plane_normal);
+	return glm::normalize(r);
+}
+
 bool SameHemisphere(const glm::vec3& a, const glm::vec3& b, const glm::vec3& normal)
 {
 	//Check if they are in the same hemisphere
@@ -63,13 +92,14 @@ bool SameHemisphere(const glm::vec3& a, const glm::vec3& b, const glm::vec3& nor
 	return false;
 }
 
-glm::vec3 FlipNegativeZerosVec3(const glm::vec3& v)
+float UniformHemispherePdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal)
 {
-	glm::vec3 f(v);
-	if (f.x == -0.0f) { f.x = 0.0f; }
-	if (f.y == -0.0f) { f.y = 0.0f; }
-	if (f.z == -0.0f) { f.z = 0.0f; }
-	return f;
+	if (SameHemisphere(wo, wi, normal))
+	{
+		return glm::two_over_pi<float>();
+
+	}
+	return 0.0f;
 }
 
 glm::vec3 UniformSampleHemisphere(const float u[2], const glm::vec3& normal)
@@ -79,7 +109,7 @@ glm::vec3 UniformSampleHemisphere(const float u[2], const glm::vec3& normal)
 	//https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
 	//1) Create rotation matrix that rotates a point around an axis
 	//	- This axis is the cross-product of the two normals
-	//2) Multiply the smapled point with this matrix
+	//2) Multiply the sampled point with this matrix
 
 	//Generate sample point (also a direction - no need to normalize)
 	glm::vec3 sample_point;
@@ -94,21 +124,22 @@ glm::vec3 UniformSampleHemisphere(const float u[2], const glm::vec3& normal)
 	// y's domain is [-1,1]
 	// z's domain is [0,1]
 	const glm::vec3 sampled_space_normal(0.0f, 0.0f, 1.0f);
-	if (FlipNegativeZerosVec3(normal) == sampled_space_normal) { return sample_point; } //No rotation is required
-	const glm::vec3 v = glm::cross(sampled_space_normal, normal);
-	const float s = glm::length(v);
-	const float c = glm::dot(sampled_space_normal, normal);
-	const glm::mat3 m(glm::vec3(0.0f, v[2], -v[1]), glm::vec3(-v[2], 0.0f, v[0]), glm::vec3(v[1], -v[0], 0.0f));
-	const glm::mat3 rotation = glm::mat3(1.0f) + m + ((m * m) * ((1.0f - c) / (s * s)));
-	
+	const glm::mat3 rotation = RotationToAlignAToB(sampled_space_normal, normal);
 	return glm::normalize(rotation * sample_point);
 }
 
-float UniformHemispherePdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal)
+float CosineHemispherePdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal)
 {
 	if (SameHemisphere(wo, wi, normal))
 	{
-		return glm::two_over_pi<float>();
+		return glm::abs(glm::dot(normal, wi)) * glm::one_over_pi<float>();
 	}
 	return 0.0f;
+}
+
+//http://www.rorydriscoll.com/2009/01/07/better-sampling/
+glm::vec3 CosineSampleHemisphere(const float u[2], const glm::vec3& normal)
+{
+	//TODO
+	return glm::vec3(0.0f);
 }

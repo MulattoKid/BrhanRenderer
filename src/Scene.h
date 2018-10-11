@@ -9,6 +9,7 @@
 #include "SurfaceInteraction.h"
 #include <vector>
 
+struct ModelLoad;
 struct SphereLoad;
 
 struct Scene
@@ -17,9 +18,9 @@ struct Scene
 	std::vector<DiffuseAreaLight> diffuse_area_lights;
 	std::vector<AreaLight*> area_lights;
 	
-	Scene(const std::vector<std::string>& model_files, const std::vector<SphereLoad>& spheres);
-	bool LoadOBJ(const char* file, const int model_index);
-	bool LoadSphere(const SphereLoad& sphere, const int model_index);
+	Scene(const std::vector<ModelLoad>& models, const std::vector<SphereLoad>& spheres);
+	bool LoadOBJ(const ModelLoad& model_load, const unsigned int model_index);
+	bool LoadSphere(const SphereLoad& sphere, const unsigned int model_index);
 	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const;
 	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const;
 };

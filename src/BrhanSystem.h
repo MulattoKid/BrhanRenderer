@@ -4,10 +4,27 @@
 #include "Camera.h"
 #include <chrono>
 #include "Integrator.h"
+#include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 #include "PixelSampler.h"
 #include "RNG.h"
 #include "Scene.h"
+
+struct ModelLoad
+{
+	std::string file;
+	glm::mat4 translation;
+	bool translation_active = false;
+	glm::mat4 rotation;
+	bool rotation_active = false;
+	
+	std::string material = "";
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+	glm::vec3 reflectance;
+	glm::vec3 transmittance;
+	bool has_custom_material = false;
+};
 
 struct SphereLoad
 {
@@ -15,6 +32,7 @@ struct SphereLoad
 
 	glm::vec3 center;
 	float radius;
+	
 	std::string material;
 	glm::vec3 diffuse;
 	glm::vec3 specular;
@@ -34,7 +52,7 @@ struct BrhanSystem
 	Integrator* integrator;
 	IntegratorType integrator_type;
 	char* scene_file;
-	std::vector<std::string> model_files;
+	std::vector<ModelLoad> models;
 	std::vector<SphereLoad> spheres;
 	
 	BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, PixelSampler** pixel_sampler);

@@ -2,6 +2,7 @@
 #include "LambertianBRDF.h"
 #include "Logger.h"
 #include "MatteMaterial.h"
+#include "OrenNayarBRDF.h"
 
 MatteMaterial::MatteMaterial(const glm::vec3& Kd)
 {
@@ -24,5 +25,6 @@ void MatteMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 	if (Kd != glm::vec3(0.0f))
 	{
 		isect->bsdf->Add(new LambertianBRDF(Kd));
+		//isect->bsdf->Add(new OrenNayarBRDF(Kd, 20.0f));
 	}
 }

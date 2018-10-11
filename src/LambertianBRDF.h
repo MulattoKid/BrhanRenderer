@@ -9,7 +9,7 @@ struct LambertianBRDF : BxDF
 
 	LambertianBRDF(const glm::vec3& R);
 	~LambertianBRDF();
-	virtual glm::vec3 f(const glm::vec3& wo, const glm::vec3& wi) const;
+	virtual glm::vec3 f(const glm::vec3& wo, const glm::vec3& normal, const glm::vec3& wi) const;
 };
 
 #endif

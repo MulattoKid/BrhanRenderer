@@ -55,14 +55,14 @@ float BSDF::Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& norma
 	return matching_comp > 0 ? pdf / float(matching_comp) : 0.0f;
 }
 
-glm::vec3 BSDF::f(const glm::vec3& wo, const glm::vec3& wi, BxDFType flags) const
+glm::vec3 BSDF::f(const glm::vec3& wo, const glm::vec3& normal, const glm::vec3& wi, BxDFType flags) const
 {
 	glm::vec3 f(0.0f);
 	for (int i = 0; i < num_bxdfs; i++)
 	{
 		if (bxdfs[i]->MatchesFlags(flags))
 		{
-			f += bxdfs[i]->f(wo, wi);
+			f += bxdfs[i]->f(wo, normal, wi);
 		}
 	}
 	
@@ -92,7 +92,7 @@ glm::vec3 BSDF::Samplef(RNG& rng, const glm::vec3& wo, float u[2], const BxDFTyp
 		}
 	}
 	
-	//Reample u[0] as it was used to choose the BxDF
+	//Resample u[0] as it was used to choose the BxDF
 	rng.Uniform1D(&u[0]);
 	
 	//Sample BxDF to get wi
@@ -117,7 +117,7 @@ glm::vec3 BSDF::Samplef(RNG& rng, const glm::vec3& wo, float u[2], const BxDFTyp
 	//Compute value for BSDF for the the sampled direction
 	if (num_matching > 1 && !(bxdf->type & BSDF_SPECULAR))
 	{
-		f = this->f(wo, *wi, type);
+		f = this->f(wo, normal, *wi, type);
 	}
 	
 	return f;

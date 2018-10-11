@@ -10,7 +10,7 @@ LambertianBRDF::LambertianBRDF(const glm::vec3& R) : BxDF(BxDFType(BSDF_REFLECTI
 LambertianBRDF::~LambertianBRDF()
 {}
 
-glm::vec3 LambertianBRDF::f(const glm::vec3& wo, const glm::vec3& wi) const
+glm::vec3 LambertianBRDF::f(const glm::vec3& wo, const glm::vec3& normal, const glm::vec3& wi) const
 {
 	//http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/
 	return R * glm::one_over_pi<float>();

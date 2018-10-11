@@ -12,7 +12,7 @@ struct SpecularBRDF : BxDF
 	SpecularBRDF(const glm::vec3& R, Fresnel* fresnel);
 	~SpecularBRDF();
 	float Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal) const;
-	glm::vec3 f(const glm::vec3& wo, const glm::vec3& wi) const;
+	glm::vec3 f(const glm::vec3& wo, const glm::vec3& normal, const glm::vec3& wi) const;
 	glm::vec3 Samplef(const glm::vec3& wo, const float u[2], const glm::vec3& normal,
 					  glm::vec3* wi, float* pdf, BxDFType* sampled_type) const;
 };

@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include "DirectLightingIntegrator.h"
 #include <fstream>
+#include "glm/gtc/matrix_transform.hpp"
 #include <iostream>
 #include <limits>
 #include "Logger.h"
@@ -196,10 +197,171 @@ void BrhanSystem::LoadIntegrator(const std::string& line)
 
 void BrhanSystem::AddModel(const std::string& line)
 {
-	unsigned int index = 11; //Eat "Model file["
-	unsigned int end = index + 1;
-	while (line[end] != ']') { end++; }
-	model_files.push_back(line.substr(index, end - index).c_str());
+	ModelLoad model;
+	static const std::string file_str = "file";
+	bool found_file = false;
+	static const std::string translate_str = "translate";
+	bool found_translate = false;
+	static const std::string rotate_str = "rotate";
+	bool found_rotate = false;
+	
+	static const std::string material_str = "material";
+	bool found_material = false;
+	static const std::string diffuse_str = "diffuse";
+	bool found_diffuse = false;
+	static const std::string specular_str = "specular";
+	bool found_specular = false;
+	static const std::string reflectance_str = "reflectance";
+	bool found_reflectance = false;
+	static const std::string transmittance_str = "transmittance";
+	bool found_transmittance = false;
+	
+	unsigned int index = 6; //Eat "Model "
+	while (index < line.length())
+	{
+		if (line.compare(index, file_str.length(), file_str) == 0)
+		{
+			index += 5; //Eat "file["
+			unsigned int end = index + 1;
+			while (line[end] != ']') { end++; }
+			model.file = line.substr(index, end - index);
+			index = end + 1;
+			found_file = true;
+		}
+		else if (line.compare(index, translate_str.length(), translate_str) == 0)
+		{
+			index += 10; //Eat "translate["
+			glm::vec3 translation_vec(0.0f);
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				translation_vec[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			model.translation = glm::translate(glm::mat4(1.0f), translation_vec);
+			model.translation_active = true;
+			found_translate = true;
+		}
+		else if (line.compare(index, rotate_str.length(), rotate_str) == 0)
+		{
+			index += 7; //Eat "rotate["
+			glm::vec3 rotation_vec(0.0f);
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				rotation_vec[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			model.rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotation_vec.x), glm::vec3(1.0f, 0.0f, 0.0f));
+			model.rotation = glm::rotate(model.rotation, glm::radians(rotation_vec.y), glm::vec3(0.0f, 1.0f, 0.0f));
+			model.rotation = glm::rotate(model.rotation, glm::radians(rotation_vec.z), glm::vec3(0.0f, 0.0f, 1.0f));
+			model.rotation_active = true;
+			found_rotate = true;
+		}
+		else if (line.compare(index, material_str.length(), material_str) == 0)
+		{
+			index += 9; //Eat "material["
+			unsigned int end = index + 1;
+			while (line[end] != ']') { end++; }
+			model.material = line.substr(index, end - index);
+			found_material = true;
+			model.has_custom_material = true;
+		}
+		else if (line.compare(index, diffuse_str.length(), diffuse_str) == 0)
+		{
+			index += 8; //Eat "diffuse["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				model.diffuse[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			found_diffuse = true;
+		}
+		else if (line.compare(index, specular_str.length(), specular_str) == 0)
+		{
+			index += 9; //Eat "specular["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				model.specular[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			found_specular = true;
+		}
+		else if (line.compare(index, reflectance_str.length(), reflectance_str) == 0)
+		{
+			index += 12; //Eat "reflectance["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				model.reflectance[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			found_reflectance = true;
+		}
+		else if (line.compare(index, transmittance_str.length(), transmittance_str) == 0)
+		{
+			index += 14; //Eat "transmittance["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				model.transmittance[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			found_transmittance = true;
+		}
+		
+		index++;
+	}
+	
+	if (!found_file)
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find model file\n");
+	}
+	if (!found_translate)
+	{
+		model.translation = glm::mat4(1.0f);
+	}
+	if (!found_rotate)
+	{
+		model.rotation = glm::mat4(1.0f);
+	}
+	if (found_material)
+	{
+		if (model.material == "matte" && !found_diffuse)
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse spectrum of model\n");
+		}
+		if (model.material == "mirror" && !found_specular)
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of model\n");
+		}
+		if (model.material == "plastic" && (!found_specular || !found_specular))
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse or specular spectrum of model\n");
+		}
+		if (model.material == "translucent" && !found_transmittance)
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find transmittance spectrum of model\n");
+		}
+		if (model.material == "water" && (!found_reflectance || !found_transmittance))
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of model\n");
+		}
+		if (model.material == "glass" && (!found_reflectance || !found_transmittance))
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of model\n");
+		}
+	}
+	
+	models.push_back(model);
 }
 
 void BrhanSystem::AddSphere(const std::string& line)
@@ -209,6 +371,7 @@ void BrhanSystem::AddSphere(const std::string& line)
 	bool found_center = false;
 	static const std::string radius_str = "radius";
 	bool found_radius = false;
+	
 	static const std::string material_str = "material";
 	bool found_material = false;
 	static const std::string diffuse_str = "diffuse";
@@ -331,6 +494,10 @@ void BrhanSystem::AddSphere(const std::string& line)
 	{
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find transmittance spectrum of sphere\n");
 	}
+	if (sphere.material == "water" && (!found_reflectance || !found_transmittance))
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of sphere\n");
+	}
 	if (sphere.material == "glass" && (!found_reflectance || !found_transmittance))
 	{
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of sphere\n");
@@ -408,7 +575,7 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 	*film = new float[film_width * film_height * 3];
 	*rngs = new RNG[omp_get_max_threads()];
 	*pixel_sampler = new PixelSampler(spp, film_width, film_height);
-	*scene = new Scene(model_files, spheres);
+	*scene = new Scene(models, spheres);
 }
 
 BrhanSystem::~BrhanSystem()
@@ -416,6 +583,11 @@ BrhanSystem::~BrhanSystem()
 	if (integrator_type == IntegratorType::DIRECT_LIGHTING_INTEGRATOR)
 	{
 		DirectLightingIntegrator* ptr = (DirectLightingIntegrator*)(integrator);
+		delete ptr;
+	}
+	else if (integrator_type == IntegratorType::PATH_INTEGRATOR)
+	{
+		PathIntegrator* ptr = (PathIntegrator*)(integrator);
 		delete ptr;
 	}
 }

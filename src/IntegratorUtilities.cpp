@@ -39,7 +39,7 @@ glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_lig
 	glm::vec3 Li = area_light->SampleLi(rng, isect, u_light, &sample_point, &wi, &light_pdf);
 	if (light_pdf > 0.0f && Li != glm::vec3(0.0f)) //Light has a probability of arriving at the point and some light does
 	{
-		glm::vec3 f = isect.bsdf->f(isect.wo, wi, BxDFType(BSDF_ALL & ~BSDF_SPECULAR));
+		glm::vec3 f = isect.bsdf->f(isect.wo, isect.normal, wi, BxDFType(BSDF_ALL & ~BSDF_SPECULAR));
 		f *= glm::abs(glm::dot(isect.normal, wi));
 		scattering_pdf = isect.bsdf->Pdf(isect.wo, wi, isect.normal, BxDFType(BSDF_ALL & ~BSDF_SPECULAR));
 		if (f != glm::vec3(0.0f)) //Some light is reflected/transmitted from the intersection point

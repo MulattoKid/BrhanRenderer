@@ -5,24 +5,26 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tinyobjloader/tiny_obj_loader.h"
 
-Scene::Scene(const std::vector<std::string>& model_files, const std::vector<SphereLoad>& spheres)
+Scene::Scene(const std::vector<ModelLoad>& models, const std::vector<SphereLoad>& spheres)
 {	
-	models.resize(model_files.size() + spheres.size());
+	this->models.resize(models.size() + spheres.size());
 
 	//Load obj files
-	for (const std::string& file : model_files)
+	unsigned int model_index = 0;
+	for (const ModelLoad& model : models)
 	{
-		if (!LoadOBJ(file.c_str(), 0))
+		if (!LoadOBJ(model, model_index))
 		{
-			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to load model %s\n", file.c_str());
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to load model %s\n", model.file.c_str());
 		}
+		model_index++;
 	}
 	
 	//Load spheres
 	unsigned int sphere_index = 0;
 	for (const SphereLoad& sphere : spheres)
 	{
-		if (!LoadSphere(sphere, model_files.size() + sphere_index))
+		if (!LoadSphere(sphere, models.size() + sphere_index))
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to load sphere number %lu\n", sphere_index);
 		}
@@ -45,25 +47,25 @@ Scene::Scene(const std::vector<std::string>& model_files, const std::vector<Sphe
 					  area_lights.size());
 }
 
-bool Scene::LoadOBJ(const char* file, const int model_index)
+bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 {
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> material_ts;
 
 	std::string err;
-	bool success = tinyobj::LoadObj(&attrib, &shapes, &material_ts, &err, file); 
+	bool success = tinyobj::LoadObj(&attrib, &shapes, &material_ts, &err, model_load.file.c_str()); 
 	if (!err.empty()) //`err` may contain warning message
 	{
 	  printf("%s\n", err.c_str());
 	}
 	if (!success)
 	{
-	  return false;
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "tinyobjloader failed\n");
 	}
-	if (material_ts.empty())
+	if (material_ts.empty() && !model_load.has_custom_material)
 	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "No material detected for object '%s' - nothing to render\n", file);
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "No material detected for model '%s' - nothing to render\n", model_load.file.c_str());
 	}
 	
 	//Count number of triangles and quads to resize Model::shapes
@@ -82,8 +84,16 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 	model->triangles.resize(num_triangles);
 	model->quads.resize(num_quads);
 	model->shapes.resize(num_triangles + num_quads);
-	model->materials.resize(material_ts.size());
-	model->mtls.resize(material_ts.size());
+	if (model_load.has_custom_material)
+	{
+		model->materials.resize(1);
+		model->mtls.resize(1);
+	}
+	else
+	{
+		model->materials.resize(material_ts.size());
+		model->mtls.resize(material_ts.size());
+	}
 	const bool has_normals = attrib.normals.size() > 0 ? true : false;
 	model->has_uvs = attrib.texcoords.size() > 0 ? true : false;
 
@@ -91,68 +101,120 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 	std::vector<int> matte_material_indices;
 	std::vector<int> mirror_material_indices;
 	std::vector<int> plastic_material_indices;
-	std::vector<int> glass_material_indices;
-	std::vector<int> water_material_indices;
 	std::vector<int> translucent_material_indices;
-	for (size_t i = 0; i < material_ts.size(); i++)
+	std::vector<int> water_material_indices;
+	std::vector<int> glass_material_indices;
+	if (model_load.has_custom_material)
 	{
-		tinyobj::material_t* material = &material_ts[i];
-		MTL* mtl = &model->mtls[i];
-
-		//Assign
-		mtl->ambient = glm::vec3(material->ambient[0], material->ambient[1], material->ambient[2]);
-		mtl->diffuse = glm::vec3(material->diffuse[0], material->diffuse[1], material->diffuse[2]);
-		mtl->specular = glm::vec3(material->specular[0], material->specular[1], material->specular[2]);
-		mtl->transmittance = glm::vec3(material->transmittance[0], material->transmittance[1], material->transmittance[2]);
-		mtl->emission = glm::vec3(material->emission[0], material->emission[1], material->emission[2]);
-		mtl->shininess = material->shininess;
-		mtl->index_of_refraction = material->ior;
-		mtl->dissolve = material->dissolve;
-		mtl->illumination_model = material->illum;
-		
 		//TODO: cover all supported materials
-		if (mtl->dissolve == 1.0f) //Fully opaque materials
+		if (model_load.material == "matte")
 		{
-			if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular == glm::vec3(0.0f))
-			{
-				model->matte_materials.push_back(MatteMaterial(mtl->diffuse));
-				matte_material_indices.push_back(i);
-			}
-			else if (mtl->diffuse == glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
-			{
-				model->mirror_materials.push_back(MirrorMaterial(mtl->specular));
-				mirror_material_indices.push_back(i);
-			}
-			else if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
-			{
-				model->plastic_materials.push_back(PlasticMaterial(mtl->diffuse, mtl->specular));
-				plastic_material_indices.push_back(i);
-			}
-			else
-			{
-				LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported material\n");
-			}
+			model->matte_materials.push_back(MatteMaterial(model_load.diffuse));
+			matte_material_indices.push_back(0);
 		}
-		else //Some transparency materials
+		else if (model_load.material == "mirror")
 		{
-			if (mtl->index_of_refraction == 1.0f)
+			model->mirror_materials.push_back(MirrorMaterial(model_load.specular));
+			mirror_material_indices.push_back(0);
+		}
+		else if (model_load.material == "plastic")
+		{
+			model->plastic_materials.push_back(PlasticMaterial(model_load.diffuse, model_load.specular));
+			plastic_material_indices.push_back(0);
+		}
+		else if (model_load.material == "translucent")
+		{
+			model->translucent_materials.push_back(TranslucentMaterial(model_load.transmittance));
+			translucent_material_indices.push_back(0);
+		}
+		else if (model_load.material == "water")
+		{
+			model->water_materials.push_back(WaterMaterial(model_load.reflectance, model_load.transmittance));
+			water_material_indices.push_back(0);
+		}
+		else if (model_load.material == "glass")
+		{
+			model->glass_materials.push_back(GlassMaterial(model_load.reflectance, model_load.transmittance));
+			glass_material_indices.push_back(0);
+		}
+		else
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Material %s is not supported\n", model_load.material);
+		}
+		
+		//TODO: update as more support is added for custom materials
+		model->mtls[0].ambient = glm::vec3(0.0f);
+		model->mtls[0].diffuse = model_load.diffuse;
+		model->mtls[0].specular = model_load.specular;
+		model->mtls[0].transmittance = model_load.transmittance;
+		model->mtls[0].emission = glm::vec3(0.0f);
+		model->mtls[0].shininess = 1.0f;
+		model->mtls[0].index_of_refraction = 1.0f;
+		model->mtls[0].dissolve = 1.0f;
+		model->mtls[0].illumination_model = 2;
+	}
+	else
+	{
+		for (size_t i = 0; i < material_ts.size(); i++)
+		{
+			tinyobj::material_t* material = &material_ts[i];
+			MTL* mtl = &model->mtls[i];
+
+			//Assign
+			mtl->ambient = glm::vec3(material->ambient[0], material->ambient[1], material->ambient[2]);
+			mtl->diffuse = glm::vec3(material->diffuse[0], material->diffuse[1], material->diffuse[2]);
+			mtl->specular = glm::vec3(material->specular[0], material->specular[1], material->specular[2]);
+			mtl->transmittance = glm::vec3(material->transmittance[0], material->transmittance[1], material->transmittance[2]);
+			mtl->emission = glm::vec3(material->emission[0], material->emission[1], material->emission[2]);
+			mtl->shininess = material->shininess;
+			mtl->index_of_refraction = material->ior;
+			mtl->dissolve = material->dissolve;
+			mtl->illumination_model = material->illum;
+		
+			//TODO: cover all supported materials
+			if (mtl->dissolve == 1.0f) //Fully opaque materials
 			{
-				model->translucent_materials.push_back(TranslucentMaterial(mtl->transmittance));
-				translucent_material_indices.push_back(i);
+				if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular == glm::vec3(0.0f))
+				{
+					model->matte_materials.push_back(MatteMaterial(mtl->diffuse));
+					matte_material_indices.push_back(i);
+				}
+				else if (mtl->diffuse == glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
+				{
+					model->mirror_materials.push_back(MirrorMaterial(mtl->specular));
+					mirror_material_indices.push_back(i);
+				}
+				else if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
+				{
+					model->plastic_materials.push_back(PlasticMaterial(mtl->diffuse, mtl->specular));
+					plastic_material_indices.push_back(i);
+				}
+				else
+				{
+					LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported material\n");
+				}
 			}
-			else if (mtl->index_of_refraction >= 1.32f && mtl->index_of_refraction <= 1.35f)
+			else //Some transparency materials
 			{
-				model->water_materials.push_back(WaterMaterial(mtl->specular, mtl->transmittance));
-				water_material_indices.push_back(i);
-			}
-			else if (mtl->index_of_refraction >= 1.5f && mtl->index_of_refraction <= 1.6f)
-			{
-				model->glass_materials.push_back(GlassMaterial(mtl->specular, mtl->transmittance));
-				glass_material_indices.push_back(i);
-			}
-			else
-			{
-				LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported material\n");
+				if (mtl->index_of_refraction == 1.0f)
+				{
+					model->translucent_materials.push_back(TranslucentMaterial(mtl->transmittance));
+					translucent_material_indices.push_back(i);
+				}
+				else if (mtl->index_of_refraction >= 1.32f && mtl->index_of_refraction <= 1.35f)
+				{
+					model->water_materials.push_back(WaterMaterial(mtl->specular, mtl->transmittance));
+					water_material_indices.push_back(i);
+				}
+				else if (mtl->index_of_refraction >= 1.5f && mtl->index_of_refraction <= 1.6f)
+				{
+					model->glass_materials.push_back(GlassMaterial(mtl->specular, mtl->transmittance));
+					glass_material_indices.push_back(i);
+				}
+				else
+				{
+					LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported material\n");
+				}
 			}
 		}
 	}
@@ -203,12 +265,24 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 					tri->v[v].x = attrib.vertices[3*idx.vertex_index+0];
 					tri->v[v].y = attrib.vertices[3*idx.vertex_index+1];
 				  	tri->v[v].z = attrib.vertices[3*idx.vertex_index+2];
+				  	if (model_load.translation_active)
+				  	{
+				  		tri->v[v] = glm::vec3(model_load.translation * glm::vec4(tri->v[v], 1.0f));
+				  	}
+				  	if (model_load.rotation_active)
+				  	{
+				  		tri->v[v] = glm::vec3(model_load.rotation * glm::vec4(tri->v[v], 1.0f));
+				  	}
 
 					if (has_normals)
 					{
 						tri->n[v].x = attrib.normals[3*idx.normal_index+0];
 					  	tri->n[v].y = attrib.normals[3*idx.normal_index+1];
 					  	tri->n[v].z = attrib.normals[3*idx.normal_index+2];
+					  	if (model_load.rotation_active)
+					  	{
+					  		tri->n[v] = glm::vec3(model_load.rotation * glm::vec4(tri->n[v], 1.0f));
+					  	}
 					}
 
 					if (model->has_uvs)
@@ -222,6 +296,10 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 					glm::vec3 v0v1 = tri->v[1] - tri->v[0];
 					glm::vec3 v0v2 = tri->v[2] - tri->v[0];
 					glm::vec3 normal = glm::normalize(glm::cross(v0v1, v0v2));
+					if (model_load.rotation_active)
+				  	{
+				  		normal = glm::vec3(model_load.rotation * glm::vec4(normal, 1.0f));
+				  	}
 					tri->n[0] = normal;
 					tri->n[1] = normal;
 					tri->n[2] = normal;
@@ -229,8 +307,16 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				model->shapes[shape_index++] = tri;
 				
 				//per-face material
-				tri->material = model->materials[shapes[s].mesh.material_ids[f]];
-				tri->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
+				if (model_load.has_custom_material)
+				{
+					tri->material = model->materials[0];
+					tri->mtl = &model->mtls[0];
+				}
+				else
+				{
+					tri->material = model->materials[shapes[s].mesh.material_ids[f]];
+					tri->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
+				}
 				//Add to lights if emissive
 				if (tri->mtl->emission != glm::vec3(0.0f))
 				{
@@ -244,7 +330,7 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 					tri->area_light_index = diffuse_area_lights.size() - 1;
 				}
 			}
-			else //Quad
+			else if (fv == 4) //Quad
 			{
 				Quad* quad = &model->quads[quad_index++];
 				//Loop over vertices in the face
@@ -254,12 +340,24 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				  	quad->v[v].x = attrib.vertices[3*idx.vertex_index+0];
 				  	quad->v[v].y = attrib.vertices[3*idx.vertex_index+1];
 				  	quad->v[v].z = attrib.vertices[3*idx.vertex_index+2];
+				  	if (model_load.translation_active)
+				  	{
+				  		quad->v[v] = glm::vec3(model_load.translation * glm::vec4(quad->v[v], 1.0f));
+				  	}
+				  	if (model_load.rotation_active)
+				  	{
+				  		quad->v[v] = glm::vec3(model_load.rotation * glm::vec4(quad->v[v], 1.0f));
+				  	}
 
 					if (has_normals)
 					{
 					  	quad->n[v].x = attrib.normals[3*idx.normal_index+0];
 					  	quad->n[v].y = attrib.normals[3*idx.normal_index+1];
 					  	quad->n[v].z = attrib.normals[3*idx.normal_index+2];
+					  	if (model_load.rotation_active)
+					  	{
+					  		quad->n[v] = glm::vec3(model_load.rotation * glm::vec4(quad->n[v], 1.0f));
+					  	}
 					}
 
 					if (model->has_uvs)
@@ -273,6 +371,10 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 					glm::vec3 v0v1 = quad->v[1] - quad->v[0];
 					glm::vec3 v0v2 = quad->v[2] - quad->v[0];
 					glm::vec3 normal = glm::normalize(glm::cross(v0v1, v0v2));
+					if (model_load.rotation_active)
+				  	{
+						normal = glm::vec3(model_load.rotation * glm::vec4(normal, 1.0f));
+					}
 					quad->n[0] = normal;
 					quad->n[1] = normal;
 					quad->n[2] = normal;
@@ -281,8 +383,16 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				model->shapes[shape_index++] = quad;
 				
 				//per-face material
-				quad->material = model->materials[shapes[s].mesh.material_ids[f]];
-				quad->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
+				if (model_load.has_custom_material)
+				{
+					quad->material = model->materials[0];
+					quad->mtl = &model->mtls[0];
+				}
+				else
+				{
+					quad->material = model->materials[shapes[s].mesh.material_ids[f]];
+					quad->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
+				}
 				//Add to lights if emissive
 				if (quad->mtl->emission != glm::vec3(0.0f))
 				{
@@ -295,7 +405,11 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 					diffuse_area_lights.push_back(dal);
 					quad->area_light_index = diffuse_area_lights.size() - 1;
 				}
-			}			
+			}
+			else
+			{
+				LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported geometry type with %lu vertices\n", fv);
+			}		
 			index_offset += fv;
 		}
 	}
@@ -306,14 +420,14 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 				"\t%lu triangles\n"
 				"\t%lu quads\n"
 				"\t%lu shapes\n"
-				"\t%lu materials\n"
+				"\t%lu material(s)\n"
 				"\t\t%lu matte\n"
 				"\t\t%lu mirror\n"
 				"\t\t%lu plastic\n"
 				"\t\t%lu translucent\n"
 				"\t\t%lu water\n"
 				"\t\t%lu glass\n",
-				file,
+				model_load.file.c_str(),
 				model->spheres.size(),
 				model->triangles.size(),
 				model->quads.size(),
@@ -329,7 +443,7 @@ bool Scene::LoadOBJ(const char* file, const int model_index)
 	return true;
 }
 
-bool Scene::LoadSphere(const SphereLoad& sphere, const int model_index)
+bool Scene::LoadSphere(const SphereLoad& sphere, const unsigned int model_index)
 {
 	Model* model = &models[model_index];
 	model->spheres.push_back(Sphere(sphere.center, sphere.radius));

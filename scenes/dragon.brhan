@@ -1,0 +1,6 @@
+Camera position[0.0 1.0 10] view_direction[0.0 0.0 -1.0] vertical_fov[19.5] width[1024] height[1024]
+
+Integrator type[path] spp[1] max_depth[1]
+
+Model file[models/Dragon/dragon.obj] translate[0 0 0] rotate[0 0 0] material[glass] reflectance[1 1 1] transmittance[1 1 1]
+Model file[models/Dragon/light.obj]

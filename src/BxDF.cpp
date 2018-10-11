@@ -28,5 +28,5 @@ glm::vec3 BxDF::Samplef(const glm::vec3& wo, const float u[2], const glm::vec3& 
 	*wi = UniformSampleHemisphere(u, normal);
 	*pdf = Pdf(wo, *wi, normal);
 	*sampled_type = type;
-	return f(wo, *wi);
+	return f(wo, normal, *wi);
 }
