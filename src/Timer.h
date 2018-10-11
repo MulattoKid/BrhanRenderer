@@ -11,6 +11,6 @@ struct ElapsedTime
 };
 
 std::chrono::high_resolution_clock::time_point GetTime();
-void LogElapsedTime(const char* msg, std::chrono::high_resolution_clock::time_point start, std::chrono::high_resolution_clock::time_point end);
+void LogElapsedTime(const char* msg, std::chrono::high_resolution_clock::time_point start_time, std::chrono::high_resolution_clock::time_point end_time);
 
 #endif

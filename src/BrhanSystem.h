@@ -2,6 +2,7 @@
 #define BRHANSYSTEM_H
 
 #include "Camera.h"
+#include <chrono>
 #include "Integrator.h"
 #include "glm/vec3.hpp"
 #include "PixelSampler.h"
@@ -43,7 +44,7 @@ struct BrhanSystem
 	void AddModel(const std::string& line);
 	void AddSphere(const std::string& line);
 	void LoadSceneFile(const std::string& scene_file);
-	void UpdateProgress(unsigned int y) const;
+	void UpdateProgress(unsigned int y, std::chrono::high_resolution_clock::time_point start_time, std::chrono::high_resolution_clock::time_point update_time) const;
 };
 
 #endif

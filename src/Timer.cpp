@@ -6,10 +6,10 @@ std::chrono::high_resolution_clock::time_point GetTime()
 	return std::chrono::high_resolution_clock::now();
 }
 
-void LogElapsedTime(const char* msg, std::chrono::high_resolution_clock::time_point start, std::chrono::high_resolution_clock::time_point end)
+void LogElapsedTime(const char* msg, std::chrono::high_resolution_clock::time_point start_time, std::chrono::high_resolution_clock::time_point end_time)
 {
 	ElapsedTime et;
-	unsigned int ms = (unsigned int)(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());;
+	unsigned int ms = (unsigned int)(std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count());
 	unsigned int s = ms / 1000;
 	unsigned int m = s / 60;
 	

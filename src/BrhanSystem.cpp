@@ -3,6 +3,7 @@
 #include "DirectLightingIntegrator.h"
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include "Logger.h"
 #include <omp.h>
 #include "PathIntegrator.h"
@@ -419,15 +420,67 @@ BrhanSystem::~BrhanSystem()
 	}
 }
 
-void BrhanSystem::UpdateProgress(unsigned int y) const
+void BrhanSystem::UpdateProgress(unsigned int y, std::chrono::high_resolution_clock::time_point start_time, std::chrono::high_resolution_clock::time_point update_time) const
 {
 	unsigned int total_effort = film_width * film_height;
 	unsigned int progress = (unsigned int)((film_width * y) / float(total_effort) * 100.0f);
+	
 	std::string output;
 	output.resize(100, ' ');
 	for (unsigned int i = 0; i < progress; i++)
 	{
 		output[i] = '-';
 	}
-	LOG_MESSAGE(true, "\rRender progress (%lu\%): [%s]", progress, output.c_str());
+	
+	unsigned int s_remaining = std::numeric_limits<unsigned int>::max();
+	unsigned int m_remaining = std::numeric_limits<unsigned int>::max();
+	unsigned int h_remaining = std::numeric_limits<unsigned int>::max();
+	if (progress > 0)
+	{
+		unsigned int ms_used = (unsigned int)(std::chrono::duration_cast<std::chrono::milliseconds>(update_time - start_time).count());
+		unsigned int ms_per_percent = ms_used / progress;
+		unsigned int ms_remaining_total = ms_per_percent * (100 - progress);
+		unsigned int s_remaining_total = ms_remaining_total / 1000;
+		unsigned int m_remaining_total = s_remaining_total / 60;
+		unsigned int h_remaining_total = m_remaining_total / 60;
+		
+		h_remaining = h_remaining_total;
+		m_remaining = m_remaining_total - (h_remaining * 60);
+		s_remaining = s_remaining_total - (m_remaining_total * 60);
+	}
+	std::string remaining_time_str = "Estimated time remaining: " + std::to_string(h_remaining) + "h " + std::to_string(m_remaining) + "m " + std::to_string(s_remaining) + "s";
+	remaining_time_str.resize(62, ' '); //Length of 'Estimated time remaining: 4294967295h 4294967295m 4294967295s'
+	LOG_MESSAGE(true, "\rRender progress (%lu\%): [%s] %s", progress, output.c_str(), remaining_time_str.c_str());
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
