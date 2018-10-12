@@ -24,27 +24,26 @@ struct EFloat
 	EFloat(float f) { this->f = f;  this->err = 0.0f; }
 	EFloat& operator+=(const EFloat& F)
 	{
-		f += F.f;
 		err = err + F.err + Gamma(1) * (std::abs(f + F.f) + err + F.err);
+		f += F.f;
 		return *this;
 	}
 	EFloat& operator-=(const EFloat& F)
 	{
-		f -= F.f;
 		err = err + F.err + Gamma(1) * (std::abs(f - F.f) + err + F.err);
+		f -= F.f;
 		return *this;
 	}
 	EFloat& operator*=(const EFloat& F)
 	{
-		f *= F.f;
 		err = std::abs(F.f * err) + std::abs(f * F.err) + (err * F.err) + (Gamma(1) * std::abs(f * F.f));
+		f *= F.f;
 		return *this;
 	}
 	EFloat& operator/=(const EFloat& F)
 	{
+		err = (std::abs(f) + err) / (std::abs(F.f) - F.err) - std::abs(f / F.f) + (Gamma(1) * (std::abs(f) + err) / (std::abs(F.f) - F.err));
 		f /= F.f;
-		err = (std::abs(f) + err) / (std::abs(F.f) - F.err) - std::abs(f / F.f) +
-				(Gamma(1) * (std::abs(f) + err) / (std::abs(F.f) - F.err));
 		return *this;
 	}
 };

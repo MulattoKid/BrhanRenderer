@@ -12,10 +12,10 @@
 mtllib models/Dragon/light.mtl
 
 ## Object light 
-v	-0.24  10.0   0.16
-v	-0.24  10.0  -0.22
-v	 0.23  10.0  -0.22
-v	 0.23  10.0   0.16
+v	-10.0  120.0   10.0
+v	-10.0  120.0  -10.0
+v	 10.0  120.0  -10.0
+v	 10.0  120.0   10.0
 
 g light
 usemtl light

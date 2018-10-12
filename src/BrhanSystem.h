@@ -17,6 +17,8 @@ struct ModelLoad
 	bool translation_active = false;
 	glm::mat4 rotation;
 	bool rotation_active = false;
+	glm::mat4 scaling;
+	bool scaling_active = false;
 	
 	std::string material = "";
 	glm::vec3 diffuse;

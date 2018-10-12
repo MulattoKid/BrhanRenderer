@@ -273,12 +273,17 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 				  	{
 				  		tri->v[v] = glm::vec3(model_load.rotation * glm::vec4(tri->v[v], 1.0f));
 				  	}
+				  	if (model_load.scaling_active)
+				  	{
+				  		tri->v[v] = glm::vec3(model_load.scaling * glm::vec4(tri->v[v], 1.0f));
+				  	}
 
 					if (has_normals)
 					{
 						tri->n[v].x = attrib.normals[3*idx.normal_index+0];
 					  	tri->n[v].y = attrib.normals[3*idx.normal_index+1];
 					  	tri->n[v].z = attrib.normals[3*idx.normal_index+2];
+					  	tri->n[v] = glm::normalize(tri->n[v]);
 					  	if (model_load.rotation_active)
 					  	{
 					  		tri->n[v] = glm::vec3(model_load.rotation * glm::vec4(tri->n[v], 1.0f));
@@ -348,12 +353,17 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 				  	{
 				  		quad->v[v] = glm::vec3(model_load.rotation * glm::vec4(quad->v[v], 1.0f));
 				  	}
+				  	if (model_load.scaling_active)
+				  	{
+				  		quad->v[v] = glm::vec3(model_load.scaling * glm::vec4(quad->v[v], 1.0f));
+				  	}
 
 					if (has_normals)
 					{
 					  	quad->n[v].x = attrib.normals[3*idx.normal_index+0];
 					  	quad->n[v].y = attrib.normals[3*idx.normal_index+1];
 					  	quad->n[v].z = attrib.normals[3*idx.normal_index+2];
+					  	quad->n[v] = glm::normalize(quad->n[v]);
 					  	if (model_load.rotation_active)
 					  	{
 					  		quad->n[v] = glm::vec3(model_load.rotation * glm::vec4(quad->n[v], 1.0f));
@@ -517,6 +527,7 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, co
 	
 	if (intersected)
 	{
+		isect->shape->Intersect(ray, isect, t_min, t_max);
 		isect->ray = ray;
 		isect->point = ray->AtError();
 		isect->normal = isect->shape->Normal(isect->Point());

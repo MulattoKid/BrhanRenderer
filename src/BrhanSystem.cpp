@@ -204,6 +204,8 @@ void BrhanSystem::AddModel(const std::string& line)
 	bool found_translate = false;
 	static const std::string rotate_str = "rotate";
 	bool found_rotate = false;
+	static const std::string scale_str = "scale";
+	bool found_scale = false;
 	
 	static const std::string material_str = "material";
 	bool found_material = false;
@@ -259,6 +261,21 @@ void BrhanSystem::AddModel(const std::string& line)
 			model.rotation = glm::rotate(model.rotation, glm::radians(rotation_vec.z), glm::vec3(0.0f, 0.0f, 1.0f));
 			model.rotation_active = true;
 			found_rotate = true;
+		}
+		else if (line.compare(index, scale_str.length(), scale_str) == 0)
+		{
+			index += 6; //Eat "scale["
+			glm::vec3 scaling_vec(0.0f);
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				scaling_vec[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			model.scaling = glm::scale(glm::mat4(1.0f), scaling_vec);
+			model.scaling_active = true;
+			found_scale = true;
 		}
 		else if (line.compare(index, material_str.length(), material_str) == 0)
 		{
@@ -332,6 +349,10 @@ void BrhanSystem::AddModel(const std::string& line)
 	if (!found_rotate)
 	{
 		model.rotation = glm::mat4(1.0f);
+	}
+	if (!found_scale)
+	{
+		model.scaling = glm::mat4(1.0f);
 	}
 	if (found_material)
 	{
