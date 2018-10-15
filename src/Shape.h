@@ -1,6 +1,7 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
+#include "BoundingBox.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 #include "Material.h"
@@ -11,6 +12,7 @@
 
 struct Shape
 {
+	BoundingBox bb;
 	Material* material = NULL;
 	MTL* mtl = NULL;
 	int area_light_index = -1;

@@ -8,6 +8,7 @@ Sphere::Sphere(const glm::vec3& center, const float radius) : Shape(false)
 {
 	this->center = center;
 	this->radius = radius;
+	this->bb = BoundingBox(*this);
 }
 
 glm::vec3 Sphere::Normal(const glm::vec3& point) const

@@ -82,7 +82,7 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min,
 	Vec3 v0v2 = v2 - v0;
 	static const EFloat ZERO(0.0f);
 	static const EFloat ONE(1.0f);
-	static const EFloat EPSILON(0.00001f);
+	static const EFloat EPSILON(0.0f);
 	
 	Vec3 pvec = Cross(ray_dir, v0v2);
 	EFloat det = Dot(v0v1, pvec);
@@ -102,7 +102,7 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min,
 
 	Vec3 qvec = Cross(tvec, v0v1);
 	EFloat v = Dot(ray_dir, qvec) * invDet;
-	if (v < ZERO || u + v > ONE) return false;
+	if (v < ZERO || (u + v) > ONE) return false;
 
 	EFloat t = Dot(v0v2, qvec) * invDet;
 	if (t.f < ray->t && t.f >= t_min && t.f <= t_max)

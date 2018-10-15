@@ -1,4 +1,4 @@
-Camera position[0.0 1.0 10] view_direction[0.0 0.0 -1.0] vertical_fov[19.5] width[1024] height[1024]
+Camera position[0.0 1.0 120] view_direction[0.0 0.0 -1.0] vertical_fov[60] width[1024] height[1024]
 
 Integrator type[path] spp[1] max_depth[1]
 

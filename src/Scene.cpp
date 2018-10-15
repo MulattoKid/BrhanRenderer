@@ -248,6 +248,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 
 	//Loop over shapes - remember that what I call a Shape is NOT the same as the OBJ view of a shape
 	int triangle_index = 0, quad_index = 0, shape_index = 0;
+	float min_area = std::numeric_limits<float>::max();
 	for (size_t s = 0; s < shapes.size(); s++)
 	{
 		//Loop over faces(polygon)
@@ -265,13 +266,17 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 					tri->v[v].x = attrib.vertices[3*idx.vertex_index+0];
 					tri->v[v].y = attrib.vertices[3*idx.vertex_index+1];
 				  	tri->v[v].z = attrib.vertices[3*idx.vertex_index+2];
-				  	if (model_load.translation_active)
+				  	if (model_load.scaling_active)
 				  	{
-				  		tri->v[v] = glm::vec3(model_load.translation * glm::vec4(tri->v[v], 1.0f));
+				  		tri->v[v] = glm::vec3(model_load.scaling * glm::vec4(tri->v[v], 1.0f));
 				  	}
 				  	if (model_load.rotation_active)
 				  	{
 				  		tri->v[v] = glm::vec3(model_load.rotation * glm::vec4(tri->v[v], 1.0f));
+				  	}
+				  	if (model_load.translation_active)
+				  	{
+				  		tri->v[v] = glm::vec3(model_load.translation * glm::vec4(tri->v[v], 1.0f));
 				  	}
 
 					if (has_normals)
@@ -279,6 +284,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 						tri->n[v].x = attrib.normals[3*idx.normal_index+0];
 					  	tri->n[v].y = attrib.normals[3*idx.normal_index+1];
 					  	tri->n[v].z = attrib.normals[3*idx.normal_index+2];
+					  	tri->n[v] = glm::normalize(tri->n[v]);
 					  	if (model_load.rotation_active)
 					  	{
 					  		tri->n[v] = glm::vec3(model_load.rotation * glm::vec4(tri->n[v], 1.0f));
@@ -298,7 +304,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 					glm::vec3 normal = glm::normalize(glm::cross(v0v1, v0v2));
 					if (model_load.rotation_active)
 				  	{
-				  		normal = glm::vec3(model_load.rotation * glm::vec4(normal, 1.0f));
+				  		normal = glm::normalize(glm::vec3(model_load.rotation * glm::vec4(normal, 1.0f)));
 				  	}
 					tri->n[0] = normal;
 					tri->n[1] = normal;
@@ -329,6 +335,9 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 					diffuse_area_lights.push_back(dal);
 					tri->area_light_index = diffuse_area_lights.size() - 1;
 				}
+				//Generate bounding box
+				tri->bb = BoundingBox(*tri);
+				min_area = tri->Area() < min_area ? tri->Area() : min_area;
 			}
 			else if (fv == 4) //Quad
 			{
@@ -348,12 +357,17 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 				  	{
 				  		quad->v[v] = glm::vec3(model_load.rotation * glm::vec4(quad->v[v], 1.0f));
 				  	}
+				  	if (model_load.scaling_active)
+				  	{
+				  		quad->v[v] = glm::vec3(model_load.scaling * glm::vec4(quad->v[v], 1.0f));
+				  	}
 
 					if (has_normals)
 					{
 					  	quad->n[v].x = attrib.normals[3*idx.normal_index+0];
 					  	quad->n[v].y = attrib.normals[3*idx.normal_index+1];
 					  	quad->n[v].z = attrib.normals[3*idx.normal_index+2];
+					  	quad->n[v] = glm::normalize(quad->n[v]);
 					  	if (model_load.rotation_active)
 					  	{
 					  		quad->n[v] = glm::vec3(model_load.rotation * glm::vec4(quad->n[v], 1.0f));
@@ -373,7 +387,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 					glm::vec3 normal = glm::normalize(glm::cross(v0v1, v0v2));
 					if (model_load.rotation_active)
 				  	{
-						normal = glm::vec3(model_load.rotation * glm::vec4(normal, 1.0f));
+						normal = glm::normalize(glm::vec3(model_load.rotation * glm::vec4(normal, 1.0f)));
 					}
 					quad->n[0] = normal;
 					quad->n[1] = normal;
@@ -405,6 +419,8 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 					diffuse_area_lights.push_back(dal);
 					quad->area_light_index = diffuse_area_lights.size() - 1;
 				}
+				//Generate bounding box
+				quad->bb = BoundingBox(*quad);
 			}
 			else
 			{
@@ -414,6 +430,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 		}
 	}
 	
+	LOG_MESSAGE(false, "MINIMUM AREA: %.10f\n", min_area);
 	LOG_MESSAGE(true,
 				"Successfully loaded %s:\n"
 				"\t%lu spheres\n"
@@ -517,6 +534,7 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, co
 	
 	if (intersected)
 	{
+		isect->shape->Intersect(ray, isect, t_min, t_max);
 		isect->ray = ray;
 		isect->point = ray->AtError();
 		isect->normal = isect->shape->Normal(isect->Point());
