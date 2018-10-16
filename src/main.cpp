@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 	BrhanSystem system(argc, argv, &camera, &scene, &film, &rngs, &pixel_sampler);
 	auto end_time = GetTime();
 	LogElapsedTime("Intialization time: ", start_time, end_time);
-	
+	return 0;
 	start_time = GetTime();
 	//for (unsigned int y = system.film_height / 2; y < system.film_height / 2 + 1; y++)
 	for (unsigned int y = 0; y < system.film_height; y++)

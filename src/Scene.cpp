@@ -37,13 +37,30 @@ Scene::Scene(const std::vector<ModelLoad>& models, const std::vector<SphereLoad>
 		area_lights.push_back((AreaLight*)(&dal));
 	}
 
-	if (models.size() == 0) { LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "No models have been loaded\n"); }
+	if (this->models.size() == 0) { LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "No models have been loaded\n"); }
 	if (area_lights.size() == 0) { LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "No lights have been loaded\n"); }
+	
+	//Build BVH tree
+	unsigned int num_shapes = 0;
+	for (Model& m : this->models)
+	{
+		num_shapes += m.shapes.size();
+	}
+	std::vector<Shape*> shapes(num_shapes);
+	unsigned int shape_index = 0;
+	for (Model& m : this->models)
+	{
+		for (Shape* s : m.shapes)
+		{
+			shapes[shape_index++] = s;
+		}
+	}
+	bvh_tree = BVH(1, shapes);
 	
 	LOG_MESSAGE(true, "Scene:\n"
 					  "\t%lu models\n"
 					  "\t%lu area lights\n",
-					  models.size(),
+					  this->models.size(),
 					  area_lights.size());
 }
 
@@ -430,7 +447,6 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 		}
 	}
 	
-	LOG_MESSAGE(false, "MINIMUM AREA: %.10f\n", min_area);
 	LOG_MESSAGE(true,
 				"Successfully loaded %s:\n"
 				"\t%lu spheres\n"

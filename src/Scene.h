@@ -2,6 +2,7 @@
 #define SCENE_H
 
 #include "AreaLight.h"
+#include "BVH.h"
 #include "DiffuseAreaLight.h"
 #include "Model.h"
 #include "Ray.h"
@@ -14,6 +15,7 @@ struct SphereLoad;
 
 struct Scene
 {
+	BVH bvh_tree;
 	std::vector<Model> models;
 	std::vector<DiffuseAreaLight> diffuse_area_lights;
 	std::vector<AreaLight*> area_lights;

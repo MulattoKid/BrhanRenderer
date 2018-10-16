@@ -1,6 +1,6 @@
 Camera position[0 0 0.5] view_direction[0.0 0.0 -1.0] vertical_fov[60] width[1024] height[1024]
 
-Integrator type[path] spp[1] max_depth[1]
+Integrator type[path] spp[256] max_depth[3] #635 minutes
 
 Model file[models/Buddha/buddha.obj] translate[0 -0.25 0] rotate[-90 0 0] scale[1 1 1] material[matte] diffuse[0.75 0.75 0.75]
 Model file[models/Buddha/light.obj] translate[0 1 0]
