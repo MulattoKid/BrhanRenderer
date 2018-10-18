@@ -1,5 +1,12 @@
-# BrhanRenderer
-Path Tracer
+# BrhanRenderer - WIP Path Tracer
+
+## Building
+
+## Running
+
+### .brhan files
+
+## Functionality
 
 ![CornellBox](https://i.imgur.com/DGFBV83.png)
 A view of the CornellBox-Original (model courtesy of Morgan McGuire's graphics archive) rendered with the following settings:
