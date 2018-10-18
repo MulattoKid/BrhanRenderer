@@ -1,20 +1,22 @@
 # BrhanRenderer
 Path Tracer
 
-![CornellBox](https://i.imgur.com/nPVERKs.png)
-A view of the CornellBox-Original (courtesy of Morgan McGuire's graphics archive) rendered with the following settings:
+![CornellBox](https://i.imgur.com/DGFBV83.png)
+A view of the CornellBox-Original (model courtesy of Morgan McGuire's graphics archive) rendered with the following settings:
 - 1024x1024
 - 512 samples per pixel
 - Max path depth of 4
-- 63.0 vertical camera FOV
+- 63 degrees of vertical camera FOV
 
-Render time: 9m using 11 cores
+Triangle count: 36
+Render time: 7m 36s using 11 cores
 
-![CornellBox](https://i.imgur.com/5v640NX.png)
-A view of the CornellBox-Mirror (courtesy of Morgan McGuire's graphics archive) rendered with the following settings:
+![Buddha statue](https://i.imgur.com/hQ3fVck.png)
+A view of the Buddha statue (model courtesy of [Stanford Computer Graphics Laboratory](http://graphics.stanford.edu/data/3Dscanrep/)) rendered with the following settings:
 - 1024x1024
-- 2048 samples per pixel
-- Max path depth of 4
-- 63.0 vertical camera FOV
+- 256 samples per pixel
+- Max path depth of 3
+- 60 degrees of vertical camera FOV
 
-Render time: 26m using 11 cores
+Triangle count: 29892
+Rendering time: 1m 55s using 11 cores
