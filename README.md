@@ -1,13 +1,15 @@
 # BrhanRenderer - WIP Path Tracer
 
 ## Building
+TODO
 
 ## Running
-
-### .brhan files
+TODO
 
 ## Functionality
+TODO
 
+## Rendered Images
 ![CornellBox](https://i.imgur.com/DGFBV83.png)
 A view of the CornellBox-Original (model courtesy of Morgan McGuire's graphics archive) rendered with the following settings:
 - 1024x1024
