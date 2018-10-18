@@ -9,31 +9,8 @@
 #include "Scene.h"
 #include "Timer.h"
 
-#include "glm/geometric.hpp"
-#include "glm/trigonometric.hpp"
-#include "GeometricUtilities.h"
-#include "OrenNayarBRDF.h"
-
 int main(int argc, char** argv)
 {
-	/*glm::vec3 normal = glm::normalize(glm::vec3(1.0f, 1.0f, 0.0f));
-	glm::mat3 rotation = RotationToAlignAToB(glm::vec3(0.0f, 1.0f, 0.0f), normal);
-	glm::vec3 transformed_x_axis = glm::normalize(rotation * glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::vec3 wo = glm::normalize(glm::vec3(1.0f, 1.0f, 0.0f));
-	glm::vec3 proj_wo = ProjectVectorOntoPlane(wo, normal);
-	float phi_wo = glm::acos(glm::dot(transformed_x_axis, proj_wo));
-	glm::vec3 wi = glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f));
-	glm::vec3 proj_wi = ProjectVectorOntoPlane(wi, normal);
-	float phi_wi = glm::acos(glm::dot(transformed_x_axis, proj_wi));
-	return 0;*/
-
-	/*OrenNayarBRDF on(glm::vec3(1.0f, 0.0f, 0.0f), 20.0f);
-	glm::vec3 wo = glm::normalize(glm::vec3(-1.0f, 1.0f, 0.0f));
-	glm::vec3 wi = glm::normalize(glm::vec3(1.0f, 1.0f, 0.0f));
-	glm::vec3 n = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::vec3 r = on.f(wo, n, wi);
-	return 0;*/
-
 	auto start_time = GetTime();
 	Camera* camera = NULL;
 	Scene* scene = NULL;
@@ -43,16 +20,14 @@ int main(int argc, char** argv)
 	BrhanSystem system(argc, argv, &camera, &scene, &film, &rngs, &pixel_sampler);
 	auto end_time = GetTime();
 	LogElapsedTime("Intialization time: ", start_time, end_time);
-	return 0;
+	
 	start_time = GetTime();
-	//for (unsigned int y = system.film_height / 2; y < system.film_height / 2 + 1; y++)
 	for (unsigned int y = 0; y < system.film_height; y++)
 	{
 		#pragma omp parallel for
 #ifdef _WIN32
 		for (int x = 0; x < int(system.film_width); x++)
 #else
-		//for (unsigned int x = system.film_width / 2; x < system.film_width / 2 + 1; x++)
 		for (unsigned int x = 0; x < system.film_width; x++)
 #endif
 		{

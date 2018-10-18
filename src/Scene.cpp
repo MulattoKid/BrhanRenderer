@@ -543,14 +543,14 @@ bool Scene::LoadSphere(const SphereLoad& sphere, const unsigned int model_index)
 bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const
 {
 	bool intersected = false;
-	for (const Model& model : models)
+	/*for (const Model& model : models)
 	{
 		intersected |= model.Intersect(ray, isect, t_min, t_max); //|= is logical OR
-	}
+	}*/
+	intersected = bvh_tree.Intersect(ray, isect);
 	
 	if (intersected)
 	{
-		isect->shape->Intersect(ray, isect, t_min, t_max);
 		isect->ray = ray;
 		isect->point = ray->AtError();
 		isect->normal = isect->shape->Normal(isect->Point());

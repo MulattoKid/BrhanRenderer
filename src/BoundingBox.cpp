@@ -80,6 +80,32 @@ glm::vec3 BoundingBox::Offset(const glm::vec3& p) const
 					 min_max.z == 0.0f ? 0.0f : min_p.z / min_max.z);
 }
 
+bool BoundingBox::Intersect(const Ray& ray, const glm::vec3& inv_dir, const int dir_is_neg[3]) const
+{
+	const BoundingBox& bounds = *this;
+	float t_min =   (bounds[    dir_is_neg[0]].x - ray.origin.x) * inv_dir.x;
+	float t_max =   (bounds[1 - dir_is_neg[0]].x - ray.origin.x) * inv_dir.x;
+	float t_y_min = (bounds[    dir_is_neg[1]].y - ray.origin.y) * inv_dir.y;
+	float t_y_max = (bounds[1 - dir_is_neg[1]].y - ray.origin.y) * inv_dir.y;
+	if (t_min > t_y_max || t_y_min > t_max)
+	{
+		return false;
+	}
+	if (t_y_min > t_min) { t_min = t_y_min; }
+	if (t_y_max < t_max) { t_max = t_y_max; }
+	
+	float t_z_min = (bounds[    dir_is_neg[2]].z - ray.origin.z) * inv_dir.z;
+	float t_z_max = (bounds[1 - dir_is_neg[2]].z - ray.origin.z) * inv_dir.z;
+	if (t_min > t_z_max || t_z_min > t_max)
+	{
+		return false;
+	}
+	if (t_z_min > t_min) t_min = t_z_min;
+    if (t_z_max < t_max) t_max = t_z_max;
+    
+	return (t_min < 10000.0f) && (t_max > 0.0f);
+}
+
 BoundingBox BoundingBoxUnion(const BoundingBox& b, const glm::vec3& p)
 {
 	return BoundingBox(

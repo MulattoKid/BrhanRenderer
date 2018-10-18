@@ -48,7 +48,14 @@ BVH::BVH(const unsigned int max_shapes_in_node, const std::vector<Shape*>& shape
 	this->shapes = ordered_shapes;
 	
 	//Compute representation of depth-first traversal of BVH tree
-	
+	this->nodes = new BVHLinearNode[total_nodes];
+	unsigned int offset = 0;
+	Flatten(root, &offset);
+}
+
+BVH::~BVH()
+{
+	delete[] nodes;
 }
 
 struct BucketInfo
@@ -101,7 +108,7 @@ BVHNode* BVH::RecursiveBuild(std::vector<BVHShapeInfo>& shape_info, unsigned int
 				unsigned int shape_index = shape_info[i].shape_index;
 				ordered_shapes.push_back(shapes[shape_index]);
 			}
-			node->InitLeaf(first_shape_offset, num_shapes, centroid_bounds);
+			node->InitLeaf(first_shape_offset, num_shapes, bounds);
 			return node;
 		}
 		else //Partition shapes into two sets using SAH and build children
@@ -165,7 +172,7 @@ BVHNode* BVH::RecursiveBuild(std::vector<BVHShapeInfo>& shape_info, unsigned int
 					unsigned int shape_index = shape_info[i].shape_index;
 					ordered_shapes.push_back(shapes[shape_index]);
 				}
-				node->InitLeaf(first_shape_offset, num_shapes, centroid_bounds);
+				node->InitLeaf(first_shape_offset, num_shapes, bounds);
 				return node;
 			}
 			
@@ -179,6 +186,78 @@ BVHNode* BVH::RecursiveBuild(std::vector<BVHShapeInfo>& shape_info, unsigned int
 	return node;
 }
 
+unsigned int BVH::Flatten(BVHNode* node, unsigned int* offset)
+{
+	BVHLinearNode* linear_node = &nodes[*offset];
+	linear_node->bb = node->bb;
+	unsigned int my_offset = (*offset)++;
+	if (node->num_shapes > 0) //Node is leaf
+	{
+		linear_node->shape_offset = node->first_shape_offset;
+		linear_node->num_shapes = node->num_shapes;
+	}
+	else //Flatten
+	{
+		linear_node->split_axis = node->split_axis;
+		linear_node->num_shapes = 0;
+		Flatten(node->children[0], offset);
+		linear_node->second_child_offset = Flatten(node->children[1], offset);
+	}
+	
+	return my_offset;
+}
+
+bool BVH::Intersect(Ray* ray, SurfaceInteraction* isect) const
+{
+	bool hit = false;
+	
+	glm::vec3 inv_dir = 1.0f / ray->dir;
+	//Since -z is inwards, this is flipped for dir_is_neg[2]
+	int dir_is_neg[3] = { inv_dir.x < 0.0f, inv_dir.y < 0.0f, inv_dir.z >= 0.0f };
+	
+	unsigned int to_visit_offset = 0;
+	unsigned int current_node_index = 0;
+	unsigned int nodes_to_visit[64];
+	while (true)
+	{
+		const BVHLinearNode* node = &nodes[current_node_index];
+		if (node->bb.Intersect(*ray, inv_dir, dir_is_neg))
+		{
+			if (node->num_shapes > 0)
+			{
+				for (int i = 0; i < node->num_shapes; i++)
+				{
+					if (shapes[node->shape_offset + i]->Intersect(ray, isect, 0.00001f, 10000.0f))
+					{
+						hit = true;
+					}
+				}
+				if (to_visit_offset == 0) { break; }
+				current_node_index = nodes_to_visit[--to_visit_offset];
+			}
+			else
+			{
+				if (dir_is_neg[node->split_axis])
+				{
+					nodes_to_visit[to_visit_offset++] = current_node_index + 1;
+					current_node_index = node->second_child_offset;
+				}
+				else
+				{
+					nodes_to_visit[to_visit_offset++] = node->second_child_offset;
+					current_node_index++;
+				}
+			}
+		}
+		else
+		{
+			if (to_visit_offset == 0) { break; }
+			current_node_index = nodes_to_visit[--to_visit_offset];
+		}
+	}
+	
+	return hit;
+}
 
 
 

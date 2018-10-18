@@ -3,6 +3,7 @@
 
 #include "glm/vec3.hpp"
 
+struct Ray;
 struct Sphere;
 struct Triangle;
 struct Quad;
@@ -20,9 +21,18 @@ struct BoundingBox
 	BoundingBox(const Sphere& s);
 	BoundingBox(const Triangle& t);
 	BoundingBox(const Quad& q);
+	const glm::vec3& operator[](int i) const
+	{
+		return i == 0 ? min : max;
+	}
+	glm::vec3& operator[](int i)
+	{
+		return i == 0 ? min : max;
+	}
 	float SurfaceArea() const;
 	int MaximumExtent() const;
 	glm::vec3 Offset(const glm::vec3& p) const;
+	bool Intersect(const Ray& ray, const glm::vec3& inv_dir, const int dir_is_neg[3]) const;
 };
 
 BoundingBox BoundingBoxUnion(const BoundingBox& b, const glm::vec3& p);
