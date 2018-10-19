@@ -8,17 +8,17 @@ git clone https://github.com/MulattoKid/BrhanRenderer.git
 cd BrhanRenderer
 mkdir build
 ```
-Debug build
+#### Debug build
 ```
 make debug -j8
 ```
-Release build
+#### Release build
 ```
 make -j8
 ```
 
 ### Windows
-Available methods:
+#### Available methods:
   - Compile using Cygwin etc.
     - Assumes knowledge of how to do this
   - Compile using Windows Subsystem Linux (requries the program to be run from within WSL)
@@ -28,13 +28,13 @@ Available methods:
 git clone https://github.com/MulattoKid/BrhanRenderer.git
 cd BrhanRenderer
 ```
-Debug build
+#### Debug build
 ```
 mkdir build_debug
 setup.bat
 build_debug.bat
 ```
-Release build
+#### Release build
 ```
 mkdir build
 setup.bat
