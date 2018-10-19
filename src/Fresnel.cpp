@@ -23,7 +23,7 @@ glm::vec3 Dielectric(const glm::vec3& wo, const glm::vec3& normal, float eta_fro
 	
 	//Find sine of outgoing angle theta_to using Snell's Law
 	//and sin²x + cos²x = 1
-	const float sin_theta_from = glm::sqrt(float(1.0f - glm::pow(cos_theta_from, 2)));
+	const float sin_theta_from = glm::sqrt(glm::max(float(1.0f - glm::pow(cos_theta_from, 2)), 0.0f));
 	const float sin_theta_to = (eta_from * sin_theta_from) / eta_to;
 	
 	//Check for total internal/external reflection
@@ -33,7 +33,7 @@ glm::vec3 Dielectric(const glm::vec3& wo, const glm::vec3& normal, float eta_fro
 	}
 	
 	//Find cos_theta_to using sin²x + cos²x = 1
-	const float cos_theta_to = glm::sqrt(float(1.0f - glm::pow(sin_theta_to, 2)));
+	const float cos_theta_to = glm::sqrt(glm::max(float(1.0f - glm::pow(sin_theta_to, 2)), 0.0f));
 	
 	
 	//Find parallel and perpendicular Fresnel reflectance

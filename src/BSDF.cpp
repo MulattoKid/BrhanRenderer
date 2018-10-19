@@ -1,5 +1,6 @@
 #include "BSDF.h"
 #include "glm/common.hpp"
+#include "glm/geometric.hpp"
 #include "Logger.h"
 #include "RNG.h"
 
@@ -42,7 +43,7 @@ int BSDF::NumMatchingComponents(const BxDFType type) const
 float BSDF::Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal, BxDFType flags)
 {
 	int matching_comp = 0;
-	float pdf = 0;
+	float pdf = 0.0f;
 	for (int i = 0; i < num_bxdfs; i++)
 	{
 		if (bxdfs[i]->MatchesFlags(flags))
@@ -52,15 +53,18 @@ float BSDF::Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& norma
 		}
 	}
 	
-	return matching_comp > 0 ? pdf / float(matching_comp) : 0.0f;
+	return matching_comp > 1 ? pdf / float(matching_comp) : pdf;
 }
 
 glm::vec3 BSDF::f(const glm::vec3& wo, const glm::vec3& normal, const glm::vec3& wi, BxDFType flags) const
 {
 	glm::vec3 f(0.0f);
+	bool reflect = glm::dot(wo, normal) * glm::dot(wi, normal) > 0.0f;
 	for (int i = 0; i < num_bxdfs; i++)
 	{
-		if (bxdfs[i]->MatchesFlags(flags))
+		if (bxdfs[i]->MatchesFlags(flags) &&
+			((reflect  && (bxdfs[i]->type & BSDF_REFLECTION)) ||
+			 (!reflect && (bxdfs[i]->type & BSDF_TRANSMISSION))))
 		{
 			f += bxdfs[i]->f(wo, normal, wi);
 		}
@@ -114,7 +118,7 @@ glm::vec3 BSDF::Samplef(RNG& rng, const glm::vec3& wo, float u[2], const BxDFTyp
 		*pdf /= num_matching;
 	}
 	
-	//Compute value for BSDF for the the sampled direction
+	//Compute value for BSDF for the sampled direction
 	if (num_matching > 1 && !(bxdf->type & BSDF_SPECULAR))
 	{
 		f = this->f(wo, normal, *wi, type);
