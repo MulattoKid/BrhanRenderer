@@ -23,7 +23,7 @@ Available methods:
     - Assumes knowledge of how to do this
   - Compile using Windows Subsystem Linux (requries the program to be run from within WSL)
     - Follow instructions for Linux listed above
-  - Compile using MSVC (recommended)
+  - Compile using MSVC (**recommended**)
 ```
 git clone https://github.com/MulattoKid/BrhanRenderer.git
 cd BrhanRenderer
