@@ -15,7 +15,7 @@ struct SphereLoad;
 
 struct Scene
 {
-	BVH bvh_tree;
+	BVH* bvh_tree;
 	std::vector<Model> models;
 	std::vector<DiffuseAreaLight> diffuse_area_lights;
 	std::vector<AreaLight*> area_lights;

@@ -55,6 +55,7 @@ BVH::BVH(const unsigned int max_shapes_in_node, const std::vector<Shape*>& shape
 
 BVH::~BVH()
 {
+	LOG_MESSAGE(false, "Deleting BVH\n");
 	delete[] nodes;
 }
 

@@ -55,7 +55,7 @@ Scene::Scene(const std::vector<ModelLoad>& models, const std::vector<SphereLoad>
 			shapes[shape_index++] = s;
 		}
 	}
-	bvh_tree = BVH(1, shapes);
+	bvh_tree = new BVH(1, shapes);
 	
 	LOG_MESSAGE(true, "Scene:\n"
 					  "\t%lu models\n"
@@ -547,7 +547,7 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, co
 	{
 		intersected |= model.Intersect(ray, isect, t_min, t_max); //|= is logical OR
 	}*/
-	intersected = bvh_tree.Intersect(ray, isect);
+	intersected = bvh_tree->Intersect(ray, isect);
 	
 	if (intersected)
 	{
