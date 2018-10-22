@@ -30,7 +30,7 @@ struct Texture
 	Texture(const std::string& filename);
 	~Texture();
 	void GenerateMipmaps(const unsigned char* data);
-	glm::vec4 Sample(const float u, const float v);
+	glm::vec4 Sample(float u, float v);
 };
 
 #endif

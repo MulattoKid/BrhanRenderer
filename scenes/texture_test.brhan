@@ -1,0 +1,6 @@
+Camera position[0 0 1.0] view_direction[0 0.0 -1.0] vertical_fov[60] width[1024] height[1024]
+
+Integrator type[path] spp[1] max_depth[1]
+
+Model file[models/TextureTest/plane.obj]
+Model file[models/TextureTest/light.obj]

@@ -13,8 +13,9 @@
 
 int main(int argc, char** argv)
 {
-	Texture wood("models/wood.jpg");
-	return 0;
+	/*Texture wood("models/TextureTest/wood.jpg");
+	wood.Sample(0.5f, 0.5f);
+	return 0;*/
 
 	auto start_time = GetTime();
 	Camera* camera = NULL;
