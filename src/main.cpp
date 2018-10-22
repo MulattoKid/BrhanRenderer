@@ -9,8 +9,13 @@
 #include "Scene.h"
 #include "Timer.h"
 
+#include "Texture.h"
+
 int main(int argc, char** argv)
 {
+	Texture wood("models/wood.jpg");
+	return 0;
+
 	auto start_time = GetTime();
 	Camera* camera = NULL;
 	Scene* scene = NULL;
