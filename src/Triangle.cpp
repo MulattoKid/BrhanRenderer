@@ -10,8 +10,8 @@ Triangle::Triangle() : Shape(true)
 glm::vec3 Triangle::BarycentricCoefficients(const glm::vec3& point) const
 {
 	const float triangle_area = Area();
-	const float triangle0_area = glm::length(glm::cross(point - v[0], v[1] - v[0])) / 2.0f;
-	const float triangle1_area = glm::length(glm::cross(point - v[1], v[2] - v[1])) / 2.0f;
+	const float triangle0_area = glm::length(glm::cross(v[1] - point, v[2] - point)) / 2.0f;
+	const float triangle1_area = glm::length(glm::cross(v[0] - point, v[2] - point)) / 2.0f;
 	//const float triangle2_area = triangle_area - triangle1_area - triangle0_area; //Not really needed
 	
 	const float lamda0 = triangle0_area / triangle_area;
@@ -30,7 +30,7 @@ glm::vec3 Triangle::Normal(const glm::vec3& point) const
 glm::vec2 Triangle::UV(const glm::vec3& point) const
 {
 	const glm::vec3 lamdas = BarycentricCoefficients(point);
-	return glm::normalize((lamdas.x * uv[0]) + (lamdas.y * uv[1]) + (lamdas.z * uv[2]));
+	return glm::normalize((lamdas[0] * uv[0]) + (lamdas[1] * uv[1]) + (lamdas[2] * uv[2]));
 }
 
 float Triangle::Area() const
