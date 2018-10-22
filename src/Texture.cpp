@@ -13,12 +13,14 @@ Mipmap::~Mipmap()
 
 Texture::Texture(const std::string& filename)
 {
+	stbi_set_flip_vertically_on_load(1);
 	unsigned char* data = stbi_load(filename.c_str(), &width, &height, &components_in_image, components);
 	if (data == NULL)
 	{
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to load image %s\n", filename.c_str());
 	}
 	
+	file = filename;
 	GenerateMipmaps(data);
 	stbi_image_free(data);
 }
@@ -95,7 +97,7 @@ void Texture::GenerateMipmaps(const unsigned char* data)
 	}
 }
 
-glm::vec4 Texture::Sample(float u, float v)
+glm::vec3 Texture::Sample(float u, float v)
 {
 	//TODO: select mipmap level
 	const unsigned int mipmap_level = 0;
@@ -104,49 +106,28 @@ glm::vec4 Texture::Sample(float u, float v)
 	//Find uv coefficients
 	u = u * mm->width - 0.5f;
 	v = v * mm->height - 0.5f;
-	const int x = glm::floor(u);
-	const int y = glm::floor(v);
+	int x = glm::floor(u);
+	int y = glm::floor(v);
 	float u_ratio = u - x;
 	float v_ratio = v - y;
 	float u_opposite = 1.0f - u_ratio;
 	float v_opposite = 1.0f - v_ratio;
 	
 	//Bilinear filtering - CLAMP
-	const unsigned int mm_index = (y * mm->width + x) * mm->components;
-	const unsigned int tl_index = mm_index;
-	unsigned int tr_index = 0, bl_index = 0, br_index = 0;
-	if (x < mm->width) { tr_index = mm_index + mm->components; }
-	else { tr_index = mm_index; }
-	if (y < mm->height)
-	{
-		bl_index = mm_index + (mm->width * mm->components);
-		if (x < mm->width)
-		{
-			br_index = mm_index + ((mm->width + 1) * mm->components);
-		}
-		else
-		{
-			br_index = mm_index + (mm->width * mm->components);
-		}
-	}
-	else
-	{
-		bl_index = mm_index;
-		if (x < mm->width)
-		{
-			br_index = mm_index + mm->components;
-		}
-		else
-		{
-			br_index = mm_index;
-		}
-	}
+	x = glm::max(x, 0);
+	y = glm::max(y, 0);
+	int x_plus_1 = glm::min(mm->width - 1,  x + 1);
+	int y_plus_1 = glm::min(mm->height - 1, y + 1);
+	const unsigned int tl_index = (y        * mm->width + x)        * mm->components;
+	const unsigned int tr_index = (y        * mm->width + x_plus_1) * mm->components;
+	const unsigned int bl_index = (y_plus_1 * mm->width + x)        * mm->components;
+	const unsigned int br_index = (y_plus_1 * mm->width + x_plus_1) * mm->components;
 	
-	glm::vec4 ret(0.0f);
-	for (int i = 0; i < mm->components; i++)
+	glm::vec3 ret(0.0f);
+	for (int i = 0; i < 3; i++)
 	{
-		ret[i] = (mm->data[tl_index] * u_opposite + mm->data[tr_index] * u_ratio) * v_opposite +
-				 (mm->data[bl_index] * u_opposite + mm->data[br_index] * u_ratio) * v_ratio;
+		ret[i] = (mm->data[tl_index + i] * u_opposite + mm->data[tr_index + i] * u_ratio) * v_opposite +
+				 (mm->data[bl_index + i] * u_opposite + mm->data[br_index + i] * u_ratio) * v_ratio;
 	}
 	return ret / 255.0f;
 }

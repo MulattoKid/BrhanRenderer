@@ -17,4 +17,4 @@ newmtl plane
   Kd 0.78 0.78 0.78
   Ks 0 0 0
   Ke 0 0 0
-  map_Kd src/TextureTest.jpg
+  map_Kd models/TextureTest/wood.jpg

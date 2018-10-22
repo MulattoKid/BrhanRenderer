@@ -179,8 +179,11 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 
 			//Assign
 			mtl->ambient = glm::vec3(material->ambient[0], material->ambient[1], material->ambient[2]);
+			mtl->map_ka = material->ambient_texname;
 			mtl->diffuse = glm::vec3(material->diffuse[0], material->diffuse[1], material->diffuse[2]);
+			mtl->map_kd = material->diffuse_texname;
 			mtl->specular = glm::vec3(material->specular[0], material->specular[1], material->specular[2]);
+			mtl->map_ks = material->specular_texname;
 			mtl->transmittance = glm::vec3(material->transmittance[0], material->transmittance[1], material->transmittance[2]);
 			mtl->emission = glm::vec3(material->emission[0], material->emission[1], material->emission[2]);
 			mtl->shininess = material->shininess;
@@ -191,14 +194,30 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 			//TODO: cover all supported materials
 			if (mtl->dissolve == 1.0f) //Fully opaque materials
 			{
-				if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular == glm::vec3(0.0f))
+				if ((mtl->diffuse != glm::vec3(0.0f) && mtl->specular == glm::vec3(0.0f)) ||
+					(mtl->map_kd != "" && mtl->map_ks == ""))
 				{
-					model->matte_materials.push_back(MatteMaterial(mtl->diffuse));
+					if (mtl->map_kd != "")
+					{
+						model->matte_materials.push_back(MatteMaterial(mtl->map_kd));
+					}
+					else
+					{
+						model->matte_materials.push_back(MatteMaterial(mtl->diffuse));
+					}
 					matte_material_indices.push_back(i);
 				}
-				else if (mtl->diffuse == glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
+				else if ((mtl->diffuse == glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f)) ||
+						 (mtl->map_kd == "" && mtl->map_ks != ""))
 				{
-					model->mirror_materials.push_back(MirrorMaterial(mtl->specular));
+					if (mtl->map_ks != "")
+					{
+						model->mirror_materials.push_back(MirrorMaterial(mtl->map_ks));
+					}
+					else
+					{
+						model->mirror_materials.push_back(MirrorMaterial(mtl->specular));
+					}
 					mirror_material_indices.push_back(i);
 				}
 				else if (mtl->diffuse != glm::vec3(0.0f) && mtl->specular != glm::vec3(0.0f))
@@ -310,8 +329,8 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 
 					if (model->has_uvs)
 					{
-					  	tri->uv[v].x = attrib.texcoords[3*idx.texcoord_index+0];
-					  	tri->uv[v].y = attrib.texcoords[3*idx.texcoord_index+1];
+					  	tri->uv[v].x = attrib.texcoords[2*idx.texcoord_index+0];
+					  	tri->uv[v].y = attrib.texcoords[2*idx.texcoord_index+1];
 					}
 				}
 				if (!has_normals) //Generate normals (all are the same)
@@ -393,8 +412,8 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 
 					if (model->has_uvs)
 					{
-					  	quad->uv[v].x = attrib.texcoords[3*idx.texcoord_index+0];
-					  	quad->uv[v].y = attrib.texcoords[3*idx.texcoord_index+1];
+					  	quad->uv[v].x = attrib.texcoords[2*idx.texcoord_index+0];
+					  	quad->uv[v].y = attrib.texcoords[2*idx.texcoord_index+1];
 					}
 				}
 				if (!has_normals) //Generate normals (all are the same)

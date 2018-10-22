@@ -9,6 +9,7 @@
 #include "Scene.h"
 #include "Timer.h"
 
+#include "MatteMaterial.h"
 #include "Texture.h"
 
 int main(int argc, char** argv)

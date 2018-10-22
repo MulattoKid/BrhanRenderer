@@ -18,6 +18,7 @@ struct Mipmap
 struct Texture
 {
 	//Base data
+	std::string file;
 	int width;
 	int height;
 	int components_in_image;
@@ -30,7 +31,7 @@ struct Texture
 	Texture(const std::string& filename);
 	~Texture();
 	void GenerateMipmaps(const unsigned char* data);
-	glm::vec4 Sample(float u, float v);
+	glm::vec3 Sample(float u, float v);
 };
 
 #endif
