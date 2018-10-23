@@ -574,27 +574,6 @@ bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, co
 		isect->point = ray->AtError();
 		isect->normal = isect->shape->Normal(isect->Point());
 		isect->wo = -ray->dir;
-		isect->ComputeScatteringFunctions();
-	}
-	
-	return intersected;
-}
-
-bool Scene::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const
-{
-	bool intersected = false;
-	for (const Model& model : models)
-	{
-		intersected |= model.Intersect(ray, isect, t_less_than); //|= is logical OR
-	}
-	
-	if (intersected)
-	{
-		isect->ray = ray;
-		isect->point = ray->AtError();
-		isect->normal = isect->shape->Normal(isect->Point());
-		isect->wo = -ray->dir;
-		isect->ComputeScatteringFunctions();
 	}
 	
 	return intersected;

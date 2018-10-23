@@ -13,6 +13,7 @@ glm::vec3 DirectLightingIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, c
 	
 	SurfaceInteraction isect;
 	if (!scene.Intersect(ray, &isect, 0.0f, 10000.0f)) { return L; }
+	isect.ComputeScatteringFunctions();
 	
 	if (isect.shape->IsAreaLight())
 	{
