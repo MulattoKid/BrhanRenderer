@@ -12,7 +12,7 @@ struct MirrorMaterial : Material
 	MirrorMaterial(const glm::vec3& Ks);
 	MirrorMaterial(const std::string& map_Ks);
 	void Info() const;
-	void ComputeScatteringFunctions(SurfaceInteraction* isect) const;
+	void ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const;
 };
 
 #endif

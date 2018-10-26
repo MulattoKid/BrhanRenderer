@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "ImageIO.h"
 #include "Logger.h"
+#include "MemoryPool.h"
 #include <omp.h>
 #include "PixelSampler.h"
 #include "Ray.h"
@@ -9,22 +10,16 @@
 #include "Scene.h"
 #include "Timer.h"
 
-#include "MatteMaterial.h"
-#include "Texture.h"
-
 int main(int argc, char** argv)
 {
-	/*Texture wood("models/TextureTest/wood.jpg");
-	wood.Sample(0.5f, 0.5f);
-	return 0;*/
-
 	auto start_time = GetTime();
 	Camera* camera = NULL;
 	Scene* scene = NULL;
 	float* film = NULL;
 	RNG* rngs = NULL;
+	MemoryPool* mem_pool;
 	PixelSampler* pixel_sampler = NULL;
-	BrhanSystem system(argc, argv, &camera, &scene, &film, &rngs, &pixel_sampler);
+	BrhanSystem system(argc, argv, &camera, &scene, &film, &rngs, &mem_pool, &pixel_sampler);
 	auto end_time = GetTime();
 	LogElapsedTime("Intialization time: ", start_time, end_time);
 	
@@ -50,7 +45,7 @@ int main(int argc, char** argv)
 			{
 				glm::vec2 sample_offset = pixel_sampler->Sample(s, rngs[omp_get_thread_num()]);
 				Ray ray = camera->GenerateRay(u + sample_offset.x, v + sample_offset.y);
-				L += system.integrator->Li(*scene, &ray, rngs[omp_get_thread_num()], 0, system.max_depth);
+				L += system.integrator->Li(*scene, &ray, rngs, mem_pool, omp_get_thread_num(), 0, system.max_depth);
 			}
 			L /= float(system.spp);
 			
@@ -71,6 +66,7 @@ int main(int argc, char** argv)
 	delete camera;
 	delete[] film;
 	delete[] rngs;
+	delete mem_pool;
 	delete pixel_sampler;
 
 	return 0;

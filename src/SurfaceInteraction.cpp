@@ -1,19 +1,21 @@
 #include "BSDF.h"
+#include "MemoryPool.h"
 #include "Scene.h"
 #include "Shape.h"
 #include "SurfaceInteraction.h"
 
-SurfaceInteraction::~SurfaceInteraction()
+void SurfaceInteraction::Delete(MemoryPool* mem_pool, const int thread_id)
 {
 	if (bsdf != NULL)
 	{
-		delete bsdf;
+		//delete bsdf;
+		bsdf->Delete(mem_pool, thread_id);
 	}
 }
 
-void SurfaceInteraction::ComputeScatteringFunctions()
+void SurfaceInteraction::ComputeScatteringFunctions(MemoryPool* mem_pool, const int thread_id)
 {
-	shape->ComputeScatteringFunctions(this);
+	shape->ComputeScatteringFunctions(this, mem_pool, thread_id);
 }
 
 glm::vec3 SurfaceInteraction::Le(const Scene& scene)

@@ -27,15 +27,23 @@ void WaterMaterial::Info() const
 	LOG_MESSAGE(true, "Water material: R=(%f %f %f) T=(%f %f %f), eta_ouside=%f, eta_inside=%f\n", R.x, R.y, R.z, T.x, T.y, T.z, eta_outside, eta_inside);
 }
 
-void WaterMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
+void WaterMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const
 {
-	isect->bsdf = new BSDF();
+	isect->bsdf = (BSDF*)(mem_pool->Allocate(sizeof(BSDF), thread_id));
+	new(isect->bsdf) BSDF();
+	
 	if (R != glm::vec3(0.0f))
 	{
-		isect->bsdf->Add(new SpecularBRDF(R, new FresnelDielectric(eta_outside, eta_inside)));
+		SpecularBRDF* s_ptr = (SpecularBRDF*)(mem_pool->Allocate(sizeof(SpecularBRDF), thread_id));
+		FresnelDielectric* f_ptr = (FresnelDielectric*)(mem_pool->Allocate(sizeof(FresnelDielectric), thread_id));
+		new(f_ptr) FresnelDielectric(eta_outside, eta_inside);
+		new(s_ptr) SpecularBRDF(R, f_ptr, FRESNEL_DIELECTRIC);
+		isect->bsdf->Add(s_ptr);
 	}
 	if (T != glm::vec3(0.0f))
 	{
-		isect->bsdf->Add(new SpecularBTDF(T, eta_outside, eta_inside));
+		SpecularBTDF* s_ptr = (SpecularBTDF*)(mem_pool->Allocate(sizeof(SpecularBTDF), thread_id));
+		new(s_ptr) SpecularBTDF(T, eta_outside, eta_inside);
+		isect->bsdf->Add(s_ptr);
 	}
 }

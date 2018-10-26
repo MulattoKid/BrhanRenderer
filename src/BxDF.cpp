@@ -4,9 +4,10 @@
 #include "glm/geometric.hpp"
 #include "glm/gtc/constants.hpp"
 
-BxDF::BxDF(BxDFType type)
+BxDF::BxDF(BxDFType type, BxDFName name)
 {
 	this->type = type;
+	this->name = name;
 }
 
 BxDF::~BxDF()

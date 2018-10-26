@@ -8,8 +8,9 @@
 PathIntegrator::~PathIntegrator()
 {}
 
-glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsigned int depth, const unsigned int max_depth) const
+glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG* rngs, MemoryPool* mem_pool, const int thread_id, const unsigned int depth, const unsigned int max_depth) const
 {
+	RNG rng = rngs[thread_id];
 	glm::vec3 L(0.0f);
 	glm::vec3 path_throughput(1.0f);
 	bool specular_bounce = false;
@@ -33,7 +34,7 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		}
 		
 		if (!intersected || b >= max_depth) { break; }
-		isect.ComputeScatteringFunctions();
+		isect.ComputeScatteringFunctions(mem_pool, thread_id);
 		
 		//Sample direct illumination from lights
 		glm::vec3 Ld = path_throughput * UniformSampleOne(scene, isect, rng);
@@ -54,6 +55,7 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG& rng, const unsig
 		specular_bounce = (sampled_type & BSDF_SPECULAR) != 0;
 		
 		*ray = SpawnRayWithOffset(isect.point, wi, isect.normal);
+		isect.Delete(mem_pool, thread_id);
 	}
 	
 	return L;

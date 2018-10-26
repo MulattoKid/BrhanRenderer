@@ -9,7 +9,7 @@
 //p.535
 //http://www1.cs.columbia.edu/CAVE/publications/pdfs/Oren_SIGGRAPH94.pdf
 //Sigma is expected to be given in degrees
-OrenNayarBRDF::OrenNayarBRDF(const glm::vec3& R, const float sigma) : BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE))
+OrenNayarBRDF::OrenNayarBRDF(const glm::vec3& R, const float sigma) : BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE), ORENNAYAR_BRDF)
 {
 	this->R = R;
 	const float sigma2 = glm::pow(glm::radians(sigma), 2);

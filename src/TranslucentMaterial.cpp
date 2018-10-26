@@ -20,11 +20,15 @@ void TranslucentMaterial::Info() const
 	LOG_MESSAGE(true, "Translucent material: T=(%f %f %f), eta_ouside=%f, eta_inside=%f\n", T.x, T.y, T.z, eta_outside, eta_inside);
 }
 
-void TranslucentMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
+void TranslucentMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const
 {
-	isect->bsdf = new BSDF();
+	isect->bsdf = (BSDF*)(mem_pool->Allocate(sizeof(BSDF), thread_id));
+	new(isect->bsdf) BSDF();
+	
 	if (T != glm::vec3(0.0f))
 	{
-		isect->bsdf->Add(new SpecularBTDF(T, eta_outside, eta_inside));
+		SpecularBTDF* s_ptr = (SpecularBTDF*)(mem_pool->Allocate(sizeof(SpecularBTDF), thread_id));
+		new(s_ptr) SpecularBTDF(T, eta_outside, eta_inside);
+		isect->bsdf->Add(s_ptr);
 	}
 }

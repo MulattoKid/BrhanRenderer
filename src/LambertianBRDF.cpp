@@ -2,7 +2,7 @@
 
 #include "glm/gtc/constants.hpp"
 
-LambertianBRDF::LambertianBRDF(const glm::vec3& R) : BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE))
+LambertianBRDF::LambertianBRDF(const glm::vec3& R) : BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE), LAMBERTIAN_BRDF)
 {
 	this->R = R;
 }

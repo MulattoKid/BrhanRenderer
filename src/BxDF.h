@@ -14,11 +14,17 @@ enum BxDFType
 						BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR
 };
 
+enum BxDFName
+{
+	LAMBERTIAN_BRDF, ORENNAYAR_BRDF, SPECULAR_BRDF, SPECULAR_BTDF
+};
+
 struct BxDF
 {
 	BxDFType type;
+	BxDFName name;
 	
-	BxDF(BxDFType type);
+	BxDF(BxDFType type, BxDFName name);
 	virtual ~BxDF();
 	bool MatchesFlags(BxDFType t) const;
 	virtual float Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal) const;

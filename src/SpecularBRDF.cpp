@@ -1,10 +1,11 @@
 #include "glm/geometric.hpp"
 #include "SpecularBRDF.h"
 
-SpecularBRDF::SpecularBRDF(const glm::vec3& R, Fresnel* fresnel) : BxDF(BxDFType(BSDF_REFLECTION | BSDF_SPECULAR))
+SpecularBRDF::SpecularBRDF(const glm::vec3& R, Fresnel* fresnel, FresnelType fresnel_type) : BxDF(BxDFType(BSDF_REFLECTION | BSDF_SPECULAR), SPECULAR_BRDF)
 {
 	this->R = R;
 	this->fresnel = fresnel;
+	this->fresnel_type = fresnel_type;
 }
 
 SpecularBRDF::~SpecularBRDF()

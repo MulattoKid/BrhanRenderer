@@ -4,7 +4,7 @@
 #include "glm/trigonometric.hpp"
 
 SpecularBTDF::SpecularBTDF(const glm::vec3& T, const float eta_outside, const float eta_inside) :
-														BxDF(BxDFType(BSDF_TRANSMISSION | BSDF_SPECULAR)),
+														BxDF(BxDFType(BSDF_TRANSMISSION | BSDF_SPECULAR), SPECULAR_BTDF),
 							   							fresnel_dielectric(eta_outside, eta_inside)
 {
 	this->eta_outside = eta_outside;

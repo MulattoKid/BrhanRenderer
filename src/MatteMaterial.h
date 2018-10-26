@@ -2,6 +2,7 @@
 #define MATTEMATERIAL_H
 
 #include "Material.h"
+#include "MemoryPool.h"
 #include "Texture.h"
 
 struct MatteMaterial : Material
@@ -12,7 +13,7 @@ struct MatteMaterial : Material
 	MatteMaterial(const glm::vec3& Kd);
 	MatteMaterial(const std::string& map_Kd);
 	void Info() const;
-	void ComputeScatteringFunctions(SurfaceInteraction* isect) const;
+	void ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const;
 };
 
 #endif

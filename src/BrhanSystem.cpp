@@ -1,6 +1,10 @@
 #include "BrhanSystem.h"
+#include "BSDF.h"
 #include <cstdlib>
 #include "DirectLightingIntegrator.h"
+#include "FresnelConductor.h"
+#include "FresnelDielectric.h"
+#include "FresnelNoOp.h"
 #include <fstream>
 #include "glm/gtc/matrix_transform.hpp"
 #include <iostream>
@@ -579,7 +583,36 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   	}
 }
 
-BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, PixelSampler** pixel_sampler)
+void InitMemoryPool(MemoryPool** mem_pool)
+{
+	static const size_t bxdfs[] = { sizeof(MatteMaterial), sizeof(MirrorMaterial), sizeof(PlasticMaterial), sizeof(TranslucentMaterial), sizeof(WaterMaterial), sizeof(GlassMaterial) };
+	static const size_t num_bxdfs = 6;
+	size_t max_bxdf_size = bxdfs[0];
+	for (size_t i = 1; i < num_bxdfs; i++)
+	{
+		if (bxdfs[i] > max_bxdf_size)
+		{
+			max_bxdf_size = bxdfs[i];
+		}
+	}
+	
+	static const size_t fresnels[] = { sizeof(FresnelNoOp), sizeof(FresnelDielectric), sizeof(FresnelConductor) };
+	static const size_t num_fresnel = 3;
+	size_t max_fresnel_size = fresnels[0];
+	for (size_t i = 1; i < num_fresnel; i++)
+	{
+		if (fresnels[i] > max_fresnel_size)
+		{
+			max_fresnel_size = fresnels[i];
+		}
+	}
+	
+	static const int max_bxdfs = 8; //From BSDF.h:11
+	size_t s = sizeof(BSDF) + max_bxdfs * (max_bxdf_size + max_fresnel_size);
+	*mem_pool = new MemoryPool(s, omp_get_max_threads());
+}
+
+BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, MemoryPool** mem_pool, PixelSampler** pixel_sampler)
 {
 	const unsigned int num_args = 2;
 	const unsigned int arg_file = 1;
@@ -595,6 +628,7 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 	*camera = new Camera(camera_position, camera_view_direction, camera_vertical_fov, float(film_width) / float(film_height));
 	*film = new float[film_width * film_height * 3];
 	*rngs = new RNG[omp_get_max_threads()];
+	InitMemoryPool(mem_pool);
 	*pixel_sampler = new PixelSampler(spp, film_width, film_height);
 	*scene = new Scene(models, spheres);
 }
