@@ -585,8 +585,8 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
 
 void InitMemoryPool(MemoryPool** mem_pool)
 {
-	static const size_t bxdfs[] = { sizeof(MatteMaterial), sizeof(MirrorMaterial), sizeof(PlasticMaterial), sizeof(TranslucentMaterial), sizeof(WaterMaterial), sizeof(GlassMaterial) };
-	static const size_t num_bxdfs = 6;
+	const size_t bxdfs[] = { sizeof(MatteMaterial), sizeof(MirrorMaterial), sizeof(PlasticMaterial), sizeof(TranslucentMaterial), sizeof(WaterMaterial), sizeof(GlassMaterial) };
+	const size_t num_bxdfs = 6;
 	size_t max_bxdf_size = bxdfs[0];
 	for (size_t i = 1; i < num_bxdfs; i++)
 	{
@@ -596,8 +596,8 @@ void InitMemoryPool(MemoryPool** mem_pool)
 		}
 	}
 	
-	static const size_t fresnels[] = { sizeof(FresnelNoOp), sizeof(FresnelDielectric), sizeof(FresnelConductor) };
-	static const size_t num_fresnel = 3;
+	const size_t fresnels[] = { sizeof(FresnelNoOp), sizeof(FresnelDielectric), sizeof(FresnelConductor) };
+	const size_t num_fresnel = 3;
 	size_t max_fresnel_size = fresnels[0];
 	for (size_t i = 1; i < num_fresnel; i++)
 	{
@@ -607,7 +607,7 @@ void InitMemoryPool(MemoryPool** mem_pool)
 		}
 	}
 	
-	static const int max_bxdfs = 8; //From BSDF.h:11
+	const int max_bxdfs = 8; //From BSDF.h:11
 	size_t s = sizeof(BSDF) + max_bxdfs * (max_bxdf_size + max_fresnel_size);
 	*mem_pool = new MemoryPool(s, omp_get_max_threads());
 }
@@ -619,7 +619,12 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 	
 	if (argc != num_args)
 	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "%lu arguments must be passed\n", num_args - 1);
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Only %lu are supported\n", num_args - 1);
+	}
+	
+	if (argv[1] == "--help")
+	{
+		LOG_MESSAGE(true, "The only input parameter needed is the path to the scene description file\n");
 	}
 	
 	scene_file = argv[arg_file];
