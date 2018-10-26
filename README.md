@@ -7,6 +7,9 @@
 - [Run Instructions](#running)
 - [Scene File Documentation](#scene-file-documentation)
 - [Supported Features](#functionality)
+  - [BxDFs](#bxdfs)
+  - [Materials](#materials)
+  - [Misc](#misc)
 - [Renders](#rendered-images)
 
 ## Building
@@ -58,7 +61,20 @@ On both platforms, the rendered image is placed in the directory form which the 
 TODO
 
 ## Functionality
-TODO
+### BxDFs
+- Lambertian BRDF
+- Oren-Nayar BRDF
+- Specular BRDF
+- Specular BTDF
+### Materials
+- Matte
+- Mirror
+- Plastic (WIP)
+- Water
+- Glass
+### Misc
+- BVH tree for ray-shape intersection
+- Memory pool for avoiding dynamic heap allocations while rendering, i.e. ```new```/```delete```
 
 ## Rendered Images
 ![CornellBox](https://i.imgur.com/DGFBV83.png)
@@ -66,7 +82,7 @@ A view of the CornellBox-Original (model courtesy of Morgan McGuire's graphics a
 - 1024x1024
 - 512 samples per pixel
 - Max path depth of 4
-- 63 degrees of vertical camera FOV
+- 19.5 degrees of vertical camera FOV
 
 Triangle count: 36
 
