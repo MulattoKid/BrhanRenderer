@@ -622,7 +622,7 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Only %lu are supported\n", num_args - 1);
 	}
 	
-	if (argv[1] == "--help")
+	if (strcmp(argv[1], "--help") == 0)
 	{
 		LOG_MESSAGE(true, "The only input parameter needed is the path to the scene description file\n");
 	}

@@ -99,7 +99,7 @@ void Texture::GenerateMipmaps(const unsigned char* data)
 
 glm::vec3 Texture::Sample(float u, float v)
 {
-	//TODO: select mipmap level
+	//TODO: select mipmap level - https://blog.yiningkarlli.com/2018/10/bidirectional-mipmap.html
 	const unsigned int mipmap_level = 0;
 	Mipmap* mm = &mipmaps[mipmap_level];
 	
