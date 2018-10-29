@@ -9,14 +9,6 @@ CXX = g++
 CXXFLAGS = -std=c++11
 LDFLAGS = -fopenmp
 
-#Compiles all source files
-#$< is the input file (.cpp file)
-#$@ is the output file (.o file)
-$(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-$(MEM_POOL_OBJ) : $(MEM_POOL_CPP)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
 #Setup for release
 all : CXXFLAGS += -fopenmp -O2
 all : BrhanRenderer
@@ -32,3 +24,11 @@ BrhanRenderer : $(OBJ_FILES) $(MEM_POOL_OBJ)
 .PHONY : clean
 clean :
 	rm build/*
+
+#Compiles all source files
+#$< is the input file (.cpp file)
+#$@ is the output file (.o file)
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(MEM_POOL_OBJ) : $(MEM_POOL_CPP)
+	$(CXX) $(CXXFLAGS) -c $< -o $@

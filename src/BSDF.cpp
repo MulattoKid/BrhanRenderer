@@ -19,50 +19,6 @@ BSDF::~BSDF()
 
 void BSDF::Delete(MemoryPool* mem_pool, const int thread_id)
 {
-	/*for (int i = 0; i < num_bxdfs; i++)
-	{
-		if (bxdfs[i]->name == LAMBERTIAN_BRDF)
-		{
-			mem_pool->Free(bxdfs[i], sizeof(LambertianBRDF), thread_id);
-		}
-		else if (bxdfs[i]->name == ORENNAYAR_BRDF)
-		{
-			mem_pool->Free(bxdfs[i], sizeof(OrenNayarBRDF), thread_id);
-		}
-		else if (bxdfs[i]->name == SPECULAR_BRDF)
-		{
-			SpecularBRDF* s_ptr = (SpecularBRDF*)(bxdfs[i]);
-			if (s_ptr->fresnel_type == FRESNEL_NO_OP)
-			{
-				mem_pool->Free(s_ptr->fresnel, sizeof(FresnelNoOp), thread_id);
-			}
-			else if (s_ptr->fresnel_type == FRESNEL_DIELECTRIC)
-			{
-				mem_pool->Free(s_ptr->fresnel, sizeof(FresnelDielectric), thread_id);
-			}
-			else if (s_ptr->fresnel_type == FRESNEL_CONDUCTOR)
-			{
-				mem_pool->Free(s_ptr, sizeof(FresnelConductor), thread_id);
-			}
-			else if (s_ptr->fresnel_type == FRESNEL_NONE)
-			{}
-			else
-			{
-				LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "The fresnel type %i does not exist\n", s_ptr->fresnel_type);
-			}
-			mem_pool->Free(bxdfs[i], sizeof(SpecularBRDF), thread_id);
-		}
-		else if (bxdfs[i]->name == SPECULAR_BTDF)
-		{
-			mem_pool->Free(bxdfs[i], sizeof(SpecularBTDF), thread_id);
-		}
-		else
-		{
-			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "The BxDF type %i does not exist\n", bxdfs[i]->name);
-		}
-	}
-	
-	mem_pool->Free(this, sizeof(BSDF), thread_id);*/
 	mem_pool->Free(thread_id);
 }
 
