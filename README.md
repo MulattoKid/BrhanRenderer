@@ -13,11 +13,12 @@
 - [Renders](#rendered-images)
 
 ## Building
-Development has primarily been performed on a Linux Ubuntu 16.04 machine, but it should build on both Linux and Windows. Steps for both platforms are listet below.
+Development has primarily been performed on a Linux Ubuntu 16.04 machine, but it should build on both Linux and Windows. Steps for both platforms are listet below. The project has one submodule dependency to my own memory pool implementation.
 ### Linux
 ```
-git clone https://github.com/MulattoKid/BrhanRenderer.git
+git clone https://github.com/MulattoKid/BrhanRenderer.git 
 cd BrhanRenderer
+git submodule update --init --recursive
 mkdir build
 ```
 #### Debug build
@@ -33,19 +34,18 @@ make -j8
 ```
 git clone https://github.com/MulattoKid/BrhanRenderer.git
 cd BrhanRenderer
+git submodule update --init --recursive
 ```
 The only method detailed below is compiling using MSVC (**recommended**). Other methods such as using Cygwin or WSL are likely to work just fine, but I assume anyone wanting to use other methods know how to do so.
 
 *setup.bat* is responsible for setting up the required environment variables so that ```cl``` (and friends) can be called directly from the working directory. If you installed Visual Studio 2017 in its default location, the script should work fine. If not, or you have a different Visual Studio version, edit the file to call ```vcvarsall.bat``` form its location on your system. E.g. ```call "your_install_directory\vcvarsall.bat" x64```.
 #### Debug build
 ```
-mkdir build_debug
 setup.bat
 build_debug.bat
 ```
 #### Release build
 ```
-mkdir build
 setup.bat
 build.bat
 ```
