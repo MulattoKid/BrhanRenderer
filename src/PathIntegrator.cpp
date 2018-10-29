@@ -10,7 +10,7 @@ PathIntegrator::~PathIntegrator()
 
 glm::vec3 PathIntegrator::Li(const Scene& scene, Ray* ray, RNG* rngs, MemoryPool* mem_pool, const int thread_id, const unsigned int depth, const unsigned int max_depth) const
 {
-	RNG rng = rngs[thread_id];
+	RNG& rng = rngs[thread_id];
 	glm::vec3 L(0.0f);
 	glm::vec3 path_throughput(1.0f);
 	bool specular_bounce = false;

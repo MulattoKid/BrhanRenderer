@@ -8,7 +8,6 @@ void SurfaceInteraction::Delete(MemoryPool* mem_pool, const int thread_id)
 {
 	if (bsdf != NULL)
 	{
-		//delete bsdf;
 		bsdf->Delete(mem_pool, thread_id);
 	}
 }
