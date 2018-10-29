@@ -1,7 +1,7 @@
 #include <cfloat>
 #include "glm/geometric.hpp"
 #include "Logger.h"
-#include "MemoryPool.h"
+#include "MemoryPool/MemoryPool.h"
 #include "Shape.h"
 
 Shape::Shape(const bool double_sided)

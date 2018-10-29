@@ -2,7 +2,6 @@
 #define MATTEMATERIAL_H
 
 #include "Material.h"
-#include "MemoryPool.h"
 #include "Texture.h"
 
 struct MatteMaterial : Material

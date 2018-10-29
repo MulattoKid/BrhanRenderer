@@ -2,7 +2,7 @@
 #define BSDF_H
 
 #include "BxDF.h"
-#include "MemoryPool.h"
+#include "MemoryPool/MemoryPool.h"
 #include "RNG.h"
 
 struct BSDF

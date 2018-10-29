@@ -2,7 +2,7 @@
 #include "Camera.h"
 #include "ImageIO.h"
 #include "Logger.h"
-#include "MemoryPool.h"
+#include "MemoryPool/MemoryPool.h"
 #include <omp.h>
 #include "PixelSampler.h"
 #include "Ray.h"

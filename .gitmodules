@@ -1,0 +1,3 @@
+[submodule "src/MemoryPool"]
+	path = src/MemoryPool
+	url = https://github.com/MulattoKid/MemoryPool_v2

@@ -1,7 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "MemoryPool.h"
+#include "MemoryPool/MemoryPool.h"
 #include "SurfaceInteraction.h"
 
 struct Material

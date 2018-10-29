@@ -2,7 +2,7 @@
 #define INTEGRATOR_H
 
 #include "glm/vec3.hpp"
-#include "MemoryPool.h"
+#include "MemoryPool/MemoryPool.h"
 #include "RNG.h"
 #include "Scene.h"
 #include "SurfaceInteraction.h"

@@ -6,7 +6,7 @@
 #include "Integrator.h"
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
-#include "MemoryPool.h"
+#include "MemoryPool/MemoryPool.h"
 #include "PixelSampler.h"
 #include "RNG.h"
 #include "Scene.h"
