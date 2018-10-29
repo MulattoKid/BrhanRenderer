@@ -1,7 +1,6 @@
 #include "BrhanSystem.h"
 #include "BSDF.h"
 #include <cstdlib>
-#include "DirectLightingIntegrator.h"
 #include "FresnelConductor.h"
 #include "FresnelDielectric.h"
 #include "FresnelNoOp.h"
@@ -143,12 +142,7 @@ void BrhanSystem::LoadIntegrator(const std::string& line)
 			unsigned int end = index + 1;
 			while (line[end] != ']') { end++; }
 			type = line.substr(index, end - index);
-			if (type == "direct")
-			{
-				integrator_type = DIRECT_LIGHTING_INTEGRATOR;
-				integrator = new DirectLightingIntegrator();
-			}
-			else if (type == "path")
+			if (type == "path")
 			{
 				integrator_type = PATH_INTEGRATOR;
 				integrator = new PathIntegrator();
@@ -640,12 +634,7 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 
 BrhanSystem::~BrhanSystem()
 {
-	if (integrator_type == IntegratorType::DIRECT_LIGHTING_INTEGRATOR)
-	{
-		DirectLightingIntegrator* ptr = (DirectLightingIntegrator*)(integrator);
-		delete ptr;
-	}
-	else if (integrator_type == IntegratorType::PATH_INTEGRATOR)
+	if (integrator_type == IntegratorType::PATH_INTEGRATOR)
 	{
 		PathIntegrator* ptr = (PathIntegrator*)(integrator);
 		delete ptr;

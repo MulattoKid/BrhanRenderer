@@ -159,3 +159,9 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less
 
 	return false;
 }
+
+//p.164
+void Triangle::ComputeDifferentialSurface(glm::vec3* dpdu, glm::vec3* dpdv) const
+{
+	
+}

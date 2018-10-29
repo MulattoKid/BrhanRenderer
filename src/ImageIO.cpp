@@ -74,11 +74,7 @@ void WriteImage(const float* film, const BrhanSystem& system)
 
 	std::string filename = ExtractFileNameOnly(system.scene_file) + "@" + std::to_string(system.film_width) + "x" + std::to_string(system.film_height) + "_" + std::to_string(system.spp) + "SPP_";
 	filename += std::to_string(system.max_depth) + "DEPTH_";
-	if (system.integrator_type == IntegratorType::DIRECT_LIGHTING_INTEGRATOR)
-	{
-		filename += "DIRECT";
-	}
-	else if (system.integrator_type == IntegratorType::PATH_INTEGRATOR)
+	if (system.integrator_type == IntegratorType::PATH_INTEGRATOR)
 	{
 		filename += "PATH";
 	}

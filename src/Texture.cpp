@@ -103,7 +103,7 @@ glm::vec3 Texture::Sample(float u, float v)
 	const unsigned int mipmap_level = 0;
 	Mipmap* mm = &mipmaps[mipmap_level];
 	
-	//Find uv coefficients
+	//Find uv coefficients for bilinear filtering
 	u = u * mm->width - 0.5f;
 	v = v * mm->height - 0.5f;
 	int x = glm::floor(u);

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "glm/geometric.hpp"
 #include "Quad.h"
 #include "RNG.h"
@@ -157,4 +158,9 @@ bool Quad::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_tha
 	}
 
 	return false;
+}
+
+void Quad::ComputeDifferentialSurface(glm::vec3* dpdu, glm::vec3* dpdv) const
+{
+	assert(0);
 }

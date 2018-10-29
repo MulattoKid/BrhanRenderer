@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "glm/geometric.hpp"
 #include "glm/gtc/constants.hpp"
 #include "glm/trigonometric.hpp"
@@ -110,4 +111,9 @@ bool Sphere::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_t
 	}
 	
 	return false;
+}
+
+void Sphere::ComputeDifferentialSurface(glm::vec3* dpdu, glm::vec3* dpdv) const
+{
+	assert(0);
 }

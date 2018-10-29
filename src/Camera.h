@@ -1,7 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "Ray.h"
+#include "glm/vec2.hpp"
+#include "RayDifferential.h"
 
 struct Camera
 {
@@ -16,9 +17,10 @@ struct Camera
 	glm::vec3 up;
 	float NEAR_PLANE;
 	float FAR_PLANE;
+	float dx, dy; //Change in ray origins starting form the camera
 
 	Camera(const glm::vec3& position, const glm::vec3& view_direction, const float vertical_fov, const float aspect_ratio);
-	Ray GenerateRay(const float u, const float v) const;
+	RayDifferential GenerateRayDifferential(const float u, const float v, const glm::vec2& sample_offset) const;
 };
 
 #endif
