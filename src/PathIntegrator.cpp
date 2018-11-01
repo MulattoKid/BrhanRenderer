@@ -49,10 +49,18 @@ glm::vec3 PathIntegrator::Li(const Scene& scene, RayDifferential* ray, RNG* rngs
 		BxDFType sampled_type;
 		glm::vec3 f = isect.bsdf->Samplef(rng, isect.wo, u, BSDF_ALL, isect.normal, &wi, &pdf, &sampled_type);
 		
-		if (pdf == 0.0f || f == glm::vec3(0.0f)) { break; }
+		if (pdf == 0.0f || f == glm::vec3(0.0f))
+		{
+			isect.Delete(mem_pool, thread_id);
+			break;
+		}
 		path_throughput *= f * glm::abs(glm::dot(isect.normal, wi)) / pdf;
 		
-		if (path_throughput.x <= 0.0f && path_throughput.y <= 0.0f && path_throughput.z <= 0.0f) { break; }
+		if (path_throughput.x <= 0.0f && path_throughput.y <= 0.0f && path_throughput.z <= 0.0f) 
+		{
+			isect.Delete(mem_pool, thread_id);
+			break;
+		}
 		specular_bounce = (sampled_type & BSDF_SPECULAR) != 0;
 		
 		ray->primary_ray = SpawnRayWithOffset(isect.point, wi, isect.normal);
