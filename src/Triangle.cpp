@@ -68,6 +68,38 @@ bool Triangle::PointIn(const glm::vec3& point) const
 	return true;
 }
 
+//p.163
+void Triangle::ComputeDifferentialSurface(glm::vec3* dpdu, glm::vec3* dpdv) const
+{
+	//p_i = p_0 + u_i * dpdu + v_i * dpdv
+	glm::vec3 dp02 = v[0] - v[2];
+	glm::vec2 duv02 = uv[0] - uv[2];
+	glm::vec3 dp12 = v[1] - v[2];
+	glm::vec2 duv12 = uv[1] - uv[2];
+	
+	float determinant = (duv02.x * duv12.y) - (duv02.y * duv12.x);
+	if (determinant == 0.0f || determinant == -0.0f)
+	{
+		glm::vec3 v1 = glm::normalize(glm::cross(v[2] - v[0], v[1] - v[0]));
+		//p.67
+		if (glm::abs(v1.x) > glm::abs(v1.y))
+		{
+			*dpdu = glm::vec3(-v1.z, 0.0f, v1.x) / glm::sqrt(v1.x * v1.x + v1.z * v1.z);
+		}
+		else
+		{
+			*dpdu = glm::vec3(0.0f, v1.z, -v1.y) / glm::sqrt(v1.y * v1.y + v1.z * v1.z);
+		}
+		*dpdv = glm::cross(v1, *dpdu);
+	}
+	else
+	{
+		float inv_det = 1.0f / determinant;
+		*dpdu = ((duv12.y * dp02) + (-duv02.y * dp12)) * inv_det;
+		*dpdv = ((-duv12.x * dp02) + (duv02.x * dp12)) * inv_det;
+	}
+}
+
 
 //https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
 bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const
@@ -109,59 +141,9 @@ bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min,
 	{
 		ray->t = t;
 		isect->shape = (Shape*)(this);
+		ComputeDifferentialSurface(&isect->dpdu, &isect->dpdv);
 		return true;
 	}
 
 	return false;
-}
-
-bool Triangle::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const
-{
-	//Convert all to local math objects
-	Vec3 ray_origin(ray->origin);
-	Vec3 ray_dir(ray->dir);
-	Vec3 v0(v[0]);
-	Vec3 v1(v[1]);
-	Vec3 v2(v[2]);
-	Vec3 v0v1 = v1 - v0;
-	Vec3 v0v2 = v2 - v0;
-	static const EFloat ZERO(0.0f);
-	static const EFloat ONE(1.0f);
-	static const EFloat EPSILON(0.00001f);
-	
-	Vec3 pvec = Cross(ray_dir, v0v2);
-	EFloat det = Dot(v0v1, pvec);
-	if (double_sided)
-	{
-		if (Abs(det) < EPSILON) return false;
-	}
-	else
-	{
-		if (det < EPSILON) return false;
-	}
-	EFloat invDet = ONE / det;
-
-	Vec3 tvec = ray_origin - v0;
-	EFloat u = Dot(tvec, pvec) * invDet;
-	if (u < ZERO || u > ONE) return false;
-
-	Vec3 qvec = Cross(tvec, v0v1);
-	EFloat v = Dot(ray_dir, qvec) * invDet;
-	if (v < ZERO || u + v > ONE) return false;
-
-	EFloat t = Dot(v0v2, qvec) * invDet;
-	if (t < ray->t && t >= 0.0f && t < t_less_than)
-	{
-		ray->t = t;
-		isect->shape = (Shape*)(this);
-		return true;
-	}
-
-	return false;
-}
-
-//p.164
-void Triangle::ComputeDifferentialSurface(glm::vec3* dpdu, glm::vec3* dpdv) const
-{
-	
 }

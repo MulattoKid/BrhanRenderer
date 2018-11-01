@@ -15,7 +15,6 @@ struct Quad : Shape
 	float Area() const;
 	glm::vec3 Sample(RNG& rng, const float u[2]) const;
 	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const;
-	bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const;
 	void ComputeDifferentialSurface(glm::vec3* dpdu, glm::vec3* dpdv) const;
 };
 

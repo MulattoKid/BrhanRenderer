@@ -21,7 +21,7 @@ struct SurfaceInteraction
 	glm::vec3 wo; //Points away from point
 	BSDF* bsdf = NULL;
 	//Differentials
-	glm::vec3 dpdx, dpdy;
+	glm::vec3 dpdu, dpdv;
 	float dudx, dvdx, dudy, dvdy;
 	
 	void Delete(MemoryPool* mem_pool, const int thread_id);

@@ -10,14 +10,3 @@ bool Model::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, co
 
 	return intersected;
 }
-
-bool Model::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const
-{
-	bool intersected = false;
-	for (const Shape* shape : shapes)
-	{
-		intersected |= shape->Intersect(ray, isect, t_less_than);
-	}
-
-	return intersected;
-}

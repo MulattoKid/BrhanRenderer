@@ -1,4 +1,6 @@
 #include "glm/common.hpp"
+#include "glm/exponential.hpp"
+#include "glm/gtc/vec1.hpp"
 #include "Logger.h"
 #include <math.h>
 #include <omp.h>
@@ -97,10 +99,11 @@ void Texture::GenerateMipmaps(const unsigned char* data)
 	}
 }
 
-glm::vec3 Texture::Sample(float u, float v)
+glm::vec3 Texture::Sample(float u, float v, float dudx, float dvdx, float dudy, float dvdy)
 {
 	//TODO: select mipmap level - https://blog.yiningkarlli.com/2018/10/bidirectional-mipmap.html
-	const unsigned int mipmap_level = 0;
+	float width = glm::max(glm::max(dudx, dvdx), glm::max(dudy, dvdy));
+	const unsigned int mipmap_level = glm::ceil(float(num_mipmaps - 1) + glm::log2(width));
 	Mipmap* mm = &mipmaps[mipmap_level];
 	
 	//Find uv coefficients for bilinear filtering

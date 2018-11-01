@@ -284,7 +284,6 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 
 	//Loop over shapes - remember that what I call a Shape is NOT the same as the OBJ view of a shape
 	int triangle_index = 0, quad_index = 0, shape_index = 0;
-	float min_area = std::numeric_limits<float>::max();
 	for (size_t s = 0; s < shapes.size(); s++)
 	{
 		//Loop over faces(polygon)
@@ -346,6 +345,12 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 					tri->n[1] = normal;
 					tri->n[2] = normal;
 				}
+				if (!model->has_uvs)
+				{
+					tri->uv[0] = glm::vec2(0.0f, 0.0f);
+					tri->uv[1] = glm::vec2(1.0f, 0.0f);
+					tri->uv[2] = glm::vec2(1.0f, 1.0f);
+				}
 				model->shapes[shape_index++] = tri;
 				
 				//per-face material
@@ -373,7 +378,6 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 				}
 				//Generate bounding box
 				tri->bb = BoundingBox(*tri);
-				min_area = tri->Area() < min_area ? tri->Area() : min_area;
 			}
 			else if (fv == 4) //Quad
 			{

@@ -33,8 +33,6 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& view_direction, const
 	this->vertical_end = lens_height * (-this->up);
 	this->NEAR_PLANE = 0.0001f;
 	this->FAR_PLANE = 10000.0f;
-	this->dx = 1.0f / lens_width;
-	this->dy = 1.0f / lens_height;
 	
 	LOG_MESSAGE(true, "Loaded camera:\n"
 					  "\tposition [%f %f %f]\n"
@@ -46,11 +44,11 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& view_direction, const
 }
 
 
-RayDifferential Camera::GenerateRayDifferential(const float u, const float v, const glm::vec2& sample_offset) const
+RayDifferential Camera::GenerateRayDifferential(const float u, const float ux, const float v, const float vy, const glm::vec2& sample_offset) const
 {
 	RayDifferential rd;
 	rd.primary_ray = Ray(position, top_left_corner + ((u + sample_offset.x) * horizontal_end) + ((v + sample_offset.y) * vertical_end) - position);
-	rd.horizontal_offset_ray = Ray(position, top_left_corner + ((u + dx) * horizontal_end) + (v * vertical_end) - position);
-	rd.vertical_offset_ray = Ray(position, top_left_corner + (u * horizontal_end) + ((v + dy) * vertical_end) - position);
+	rd.horizontal_offset_ray = Ray(position, top_left_corner + (ux * horizontal_end) + (v * vertical_end) - position);
+	rd.vertical_offset_ray = Ray(position, top_left_corner + (u * horizontal_end) + (vy * vertical_end) - position);
 	return rd;
 }

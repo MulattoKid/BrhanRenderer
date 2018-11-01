@@ -59,7 +59,7 @@ void MirrorMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, Memor
 		SpecularBRDF* s_ptr = (SpecularBRDF*)(mem_pool->Allocate(sizeof(SpecularBRDF), thread_id));
 		FresnelNoOp* f_ptr = (FresnelNoOp*)(mem_pool->Allocate(sizeof(FresnelNoOp), thread_id));
 		new(f_ptr) FresnelNoOp();
-		new(s_ptr) SpecularBRDF(t_Ks->Sample(uv.x, uv.y), f_ptr, FRESNEL_NONE);
+		new(s_ptr) SpecularBRDF(t_Ks->Sample(uv.x, uv.y, isect->dudx, isect->dvdx, isect->dudy, isect->dvdy), f_ptr, FRESNEL_NONE);
 		isect->bsdf->Add(s_ptr);
 	}
 }

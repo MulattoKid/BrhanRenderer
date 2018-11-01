@@ -37,14 +37,16 @@ int main(int argc, char** argv)
 #endif
 		{
 			//Center coordinates of pixel
-			const float u = (float(x) + 0.5f) / float(system.film_width);
-			const float v = (float(y) + 0.5f) / float(system.film_height);
+			const float u  = (float(x) + 0.5f) / float(system.film_width);
+			const float ux = (float(x + 1) + 0.5f) / float(system.film_width);
+			const float v  = (float(y) + 0.5f) / float(system.film_height);
+			const float vy = (float(y + 1) + 0.5f) / float(system.film_height);
 			
 			glm::vec3 L(0.0f);
 			for (unsigned int s = 0; s < system.spp; s++)
 			{
 				glm::vec2 sample_offset = pixel_sampler->Sample(s, rngs[omp_get_thread_num()]);
-				RayDifferential ray = camera->GenerateRayDifferential(u, v, sample_offset);
+				RayDifferential ray = camera->GenerateRayDifferential(u, ux, v, vy, sample_offset);
 				L += system.integrator->Li(*scene, &ray, rngs, mem_pool, omp_get_thread_num(), 0, system.max_depth);
 			}
 			L /= float(system.spp);

@@ -86,6 +86,11 @@ glm::vec3 Quad::Sample(RNG& rng, const float u[2]) const
 	return tri.Sample(rng, u);
 }
 
+void Quad::ComputeDifferentialSurface(glm::vec3* dpdu, glm::vec3* dpdv) const
+{
+	assert(0);
+}
+
 bool Quad::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const
 {
 	Triangle t1;
@@ -121,46 +126,4 @@ bool Quad::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, con
 	}
 
 	return false;
-}
-
-bool Quad::Intersect(Ray* ray, SurfaceInteraction* isect, const float t_less_than) const
-{
-	Triangle t1;
-	t1.v[0] = v[0];
-	t1.v[1] = v[1];
-	t1.v[2] = v[2];
-	t1.n[0] = n[0];
-	t1.n[1] = n[1];
-	t1.n[2] = n[2];
-	t1.uv[0] = uv[0];
-	t1.uv[1] = uv[1];
-	t1.uv[2] = uv[2];
-	if (t1.Intersect(ray, isect, t_less_than))
-	{
-		isect->shape = (Shape*)(this);
-		return true;
-	}
-
-	Triangle t2;
-	t2.v[0] = v[2];
-	t2.v[1] = v[3];
-	t2.v[2] = v[0];
-	t2.n[0] = n[2];
-	t2.n[1] = n[3];
-	t2.n[2] = n[0];
-	t2.uv[0] = uv[2];
-	t2.uv[1] = uv[3];
-	t2.uv[2] = uv[0]; 
-	if (t2.Intersect(ray, isect, t_less_than))
-	{
-		isect->shape = (Shape*)(this);
-		return true;
-	}
-
-	return false;
-}
-
-void Quad::ComputeDifferentialSurface(glm::vec3* dpdu, glm::vec3* dpdv) const
-{
-	assert(0);
 }
