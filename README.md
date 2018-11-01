@@ -80,6 +80,7 @@ TODO
 ### Misc
 - BVH tree for ray-shape intersection
 - Memory pool for avoiding dynamic heap allocations while rendering, i.e. ```new```/```delete```
+- OpenMP parallelization
 
 ## Rendered Images
 ![CornellBox](https://i.imgur.com/DGFBV83.png)
@@ -91,9 +92,9 @@ A view of the CornellBox-Original (model courtesy of Morgan McGuire's graphics a
 
 Triangle count: 36
 
-Render time: 7m 36s using 11 cores
+Render time: 7m 36s using 12 cores
 
-![Buddha statue](https://i.imgur.com/hQ3fVck.png)
+![Buddha statue](https://i.imgur.com/0GbiD1E.png)
 A view of the Buddha statue (model courtesy of [Stanford Computer Graphics Laboratory](http://graphics.stanford.edu/data/3Dscanrep/)) rendered with the following settings:
 - 1024x1024
 - 256 samples per pixel
@@ -102,4 +103,4 @@ A view of the Buddha statue (model courtesy of [Stanford Computer Graphics Labor
 
 Triangle count: 29892
 
-Rendering time: 1m 55s using 11 cores
+Rendering time: 1m 33 using 12 cores
