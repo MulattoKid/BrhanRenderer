@@ -72,6 +72,10 @@ TODO
 - Plastic (WIP)
 - Water
 - Glass
+### Textures
+- Matte, mirror and plastic materials composed of textures
+- Automatic mipmap generation and selection
+- Bilinear filtering
 ### Misc
 - BVH tree for ray-shape intersection
 - Memory pool for avoiding dynamic heap allocations while rendering, i.e. ```new```/```delete```
