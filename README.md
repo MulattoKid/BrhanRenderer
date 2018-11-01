@@ -9,6 +9,7 @@
 - [Supported Features](#functionality)
   - [BxDFs](#bxdfs)
   - [Materials](#materials)
+  - [Textures](#textures)
   - [Misc](#misc)
 - [Renders](#rendered-images)
 
