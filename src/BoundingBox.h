@@ -6,7 +6,6 @@
 struct Ray;
 struct Sphere;
 struct Triangle;
-struct Quad;
 
 //Axis-Aligned Bounding Box
 struct BoundingBox
@@ -20,7 +19,6 @@ struct BoundingBox
 	BoundingBox(const glm::vec3& min, const glm::vec3& max);
 	BoundingBox(const Sphere& s);
 	BoundingBox(const Triangle& t);
-	BoundingBox(const Quad& q);
 	const glm::vec3& operator[](int i) const
 	{
 		return i == 0 ? min : max;

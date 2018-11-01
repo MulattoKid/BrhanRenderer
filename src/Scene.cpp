@@ -87,7 +87,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 	
 	//Count number of triangles and quads to resize Model::shapes
 	Model* model = &models[model_index];
-	int num_triangles = 0, num_quads = 0;
+	int num_triangles = 0;
 	for (size_t s = 0; s < shapes.size(); s++)
 	{
 		//Loop over faces(polygon)
@@ -95,12 +95,14 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 		{
 			int fv = shapes[s].mesh.num_face_vertices[f];
 			if (fv == 3) { num_triangles++; }
-			else { num_quads++; }
+			else
+			{
+				LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported number of vertices (%i) for shape %lu in model '%s'", fv, s, model_load.file.c_str());
+			}
 		}
 	}
 	model->triangles.resize(num_triangles);
-	model->quads.resize(num_quads);
-	model->shapes.resize(num_triangles + num_quads);
+	model->shapes.resize(num_triangles);
 	if (model_load.has_custom_material)
 	{
 		model->materials.resize(1);
@@ -283,7 +285,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 	}
 
 	//Loop over shapes - remember that what I call a Shape is NOT the same as the OBJ view of a shape
-	int triangle_index = 0, quad_index = 0, shape_index = 0;
+	int triangle_index = 0;
 	for (size_t s = 0; s < shapes.size(); s++)
 	{
 		//Loop over faces(polygon)
@@ -293,7 +295,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 			size_t fv = shapes[s].mesh.num_face_vertices[f];
 			if (fv == 3) //Triangle
 			{
-				Triangle* tri = &model->triangles[triangle_index++];
+				Triangle* tri = &model->triangles[triangle_index];
 				//Loop over vertices in the face
 				for (size_t v = 0; v < fv; v++)
 				{
@@ -351,7 +353,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 					tri->uv[1] = glm::vec2(1.0f, 0.0f);
 					tri->uv[2] = glm::vec2(1.0f, 1.0f);
 				}
-				model->shapes[shape_index++] = tri;
+				model->shapes[triangle_index] = tri;
 				
 				//per-face material
 				if (model_load.has_custom_material)
@@ -379,93 +381,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 				//Generate bounding box
 				tri->bb = BoundingBox(*tri);
 			}
-			else if (fv == 4) //Quad
-			{
-				Quad* quad = &model->quads[quad_index++];
-				//Loop over vertices in the face
-				for (size_t v = 0; v < fv; v++)
-				{
-					tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
-				  	quad->v[v].x = attrib.vertices[3*idx.vertex_index+0];
-				  	quad->v[v].y = attrib.vertices[3*idx.vertex_index+1];
-				  	quad->v[v].z = attrib.vertices[3*idx.vertex_index+2];
-				  	if (model_load.translation_active)
-				  	{
-				  		quad->v[v] = glm::vec3(model_load.translation * glm::vec4(quad->v[v], 1.0f));
-				  	}
-				  	if (model_load.rotation_active)
-				  	{
-				  		quad->v[v] = glm::vec3(model_load.rotation * glm::vec4(quad->v[v], 1.0f));
-				  	}
-				  	if (model_load.scaling_active)
-				  	{
-				  		quad->v[v] = glm::vec3(model_load.scaling * glm::vec4(quad->v[v], 1.0f));
-				  	}
-
-					if (has_normals)
-					{
-					  	quad->n[v].x = attrib.normals[3*idx.normal_index+0];
-					  	quad->n[v].y = attrib.normals[3*idx.normal_index+1];
-					  	quad->n[v].z = attrib.normals[3*idx.normal_index+2];
-					  	quad->n[v] = glm::normalize(quad->n[v]);
-					  	if (model_load.rotation_active)
-					  	{
-					  		quad->n[v] = glm::vec3(model_load.rotation * glm::vec4(quad->n[v], 1.0f));
-					  	}
-					}
-
-					if (model->has_uvs)
-					{
-					  	quad->uv[v].x = attrib.texcoords[2*idx.texcoord_index+0];
-					  	quad->uv[v].y = attrib.texcoords[2*idx.texcoord_index+1];
-					}
-				}
-				if (!has_normals) //Generate normals (all are the same)
-				{
-					glm::vec3 v0v1 = quad->v[1] - quad->v[0];
-					glm::vec3 v0v2 = quad->v[2] - quad->v[0];
-					glm::vec3 normal = glm::normalize(glm::cross(v0v1, v0v2));
-					if (model_load.rotation_active)
-				  	{
-						normal = glm::normalize(glm::vec3(model_load.rotation * glm::vec4(normal, 1.0f)));
-					}
-					quad->n[0] = normal;
-					quad->n[1] = normal;
-					quad->n[2] = normal;
-					quad->n[3] = normal;
-				}
-				model->shapes[shape_index++] = quad;
-				
-				//per-face material
-				if (model_load.has_custom_material)
-				{
-					quad->material = model->materials[0];
-					quad->mtl = &model->mtls[0];
-				}
-				else
-				{
-					quad->material = model->materials[shapes[s].mesh.material_ids[f]];
-					quad->mtl = &model->mtls[shapes[s].mesh.material_ids[f]];
-				}
-				//Add to lights if emissive
-				if (quad->mtl->emission != glm::vec3(0.0f))
-				{
-					//TODO: only diffuse area light for now
-					DiffuseAreaLight dal;
-					dal.shape = (Shape*)(quad);
-					//NOTE: double-sided lights are not allowed??
-					//dal.shape->double_sided = false;
-					dal.L_emit = quad->mtl->emission;
-					diffuse_area_lights.push_back(dal);
-					quad->area_light_index = diffuse_area_lights.size() - 1;
-				}
-				//Generate bounding box
-				quad->bb = BoundingBox(*quad);
-			}
-			else
-			{
-				LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported geometry type with %lu vertices\n", fv);
-			}		
+			triangle_index++;
 			index_offset += fv;
 		}
 	}
@@ -474,7 +390,6 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 				"Successfully loaded %s:\n"
 				"\t%lu spheres\n"
 				"\t%lu triangles\n"
-				"\t%lu quads\n"
 				"\t%lu shapes\n"
 				"\t%lu material(s)\n"
 				"\t\t%lu matte\n"
@@ -486,7 +401,6 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 				model_load.file.c_str(),
 				model->spheres.size(),
 				model->triangles.size(),
-				model->quads.size(),
 				model->shapes.size(),
 				model->materials.size(),
 				model->matte_materials.size(),

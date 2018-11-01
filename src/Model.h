@@ -6,7 +6,6 @@
 #include "MirrorMaterial.h"
 #include "MTL.h"
 #include "PlasticMaterial.h"
-#include "Quad.h"
 #include "Shape.h"
 #include "Sphere.h"
 #include "SurfaceInteraction.h"
@@ -19,7 +18,6 @@ struct Model
 {
 	std::vector<Sphere> spheres;
 	std::vector<Triangle> triangles;
-	std::vector<Quad> quads;
 	std::vector<Shape*> shapes;
 	std::vector<MatteMaterial> matte_materials;
 	std::vector<MirrorMaterial> mirror_materials;
