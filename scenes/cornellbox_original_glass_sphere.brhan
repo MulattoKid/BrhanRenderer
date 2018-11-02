@@ -1,0 +1,6 @@
+Camera position[0.0 1.0 6.58] view_direction[0.0 0.0 -1.0] vertical_fov[19.5] width[1024] height[1024]
+
+Integrator type[path] spp[2048] max_depth[4]
+
+Model file[models/CornellBox/CornellBox-Original.obj] translate[0 0 0] rotate[0 0 0]
+Sphere center[0 1 2] radius[0.15] material[glass] reflectance[1 1 1] transmittance[1 1 1]
