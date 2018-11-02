@@ -83,6 +83,19 @@ TODO
 - OpenMP parallelization
 
 ## Rendered Images
+![CornellBox with glass sphere](https://i.imgur.com/xI2jXSe.png)
+A view of the CornellBox-Original (model courtesy of Morgan McGuire's graphics archive) with an added glass sphere rendered with the following settings:
+- 1024x1024
+- 2048 samples per pixel
+- Max path depth of 4
+- 19.5 degrees of vertical camera FOV
+
+Triangle count: 36
+Sphere count: 1
+
+Render time: 29m 48s using 12 cores
+
+
 ![CornellBox](https://i.imgur.com/DGFBV83.png)
 A view of the CornellBox-Original (model courtesy of Morgan McGuire's graphics archive) rendered with the following settings:
 - 1024x1024
