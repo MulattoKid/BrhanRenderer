@@ -27,19 +27,19 @@ void PlasticMaterial::Info() const
 
 void PlasticMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const
 {
-	isect->bsdf = (BSDF*)(mem_pool->Allocate(sizeof(BSDF), thread_id));
+	isect->bsdf = (BSDF*)(mem_pool->Allocate(MemoryPoolObjectTypes::MEM_POOL_BSDF, thread_id));
 	new(isect->bsdf) BSDF();
 	
 	if (Kd != glm::vec3(0.0f))
 	{
-		LambertianBRDF* l_ptr = (LambertianBRDF*)(mem_pool->Allocate(sizeof(LambertianBRDF), thread_id));
+		LambertianBRDF* l_ptr = (LambertianBRDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
 		new(l_ptr) LambertianBRDF(Kd);
 		isect->bsdf->Add(l_ptr);
 	}
 	if (Ks != glm::vec3(0.0f))
 	{
-		SpecularBRDF* s_ptr = (SpecularBRDF*)(mem_pool->Allocate(sizeof(SpecularBRDF), thread_id));
-		FresnelNoOp* f_ptr = (FresnelNoOp*)(mem_pool->Allocate(sizeof(FresnelNoOp), thread_id));
+		SpecularBRDF* s_ptr = (SpecularBRDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
+		FresnelNoOp* f_ptr = (FresnelNoOp*)(mem_pool->Allocate(MEM_POOL_FRESNEL, thread_id));
 		new(f_ptr) FresnelNoOp();
 		new(s_ptr) SpecularBRDF(Ks, f_ptr, FRESNEL_NONE);
 		isect->bsdf->Add(s_ptr);

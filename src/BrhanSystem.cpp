@@ -602,8 +602,9 @@ void InitMemoryPool(MemoryPool** mem_pool)
 	}
 	
 	const int max_bxdfs = 8; //From BSDF.h:11
-	size_t s = sizeof(BSDF) + max_bxdfs * (max_bxdf_size + max_fresnel_size);
-	*mem_pool = new MemoryPool(s, omp_get_max_threads());
+	size_t obj_sizes[3] = { sizeof(BSDF), max_bxdf_size, max_fresnel_size };
+	size_t num_instances[3] = { 1, max_bxdfs, max_bxdfs };
+	*mem_pool = new MemoryPool(obj_sizes, num_instances, 3, omp_get_max_threads());
 }
 
 BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, MemoryPool** mem_pool, PixelSampler** pixel_sampler)

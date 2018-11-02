@@ -4,6 +4,13 @@
 #include "MemoryPool/MemoryPool.h"
 #include "SurfaceInteraction.h"
 
+enum MemoryPoolObjectTypes
+{
+	MEM_POOL_BSDF = 0,
+	MEM_POOL_BxDF = 1,
+	MEM_POOL_FRESNEL = 2
+};
+
 struct Material
 {
 	virtual void Info() const = 0;

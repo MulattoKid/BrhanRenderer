@@ -29,20 +29,20 @@ void GlassMaterial::Info() const
 
 void GlassMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const
 {
-	isect->bsdf = (BSDF*)(mem_pool->Allocate(sizeof(BSDF), thread_id));
+	isect->bsdf = (BSDF*)(mem_pool->Allocate(MEM_POOL_BSDF, thread_id));
 	new(isect->bsdf) BSDF();
 	
 	if (R != glm::vec3(0.0f))
 	{
-		SpecularBRDF* s_ptr = (SpecularBRDF*)(mem_pool->Allocate(sizeof(SpecularBRDF), thread_id));
-		FresnelDielectric* f_ptr = (FresnelDielectric*)(mem_pool->Allocate(sizeof(FresnelDielectric), thread_id));
+		SpecularBRDF* s_ptr = (SpecularBRDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
+		FresnelDielectric* f_ptr = (FresnelDielectric*)(mem_pool->Allocate(MEM_POOL_FRESNEL, thread_id));
 		new(f_ptr) FresnelDielectric(eta_outside, eta_inside);
 		new(s_ptr) SpecularBRDF(R, f_ptr, FRESNEL_DIELECTRIC);
 		isect->bsdf->Add(s_ptr);
 	}
 	if (T != glm::vec3(0.0f))
 	{
-		SpecularBTDF* s_ptr = (SpecularBTDF*)(mem_pool->Allocate(sizeof(SpecularBTDF), thread_id));
+		SpecularBTDF* s_ptr = (SpecularBTDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
 		new(s_ptr) SpecularBTDF(T, eta_outside, eta_inside);
 		isect->bsdf->Add(s_ptr);
 	}
