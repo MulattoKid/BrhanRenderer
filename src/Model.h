@@ -3,6 +3,7 @@
 
 #include "GlassMaterial.h"
 #include "MatteMaterial.h"
+#include "MetalMaterial.h"
 #include "MirrorMaterial.h"
 #include "MTL.h"
 #include "PlasticMaterial.h"
@@ -22,6 +23,7 @@ struct Model
 	std::vector<MatteMaterial> matte_materials;
 	std::vector<MirrorMaterial> mirror_materials;
 	std::vector<PlasticMaterial> plastic_materials;
+	std::vector<MetalMaterial> metal_materials;
 	std::vector<TranslucentMaterial> translucent_materials;
 	std::vector<WaterMaterial> water_materials;
 	std::vector<GlassMaterial> glass_materials;

@@ -120,6 +120,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 	std::vector<int> matte_material_indices;
 	std::vector<int> mirror_material_indices;
 	std::vector<int> plastic_material_indices;
+	std::vector<int> metal_material_indices;
 	std::vector<int> translucent_material_indices;
 	std::vector<int> water_material_indices;
 	std::vector<int> glass_material_indices;
@@ -140,6 +141,11 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 		{
 			model->plastic_materials.push_back(PlasticMaterial(model_load.diffuse, model_load.specular));
 			plastic_material_indices.push_back(0);
+		}
+		else if (model_load.material == "copper")
+		{
+			model->metal_materials.push_back(MetalMaterial(model_load.specular, MetalType::COPPER));
+			metal_material_indices.push_back(0);
 		}
 		else if (model_load.material == "translucent")
 		{
@@ -227,6 +233,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 					model->plastic_materials.push_back(PlasticMaterial(mtl->diffuse, mtl->specular));
 					plastic_material_indices.push_back(i);
 				}
+				//TODO: metals?
 				else
 				{
 					LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Unsupported material\n");
@@ -270,6 +277,10 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 	for (size_t i = 0; i < model->plastic_materials.size(); i++)
 	{
 		model->materials[plastic_material_indices[i]] = (Material*)(&model->plastic_materials[i]);
+	}
+	for (size_t i = 0; i < model->metal_materials.size(); i++)
+	{
+		model->materials[metal_material_indices[i]] = (Material*)(&model->metal_materials[i]);
 	}
 	for (size_t i = 0; i < model->translucent_materials.size(); i++)
 	{
@@ -395,6 +406,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 				"\t\t%lu matte\n"
 				"\t\t%lu mirror\n"
 				"\t\t%lu plastic\n"
+				"\t\t%lu metals\n"
 				"\t\t%lu translucent\n"
 				"\t\t%lu water\n"
 				"\t\t%lu glass\n",
@@ -406,6 +418,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 				model->matte_materials.size(),
 				model->mirror_materials.size(),
 				model->plastic_materials.size(),
+				model->metal_materials.size(),
 				model->translucent_materials.size(),
 				model->water_materials.size(),
 				model->glass_materials.size());
@@ -433,6 +446,11 @@ bool Scene::LoadSphere(const SphereLoad& sphere, const unsigned int model_index)
 	{
 		model->plastic_materials.push_back(PlasticMaterial(sphere.diffuse, sphere.specular));
 		model->materials.push_back(&model->plastic_materials[0]);
+	}
+	else if (sphere.material == "copper")
+	{
+		model->metal_materials.push_back(MetalMaterial(sphere.specular, MetalType::COPPER));
+		model->materials.push_back(&model->metal_materials[0]);
 	}
 	else if (sphere.material == "translucent")
 	{

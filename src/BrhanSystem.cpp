@@ -356,27 +356,31 @@ void BrhanSystem::AddModel(const std::string& line)
 	{
 		if (model.material == "matte" && !found_diffuse)
 		{
-			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse spectrum of model\n");
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
 		}
 		if (model.material == "mirror" && !found_specular)
 		{
-			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of model\n");
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
 		}
 		if (model.material == "plastic" && (!found_specular || !found_specular))
 		{
-			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse or specular spectrum of model\n");
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse or specular spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
+		}
+		if (model.material == "copper" && !found_specular)
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
 		}
 		if (model.material == "translucent" && !found_transmittance)
 		{
-			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find transmittance spectrum of model\n");
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find transmittance spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
 		}
 		if (model.material == "water" && (!found_reflectance || !found_transmittance))
 		{
-			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of model\n");
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
 		}
 		if (model.material == "glass" && (!found_reflectance || !found_transmittance))
 		{
-			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of model\n");
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
 		}
 	}
 	
@@ -497,29 +501,36 @@ void BrhanSystem::AddSphere(const std::string& line)
 	{
 		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find material of sphere\n");
 	}
-	if (sphere.material == "matte" && !found_diffuse)
+	else
 	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse spectrum of sphere\n");
-	}
-	if (sphere.material == "mirror" && !found_specular)
-	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of sphere\n");
-	}
-	if (sphere.material == "plastic" && (!found_specular || !found_specular))
-	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse or specular spectrum of sphere\n");
-	}
-	if (sphere.material == "translucent" && !found_transmittance)
-	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find transmittance spectrum of sphere\n");
-	}
-	if (sphere.material == "water" && (!found_reflectance || !found_transmittance))
-	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of sphere\n");
-	}
-	if (sphere.material == "glass" && (!found_reflectance || !found_transmittance))
-	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of sphere\n");
+		if (sphere.material == "matte" && !found_diffuse)
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse spectrum of sphere on line: '%s'\n", line.c_str());
+		}
+		if (sphere.material == "mirror" && !found_specular)
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of sphere on line: '%s'\n", line.c_str());
+		}
+		if (sphere.material == "plastic" && (!found_specular || !found_specular))
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse or specular spectrum of sphere on line: '%s'\n", line.c_str());
+		}
+		if (sphere.material == "copper" && !found_specular)
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of sphere on line: '%s'\n", line.c_str());
+		}
+		if (sphere.material == "translucent" && !found_transmittance)
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find transmittance spectrum of sphere on line: '%s'\n", line.c_str());
+		}
+		if (sphere.material == "water" && (!found_reflectance || !found_transmittance))
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of sphere on line: '%s'\n", line.c_str());
+		}
+		if (sphere.material == "glass" && (!found_reflectance || !found_transmittance))
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find reflectance or transmittance spectrum of sphere on line: '%s'\n", line.c_str());
+		}
 	}
 	
 	spheres.push_back(sphere);
@@ -674,35 +685,3 @@ void BrhanSystem::UpdateProgress(unsigned int y, std::chrono::high_resolution_cl
 	remaining_time_str.resize(62, ' '); //Length of 'Estimated time remaining: 4294967295h 4294967295m 4294967295s'
 	LOG_MESSAGE(true, "\rRender progress (%lu\%): [%s] %s", progress, output.c_str(), remaining_time_str.c_str());
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
