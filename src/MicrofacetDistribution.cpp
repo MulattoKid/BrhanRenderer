@@ -25,7 +25,6 @@ float MicrofacetDistribution::G(const glm::vec3& wo, const glm::vec3& normal, co
 
 float MicrofacetDistribution::Pdf(const glm::vec3& wo, const glm::vec3& wh, const glm::vec3& normal) const
 {
-	/*return D(wh, normal) * G1(wo, normal) * glm::abs(glm::dot(wo, wh)) / glm::abs(glm::dot(wo, normal));*/
 	return D(wh, normal) * glm::abs(glm::dot(wh, normal));
 }
 
@@ -45,16 +44,17 @@ BeckmannDistribution::~BeckmannDistribution()
 {}
 
 //p.539
+//http://www.reedbeta.com/blog/hows-the-ndf-really-defined/
 float BeckmannDistribution::D(const glm::vec3& wh, const glm::vec3& normal) const
 {
-	float theta = glm::acos(glm::dot(normal, wh));
+	float theta = glm::acos(glm::dot(wh, normal));
 	float tan_theta_2 = glm::pow(glm::tan(theta), 2);
 	if (std::isinf(tan_theta_2))
 	{
 		return 0.0f;
 	}
 	
-	float cos_theta_4 = glm::pow(glm::dot(normal, wh), 4);
+	float cos_theta_4 = glm::pow(glm::dot(wh, normal), 4);
 	float alpha_2 = alpha * alpha;
 	return glm::exp(-tan_theta_2 / alpha_2) / (glm::pi<float>() * alpha_2 * cos_theta_4);
 }

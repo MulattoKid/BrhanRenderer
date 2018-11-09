@@ -43,8 +43,7 @@ void MetalMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, Memory
 		FresnelConductor* f_ptr = (FresnelConductor*)(mem_pool->Allocate(MEM_POOL_FRESNEL, thread_id));
 		
 		new(f_ptr) FresnelConductor(glm::vec3(1.0f), N, K);
-		//new(b_ptr) BeckmannDistribution(MicrofacetDistribution::RoughnessToAlpha(0.01f));
-		new(b_ptr) BeckmannDistribution(0.5f);
+		new(b_ptr) BeckmannDistribution(MicrofacetDistribution::RoughnessToAlpha(0.01f));
 		new(m_ptr) MicrofacetBRDF(Ks, b_ptr, f_ptr);
 		
 		isect->bsdf->Add(m_ptr);
