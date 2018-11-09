@@ -3,8 +3,8 @@
 #include "Logger.h"
 #include "MetalData.h"
 #include "MetalMaterial.h"
+#include "MicrofacetBRDF.h"
 #include "Spectrum.h"
-#include "SpecularBRDF.h"
 
 MetalMaterial::MetalMaterial(const glm::vec3& Ks, const MetalType m_type)
 {
@@ -38,11 +38,15 @@ void MetalMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, Memory
 	
 	if (Ks != glm::vec3(0.0f))
 	{
-		SpecularBRDF* s_ptr = (SpecularBRDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
+		MicrofacetBRDF* m_ptr = (MicrofacetBRDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
+		BeckmannDistribution* b_ptr = (BeckmannDistribution*)(mem_pool->Allocate(MEM_POOL_MICRO_DISTRIBUTION, thread_id));
 		FresnelConductor* f_ptr = (FresnelConductor*)(mem_pool->Allocate(MEM_POOL_FRESNEL, thread_id));
-		//Assuming coming from AIR -> glm::vec3(1.0f)
+		
 		new(f_ptr) FresnelConductor(glm::vec3(1.0f), N, K);
-		new(s_ptr) SpecularBRDF(Ks, f_ptr, FRESNEL_CONDUCTOR);
-		isect->bsdf->Add(s_ptr);
+		//new(b_ptr) BeckmannDistribution(MicrofacetDistribution::RoughnessToAlpha(0.01f));
+		new(b_ptr) BeckmannDistribution(0.5f);
+		new(m_ptr) MicrofacetBRDF(Ks, b_ptr, f_ptr);
+		
+		isect->bsdf->Add(m_ptr);
 	}
 }

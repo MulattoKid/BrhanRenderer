@@ -8,7 +8,8 @@ enum MemoryPoolObjectTypes
 {
 	MEM_POOL_BSDF = 0,
 	MEM_POOL_BxDF = 1,
-	MEM_POOL_FRESNEL = 2
+	MEM_POOL_FRESNEL = 2,
+	MEM_POOL_MICRO_DISTRIBUTION = 3
 };
 
 struct Material

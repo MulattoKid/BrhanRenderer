@@ -9,6 +9,7 @@
 #include <iostream>
 #include <limits>
 #include "Logger.h"
+#include "MicrofacetDistribution.h"
 #include <omp.h>
 #include "PathIntegrator.h"
 #include <string>
@@ -612,10 +613,12 @@ void InitMemoryPool(MemoryPool** mem_pool)
 		}
 	}
 	
+	const size_t max_micro_distr_size = sizeof(BeckmannDistribution);
+	
 	const int max_bxdfs = 8; //From BSDF.h:11
-	size_t obj_sizes[3] = { sizeof(BSDF), max_bxdf_size, max_fresnel_size };
-	size_t num_instances[3] = { 1, max_bxdfs, max_bxdfs };
-	*mem_pool = new MemoryPool(obj_sizes, num_instances, 3, omp_get_max_threads());
+	size_t obj_sizes[4] = { sizeof(BSDF), max_bxdf_size, max_fresnel_size, max_micro_distr_size };
+	size_t num_instances[4] = { 1, max_bxdfs, max_bxdfs, max_bxdfs };
+	*mem_pool = new MemoryPool(obj_sizes, num_instances, 4, omp_get_max_threads());
 }
 
 BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, MemoryPool** mem_pool, PixelSampler** pixel_sampler)
