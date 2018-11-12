@@ -67,18 +67,21 @@ TODO
 - Oren-Nayar BRDF
 - Specular BRDF
 - Specular BTDF
+- Microfacet BRDF using Beckmann's microfacet distribution function
 ### Materials
 - Matte
 - Mirror
 - Plastic (WIP)
-- Water
-- Glass
+- Metals (Fresnel conductor): copper
+- Water (Fresnel dielectric)
+- Glass (Fresnel dielectric)
 ### Textures
 - Matte, mirror and plastic materials composed of textures
 - Automatic mipmap generation and selection
 - Bilinear filtering
 ### Misc
 - BVH tree for ray-shape intersection
+- Writing out images during rendering (useful for generating image data for neural networks)
 - Memory pool for avoiding dynamic heap allocations while rendering, i.e. ```new```/```delete```
 - OpenMP parallelization
 
