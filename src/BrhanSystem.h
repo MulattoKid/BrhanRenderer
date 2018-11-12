@@ -52,20 +52,25 @@ struct BrhanSystem
 	unsigned int film_height;
 	unsigned int spp;
 	unsigned int max_depth;
+	unsigned int save_intervals;
+	bool save_intervals_enabled = false;
 	Integrator* integrator;
 	IntegratorType integrator_type;
 	char* scene_file;
+	std::string path;
 	std::vector<ModelLoad> models;
 	std::vector<SphereLoad> spheres;
 	
 	BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, MemoryPool** mem_pool, PixelSampler** pixel_sampler);
 	~BrhanSystem();
+	std::string ExtractFileNameOnly() const;
 	void LoadCamera(const std::string& line);
 	void LoadIntegrator(const std::string& line);
+	void LoadSaveIntervals(const std::string& line);
 	void AddModel(const std::string& line);
 	void AddSphere(const std::string& line);
 	void LoadSceneFile(const std::string& scene_file);
-	void UpdateProgress(unsigned int y, std::chrono::high_resolution_clock::time_point start_time, std::chrono::high_resolution_clock::time_point update_time) const;
+	void UpdateProgress(unsigned int y, std::chrono::high_resolution_clock::time_point start_time, std::chrono::high_resolution_clock::time_point update_time, unsigned int save_interval = 0) const;
 };
 
 #endif

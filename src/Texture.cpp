@@ -34,7 +34,7 @@ Texture::~Texture()
 
 void Texture::GenerateMipmaps(const unsigned char* data)
 {
-	num_mipmaps = floor(log2(std::max(width, height))) + 1;
+	num_mipmaps = floor(log2(glm::max(width, height))) + 1;
 	mipmaps = new Mipmap[num_mipmaps];
 	
 	int mm_width = width;

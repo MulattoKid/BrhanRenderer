@@ -1,6 +1,8 @@
 #include "BrhanSystem.h"
 #include "BSDF.h"
 #include <cstdlib>
+#include <experimental/filesystem>
+namespace filesystem = std::experimental::filesystem;
 #include "FresnelConductor.h"
 #include "FresnelDielectric.h"
 #include "FresnelNoOp.h"
@@ -13,12 +15,49 @@
 #include <omp.h>
 #include "PathIntegrator.h"
 #include <string>
+#include <time.h>
 
 SphereLoad::SphereLoad() : diffuse(0.0f),
 						   specular(0.0f),
 						   reflectance(0.0f),
 						   transmittance(0.0f)
 {}
+
+std::string BrhanSystem::ExtractFileNameOnly() const
+{
+	const std::string path(scene_file);
+	int file_ext_pos = -1;
+	int slash_pos = -1;
+	for (size_t i = 0; i < path.length(); i++)
+	{
+		if (path[i] == '.')
+		{
+			file_ext_pos = i;
+		}
+		else if (path[i] == '/')
+		{
+			slash_pos = i;
+		}
+	}
+	
+	unsigned int end = path.length();
+	if (file_ext_pos == -1)
+	{
+		LOG_WARNING(false, __FILE__, __FUNCTION__, __LINE__, "Input file does not have an extension\n");
+	}
+	else
+	{
+		end = file_ext_pos;
+	}
+	
+	unsigned int start = 0;
+	if (slash_pos != -1) 
+	{
+		start = slash_pos + 1;
+	}
+	
+	return path.substr(start, end - start);
+}
 
 void BrhanSystem::LoadCamera(const std::string& line)
 {
@@ -192,6 +231,23 @@ void BrhanSystem::LoadIntegrator(const std::string& line)
 					  "\tspp %lu\n"
 					  "\tmax_depth %lu\n",
 					  type.c_str(), spp, max_depth);
+}
+
+void BrhanSystem::LoadSaveIntervals(const std::string& line)
+{
+	unsigned int start_index = 14; //Eat 'SaveIntervals['
+	unsigned int index = start_index;
+	while (index < line.length())
+	{
+		if (line[index] == ']' || line[index] == ' ')
+		{
+			save_intervals = std::stoi(line.substr(start_index, index).c_str());
+			break;
+		}
+		index++;
+	}
+	
+	LOG_MESSAGE(true, "Save intervals ENABLED: %lu\n", save_intervals);
 }
 
 void BrhanSystem::AddModel(const std::string& line)
@@ -550,6 +606,7 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   	bool found_camera = false;
   	static const std::string integrator_str = "Integrator";
   	bool found_integrator = false;
+  	static const std::string save_intervals_str = "SaveIntervals";
   	static const std::string model_str = "Model";
   	static const std::string sphere_str = "Sphere";
   	
@@ -566,6 +623,11 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   		{
   			LoadIntegrator(line);
   			found_integrator = true;
+  		}
+  		else if (line.compare(0, save_intervals_str.length(), save_intervals_str) == 0)
+  		{
+  			LoadSaveIntervals(line);
+  			save_intervals_enabled = true;
   		}
   		else if (line.compare(0, model_str.length(), model_str) == 0)
   		{
@@ -586,6 +648,10 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   	if (!found_integrator)
   	{
   		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to locate integrator\n");
+  	}
+  	if (save_intervals > spp)
+  	{
+  		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "The requested number of save itnervals (%lu) is larger than the requested number of samples per pixel (%lu)\n", save_intervals, spp);
   	}
 }
 
@@ -624,7 +690,7 @@ void InitMemoryPool(MemoryPool** mem_pool)
 BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, MemoryPool** mem_pool, PixelSampler** pixel_sampler)
 {
 	const unsigned int num_args = 2;
-	const unsigned int arg_file = 1;
+	const unsigned int arg_scene_file = 1;
 	
 	if (argc != num_args)
 	{
@@ -636,7 +702,18 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 		LOG_MESSAGE(true, "The only input parameter needed is the path to the scene description file\n");
 	}
 	
-	scene_file = argv[arg_file];
+	scene_file = argv[arg_scene_file];
+	path = "renders/" + ExtractFileNameOnly(); //scene_file MUST be set first
+	time_t now = time(NULL);
+	struct tm *t = localtime(&now);
+	int sec = t->tm_sec;
+	int min = t->tm_min;
+	int hour = t->tm_hour;
+	int day = t->tm_mday;
+	int month = t->tm_mon + 1; // Month is 0 - 11, add 1 to get a jan-dec 1-12 concept
+	int year = t->tm_year + 1900; // Year is # years since 1900
+	path += "-" + std::to_string(year) + "-" + std::to_string(month) + "-" + std::to_string(day) + "-" + std::to_string(hour) + ":" + std::to_string(min) + ":" + std::to_string(sec);
+	filesystem::create_directory(path.c_str());
 	LoadSceneFile(scene_file);
 	
 	*camera = new Camera(camera_position, camera_view_direction, camera_vertical_fov, float(film_width) / float(film_height));
@@ -649,17 +726,21 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 
 BrhanSystem::~BrhanSystem()
 {
-	if (integrator_type == IntegratorType::PATH_INTEGRATOR)
-	{
-		PathIntegrator* ptr = (PathIntegrator*)(integrator);
-		delete ptr;
-	}
+	PathIntegrator* ptr = (PathIntegrator*)(integrator);
+	delete ptr;
 }
 
-void BrhanSystem::UpdateProgress(unsigned int y, std::chrono::high_resolution_clock::time_point start_time, std::chrono::high_resolution_clock::time_point update_time) const
+void BrhanSystem::UpdateProgress(unsigned int y, std::chrono::high_resolution_clock::time_point start_time, std::chrono::high_resolution_clock::time_point update_time, unsigned int save_interval) const
 {
 	unsigned int total_effort = film_width * film_height;
 	unsigned int progress = (unsigned int)((film_width * y) / float(total_effort) * 100.0f);
+	if (save_intervals_enabled)
+	{
+		unsigned int total_work = 100 * save_intervals;
+		unsigned int work_already_done = 100 * save_interval;
+		progress += work_already_done;
+		progress = (unsigned int)(progress / float(total_work) * 100.0f);
+	}
 	
 	std::string output;
 	output.resize(100, ' ');

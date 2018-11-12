@@ -6,20 +6,20 @@ MEM_POOL_CPP = $(SRC_DIR)/MemoryPool/MemoryPool.cpp
 MEM_POOL_OBJ = $(OBJ_DIR)/MemoryPool.o
 
 CXX = g++
-CXXFLAGS = -std=c++11
-LDFLAGS = -fopenmp
+CXXFLAGS = -std=c++11 -fopenmp
+LDFLAGS = -fopenmp -lstdc++fs
 
 #Setup for release
-all : CXXFLAGS += -fopenmp -O2
+all : CXXFLAGS += -O2
 all : BrhanRenderer
 
 #Setup for debug
-debug : CXXFLAGS += -fopenmp -Wall -g -O0
+debug : CXXFLAGS += -Wall -g -O0
 debug : BrhanRenderer
 
 #Links all object files
 BrhanRenderer : $(OBJ_FILES) $(MEM_POOL_OBJ)
-	$(CXX) $(LDFLAGS) -o ./$(OBJ_DIR)/BrhanRenderer $(OBJ_FILES) $(MEM_POOL_OBJ)
+	$(CXX) -o ./$(OBJ_DIR)/BrhanRenderer $(OBJ_FILES) $(MEM_POOL_OBJ) $(LDFLAGS)
 
 .PHONY : clean
 clean :
