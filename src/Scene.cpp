@@ -142,9 +142,24 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 			model->plastic_materials.push_back(PlasticMaterial(model_load.diffuse, model_load.specular));
 			plastic_material_indices.push_back(0);
 		}
+		else if (model_load.material == "aluminium")
+		{
+			model->metal_materials.push_back(MetalMaterial(model_load.specular, MetalType::ALUMINIUM));
+			metal_material_indices.push_back(0);
+		}
 		else if (model_load.material == "copper")
 		{
 			model->metal_materials.push_back(MetalMaterial(model_load.specular, MetalType::COPPER));
+			metal_material_indices.push_back(0);
+		}
+		else if (model_load.material == "gold")
+		{
+			model->metal_materials.push_back(MetalMaterial(model_load.specular, MetalType::GOLD));
+			metal_material_indices.push_back(0);
+		}
+		else if (model_load.material == "salt")
+		{
+			model->metal_materials.push_back(MetalMaterial(model_load.specular, MetalType::SALT));
 			metal_material_indices.push_back(0);
 		}
 		else if (model_load.material == "translucent")
@@ -164,7 +179,7 @@ bool Scene::LoadOBJ(const ModelLoad& model_load, const unsigned int model_index)
 		}
 		else
 		{
-			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Material %s is not supported\n", model_load.material);
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Material %s is not supported\n", model_load.material.c_str());
 		}
 		
 		//TODO: update as more support is added for custom materials
@@ -447,9 +462,24 @@ bool Scene::LoadSphere(const SphereLoad& sphere, const unsigned int model_index)
 		model->plastic_materials.push_back(PlasticMaterial(sphere.diffuse, sphere.specular));
 		model->materials.push_back(&model->plastic_materials[0]);
 	}
+	else if (sphere.material == "aluminium")
+	{
+		model->metal_materials.push_back(MetalMaterial(sphere.specular, MetalType::ALUMINIUM));
+		model->materials.push_back(&model->metal_materials[0]);
+	}
 	else if (sphere.material == "copper")
 	{
 		model->metal_materials.push_back(MetalMaterial(sphere.specular, MetalType::COPPER));
+		model->materials.push_back(&model->metal_materials[0]);
+	}
+	else if (sphere.material == "gold")
+	{
+		model->metal_materials.push_back(MetalMaterial(sphere.specular, MetalType::GOLD));
+		model->materials.push_back(&model->metal_materials[0]);
+	}
+	else if (sphere.material == "salt")
+	{
+		model->metal_materials.push_back(MetalMaterial(sphere.specular, MetalType::SALT));
 		model->materials.push_back(&model->metal_materials[0]);
 	}
 	else if (sphere.material == "translucent")
@@ -469,7 +499,7 @@ bool Scene::LoadSphere(const SphereLoad& sphere, const unsigned int model_index)
 	}
 	else
 	{
-		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Material %s is not supported\n", sphere.material);
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Material %s is not supported\n", sphere.material.c_str());
 	}
 	
 	model->spheres[0].material = model->materials[0];

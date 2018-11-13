@@ -11,9 +11,21 @@ MetalMaterial::MetalMaterial(const glm::vec3& Ks, const MetalType m_type)
 	this->Ks = Ks;
 	switch(m_type)
 	{
+		case ALUMINIUM:
+			this->N = RGBFromSampled(AluminiumWavelengths, AluminiumN, AluminiumSamples);
+			this->K = RGBFromSampled(AluminiumWavelengths, AluminiumK, AluminiumSamples);
+			break;
 		case COPPER:
 			this->N = RGBFromSampled(CopperWavelengths, CopperN, CopperSamples);
 			this->K = RGBFromSampled(CopperWavelengths, CopperK, CopperSamples);
+			break;
+		case GOLD:
+			this->N = RGBFromSampled(GoldWavelengths, GoldN, GoldSamples);
+			this->K = RGBFromSampled(GoldWavelengths, GoldK, GoldSamples);
+			break;
+		case SALT:
+			this->N = RGBFromSampled(SaltWavelengths, SaltN, SaltSamples);
+			this->K = RGBFromSampled(SaltWavelengths, SaltK, SaltSamples);
 			break;
 		default:
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "No material type specified\n");

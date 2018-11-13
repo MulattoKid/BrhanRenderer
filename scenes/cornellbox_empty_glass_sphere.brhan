@@ -5,4 +5,4 @@ Integrator type[path] spp[2048] max_depth[8]
 Model file[models/CornellBox/CornellBox-Empty-RG.obj]
 Sphere center[0 1 0] radius[0.25] material[glass] reflectance[1 1 1] transmittance[1 1 1]
 
-SaveIntervals[4]
+#SaveIntervals[4]

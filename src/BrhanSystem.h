@@ -52,7 +52,7 @@ struct BrhanSystem
 	unsigned int film_height;
 	unsigned int spp;
 	unsigned int max_depth;
-	unsigned int save_intervals;
+	unsigned int save_intervals = 0;
 	bool save_intervals_enabled = false;
 	Integrator* integrator;
 	IntegratorType integrator_type;

@@ -423,7 +423,7 @@ void BrhanSystem::AddModel(const std::string& line)
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse or specular spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
 		}
-		if (model.material == "copper" && !found_specular)
+		if ((model.material == "copper" || model.material == "gold" || model.material == "aluminium" || model.material == "salt") && !found_specular)
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
 		}
@@ -572,7 +572,7 @@ void BrhanSystem::AddSphere(const std::string& line)
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse or specular spectrum of sphere on line: '%s'\n", line.c_str());
 		}
-		if (sphere.material == "copper" && !found_specular)
+		if ((sphere.material == "copper" || sphere.material == "gold" || sphere.material == "aluminium" || sphere.material == "salt") && !found_specular)
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of sphere on line: '%s'\n", line.c_str());
 		}

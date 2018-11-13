@@ -5,7 +5,10 @@
 
 enum MetalType
 {
-	COPPER
+	ALUMINIUM,
+	COPPER,
+	GOLD,
+	SALT
 };
 
 struct MetalMaterial : Material
