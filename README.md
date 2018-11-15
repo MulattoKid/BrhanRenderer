@@ -59,7 +59,51 @@ This step is platform independent.
 On both platforms, the rendered image is placed in the directory form which the call to BrhanRenderer was made. The ```scenes/```folder holds some default scenes that can be used to test the renderer. The models used for these scenes are located in ```models/```.
 
 ## Scene file documentation
-TODO
+The scene file (.brhan extension, although the extension is not critical for a file to be used as one) describes the scene and the render settings. A few settings must be present for the renderer to be able to render anything. These are:
+- ```Camera position[x y z] view_direction[x y z] vertical_fov[n] width[n] height[n]```
+
+- ```Integrator type[path] spp[n] max_depth[n]```
+
+Geometry specifications are provided like so:
+- ```Model file[f.obj]```
+
+- ```Sphere center[x y z] radius[n]```
+
+OBJ files generally have a MTL file associated with them. In that case, no more information is needed and rendering can commence.  If the material for a piece of geometry isn't supported, the system will alert you of this.
+However, if no MTL file is available, or you want to specify your own material or you provide the details of a sphere, it is *requried* to specify a material name and the needed reflection and/or transmittance values.
+
+The supported materials with corresponding required details are:
+- matte -> ```diffuse[r g b]```
+- mirror -> ```specular[r g b]```
+- plastic -> ```diffuse[r g b] specular[r g b]```
+- aluminium -> ```specular[r g b]```
+- copper -> ```specular[r g b]```
+- gold -> ```specular[r g b]```
+- salt -> ```specular[r g b]```
+- water -> ```reflectance[r g b] transmittance[r g b]```
+- glass -> ```reflectance[r g b] transmittance[r g b]```
+
+**Note**: textures are not supported when specifying a custom material.
+
+Additionally, any model or sphere can be translated, rotated and scaled by specifying the respective settings:
+- ```translate[x y z]```
+- ```rotate[x y z]```
+- ```scale[x y z]```
+
+Lastly, two settings are available to generate incremental images while rendering and to generate a depth image:
+- ```SaveIntervals[n]```
+- ```GenDepthImage[true/false]```
+
+Here's an example of what a *scene.brhan* file can look like:
+```
+Camera position[0.0 1.0 5.58] view_direction[0.0 0.0 -1.0] vertical_fov[19.5] width[1024] height[1024]
+Integrator type[path] spp[256] max_depth[4]
+SaveIntervals[4]
+GenDepthImage[true]
+
+Model file[models/CornellBox/CornellBox-Empty-RG.obj] translate[0 0 -1]
+Sphere center[0 0.5 0] radius[0.25] material[copper] specular[0.28 0.17 0.08]
+```
 
 ## Functionality
 ### BxDFs
