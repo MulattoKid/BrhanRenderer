@@ -72,7 +72,7 @@ TODO
 - Matte
 - Mirror
 - Plastic (WIP)
-- Metals (Fresnel conductor): copper
+- Metals (Fresnel conductor): aluminium, copper, gold
 - Water (Fresnel dielectric)
 - Glass (Fresnel dielectric)
 ### Textures
