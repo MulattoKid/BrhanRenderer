@@ -2,18 +2,17 @@
 #include "Camera.h"
 #include "glm/geometric.hpp"
 #include "LinearAlgebra.h"
-#include "MemoryPool/MemoryPool.h"
 #include "Ray.h"
 #include "RayDifferential.h"
 #include "Scene.h"
 #include "Shape.h"
 #include "SurfaceInteraction.h"
 
-void SurfaceInteraction::Delete(MemoryPool* mem_pool, const int thread_id)
+SurfaceInteraction::~SurfaceInteraction()
 {
 	if (bsdf != NULL)
 	{
-		bsdf->Delete(mem_pool, thread_id);
+		delete bsdf;
 	}
 }
 
@@ -70,9 +69,9 @@ void SurfaceInteraction::ComputeDifferentials(const RayDifferential& ray, const 
 	}
 }
 
-void SurfaceInteraction::ComputeScatteringFunctions(MemoryPool* mem_pool, const int thread_id)
+void SurfaceInteraction::ComputeScatteringFunctions()
 {
-	shape->ComputeScatteringFunctions(this, mem_pool, thread_id);
+	shape->ComputeScatteringFunctions(this);
 }
 
 glm::vec3 SurfaceInteraction::Le(const Scene& scene)

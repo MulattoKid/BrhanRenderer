@@ -19,7 +19,7 @@ struct MetalMaterial : Material
 	
 	MetalMaterial(const glm::vec3& Ks, const MetalType m_type);
 	void Info() const;
-	void ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const;
+	void ComputeScatteringFunctions(SurfaceInteraction* isect) const;
 };
 
 #endif

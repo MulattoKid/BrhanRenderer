@@ -6,7 +6,7 @@
 struct PathIntegrator : Integrator
 {
 	~PathIntegrator();
-	glm::vec3 Li(const Scene& scene, RayDifferential* ray, RNG* rngs, MemoryPool* mem_pool, const int thread_id, const unsigned int depth, const unsigned int max_depth) const;
+	glm::vec3 Li(const Scene& scene, RayDifferential* ray, RNG* rngs, const int thread_id, const unsigned int depth, const unsigned int max_depth) const;
 };
 
 #endif

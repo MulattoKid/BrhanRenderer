@@ -6,7 +6,6 @@
 #include "Integrator.h"
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
-#include "MemoryPool/MemoryPool.h"
 #include "PixelSampler.h"
 #include "RNG.h"
 #include "Scene.h"
@@ -61,7 +60,7 @@ struct BrhanSystem
 	std::vector<ModelLoad> models;
 	std::vector<SphereLoad> spheres;
 	
-	BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, MemoryPool** mem_pool, PixelSampler** pixel_sampler);
+	BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, PixelSampler** pixel_sampler);
 	~BrhanSystem();
 	std::string ExtractFileNameOnly() const;
 	void LoadCamera(const std::string& line);

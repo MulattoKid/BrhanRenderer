@@ -35,19 +35,16 @@ void MirrorMaterial::Info() const
 	}
 }
 
-void MirrorMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const
+void MirrorMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 {
-	isect->bsdf = (BSDF*)(mem_pool->Allocate(MEM_POOL_BSDF, thread_id));
-	new(isect->bsdf) BSDF();
+	isect->bsdf = new BSDF();
 	
 	if (t_Ks == NULL)
 	{
 		if (Ks != glm::vec3(0.0f))
 		{
-			SpecularBRDF* s_ptr = (SpecularBRDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
-			FresnelNoOp* f_ptr = (FresnelNoOp*)(mem_pool->Allocate(MEM_POOL_FRESNEL, thread_id));
-			new(f_ptr) FresnelNoOp();
-			new(s_ptr) SpecularBRDF(Ks, f_ptr, FRESNEL_NONE);
+			FresnelNoOp* f_ptr = new FresnelNoOp();
+			SpecularBRDF* s_ptr = new SpecularBRDF(Ks, f_ptr, FRESNEL_NONE);
 			isect->bsdf->Add(s_ptr);
 		}
 	}
@@ -56,10 +53,8 @@ void MirrorMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, Memor
 		glm::vec3 point(isect->point.x.f, isect->point.y.f, isect->point.z.f);
 		glm::vec2 uv = isect->shape->UV(point);
 		
-		SpecularBRDF* s_ptr = (SpecularBRDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
-		FresnelNoOp* f_ptr = (FresnelNoOp*)(mem_pool->Allocate(MEM_POOL_FRESNEL, thread_id));
-		new(f_ptr) FresnelNoOp();
-		new(s_ptr) SpecularBRDF(t_Ks->Sample(uv.x, uv.y, isect->dudx, isect->dvdx, isect->dudy, isect->dvdy), f_ptr, FRESNEL_NONE);
+		FresnelNoOp* f_ptr = new FresnelNoOp();
+		SpecularBRDF* s_ptr = new SpecularBRDF(t_Ks->Sample(uv.x, uv.y, isect->dudx, isect->dvdx, isect->dudy, isect->dvdy), f_ptr, FRESNEL_NONE);
 		isect->bsdf->Add(s_ptr);
 	}
 }

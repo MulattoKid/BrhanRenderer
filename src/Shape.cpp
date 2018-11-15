@@ -1,7 +1,6 @@
 #include <cfloat>
 #include "glm/geometric.hpp"
 #include "Logger.h"
-#include "MemoryPool/MemoryPool.h"
 #include "Shape.h"
 
 Shape::Shape(const bool double_sided)
@@ -25,9 +24,9 @@ float Shape::Pdf(const SurfaceInteraction& isect, const glm::vec3& wi) const
 	return pdf;
 }
 
-void Shape::ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const
+void Shape::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 {
-	material->ComputeScatteringFunctions(isect, mem_pool, thread_id);
+	material->ComputeScatteringFunctions(isect);
 }
 
 glm::vec3 Shape::AmbientColor() const

@@ -11,7 +11,7 @@ struct PlasticMaterial : Material
 
 	PlasticMaterial(const glm::vec3& Kd, const glm::vec3& Ks);
 	void Info() const;
-	void ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const;
+	void ComputeScatteringFunctions(SurfaceInteraction* isect) const;
 };
 
 #endif

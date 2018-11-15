@@ -6,7 +6,6 @@
 
 struct Camera;
 struct BSDF;
-struct MemoryPool;
 struct Ray;
 struct RayDifferential;
 struct Scene;
@@ -24,10 +23,10 @@ struct SurfaceInteraction
 	glm::vec3 dpdu, dpdv;
 	float dudx, dvdx, dudy, dvdy;
 	
-	void Delete(MemoryPool* mem_pool, const int thread_id);
+	~SurfaceInteraction();
 	inline glm::vec3 Point() const { return glm::vec3(point.x.f, point.y.f, point.z.f); }
 	void ComputeDifferentials(const RayDifferential& ray, const unsigned int depth);
-	void ComputeScatteringFunctions(MemoryPool* mem_pool, const int thread_id);
+	void ComputeScatteringFunctions();
 	glm::vec3 Le(const Scene& scene);
 };
 

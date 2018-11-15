@@ -43,21 +43,15 @@ void MetalMaterial::Info() const
 	LOG_MESSAGE(true, "Metal material: Ks=(%f %f %f)\n", Ks.x, Ks.y, Ks.z);
 }
 
-void MetalMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const
+void MetalMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 {
-	isect->bsdf = (BSDF*)(mem_pool->Allocate(MemoryPoolObjectTypes::MEM_POOL_BSDF, thread_id));
-	new(isect->bsdf) BSDF();
+	isect->bsdf = new BSDF();
 	
 	if (Ks != glm::vec3(0.0f))
 	{
-		MicrofacetBRDF* m_ptr = (MicrofacetBRDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
-		BeckmannDistribution* b_ptr = (BeckmannDistribution*)(mem_pool->Allocate(MEM_POOL_MICRO_DISTRIBUTION, thread_id));
-		FresnelConductor* f_ptr = (FresnelConductor*)(mem_pool->Allocate(MEM_POOL_FRESNEL, thread_id));
-		
-		new(f_ptr) FresnelConductor(glm::vec3(1.0f), N, K);
-		new(b_ptr) BeckmannDistribution(MicrofacetDistribution::RoughnessToAlpha(0.01f));
-		new(m_ptr) MicrofacetBRDF(Ks, b_ptr, f_ptr);
-		
+		FresnelConductor* f_ptr = new FresnelConductor(glm::vec3(1.0f), N, K);
+		BeckmannDistribution* b_ptr = new BeckmannDistribution(MicrofacetDistribution::RoughnessToAlpha(0.01f));
+		MicrofacetBRDF* m_ptr = new MicrofacetBRDF(Ks, b_ptr, f_ptr);
 		isect->bsdf->Add(m_ptr);
 	}
 }

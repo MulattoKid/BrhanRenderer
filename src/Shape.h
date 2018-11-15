@@ -26,7 +26,7 @@ struct Shape
 	virtual glm::vec3 Sample(RNG& rng, const float u[2]) const = 0;
 	virtual void ComputeDifferentialSurface(glm::vec3* dpdu, glm::vec3* dpdv) const = 0;
 	virtual bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const = 0;
-	void ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const;
+	void ComputeScatteringFunctions(SurfaceInteraction* isect) const;
 	glm::vec3 AmbientColor() const;
 	glm::vec3 DiffuseColor() const;
 	glm::vec3 SpecularColor() const;

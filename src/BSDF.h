@@ -2,7 +2,6 @@
 #define BSDF_H
 
 #include "BxDF.h"
-#include "MemoryPool/MemoryPool.h"
 #include "RNG.h"
 
 struct BSDF
@@ -13,7 +12,6 @@ struct BSDF
 	
 	BSDF();
 	~BSDF();
-	void Delete(MemoryPool* mem_pool, const int thread_id);
 	void Add(BxDF* bxdf);
 	int NumMatchingComponents(const BxDFType type) const;
 	float Pdf(const glm::vec3& wo, const glm::vec3& wi, const glm::vec3& normal, BxDFType flags);

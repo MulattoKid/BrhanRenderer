@@ -655,39 +655,7 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   	}
 }
 
-void InitMemoryPool(MemoryPool** mem_pool)
-{
-	const size_t bxdfs[] = { sizeof(MatteMaterial), sizeof(MirrorMaterial), sizeof(PlasticMaterial), sizeof(TranslucentMaterial), sizeof(WaterMaterial), sizeof(GlassMaterial) };
-	const size_t num_bxdfs = 6;
-	size_t max_bxdf_size = bxdfs[0];
-	for (size_t i = 1; i < num_bxdfs; i++)
-	{
-		if (bxdfs[i] > max_bxdf_size)
-		{
-			max_bxdf_size = bxdfs[i];
-		}
-	}
-	
-	const size_t fresnels[] = { sizeof(FresnelNoOp), sizeof(FresnelDielectric), sizeof(FresnelConductor) };
-	const size_t num_fresnel = 3;
-	size_t max_fresnel_size = fresnels[0];
-	for (size_t i = 1; i < num_fresnel; i++)
-	{
-		if (fresnels[i] > max_fresnel_size)
-		{
-			max_fresnel_size = fresnels[i];
-		}
-	}
-	
-	const size_t max_micro_distr_size = sizeof(BeckmannDistribution);
-	
-	const int max_bxdfs = 8; //From BSDF.h:11
-	size_t obj_sizes[4] = { sizeof(BSDF), max_bxdf_size, max_fresnel_size, max_micro_distr_size };
-	size_t num_instances[4] = { 1, max_bxdfs, max_bxdfs, max_bxdfs };
-	*mem_pool = new MemoryPool(obj_sizes, num_instances, 4, omp_get_max_threads());
-}
-
-BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, MemoryPool** mem_pool, PixelSampler** pixel_sampler)
+BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, PixelSampler** pixel_sampler)
 {
 	const unsigned int num_args = 2;
 	const unsigned int arg_scene_file = 1;
@@ -719,7 +687,6 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 	*camera = new Camera(camera_position, camera_view_direction, camera_vertical_fov, float(film_width) / float(film_height));
 	*film = new float[film_width * film_height * 3];
 	*rngs = new RNG[omp_get_max_threads()];
-	InitMemoryPool(mem_pool);
 	*pixel_sampler = new PixelSampler(spp, film_width, film_height);
 	*scene = new Scene(models, spheres);
 }

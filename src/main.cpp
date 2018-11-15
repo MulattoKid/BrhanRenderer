@@ -2,7 +2,6 @@
 #include "Camera.h"
 #include "ImageIO.h"
 #include "Logger.h"
-#include "MemoryPool/MemoryPool.h"
 #include <omp.h>
 #include "PixelSampler.h"
 #include "Ray.h"
@@ -17,9 +16,8 @@ int main(int argc, char** argv)
 	Scene* scene = NULL;
 	float* film = NULL;
 	RNG* rngs = NULL;
-	MemoryPool* mem_pool;
 	PixelSampler* pixel_sampler = NULL;
-	BrhanSystem system(argc, argv, &camera, &scene, &film, &rngs, &mem_pool, &pixel_sampler);
+	BrhanSystem system(argc, argv, &camera, &scene, &film, &rngs, &pixel_sampler);
 	auto end_time = GetTime();
 	LogElapsedTime("Intialization time: ", start_time, end_time);
 	
@@ -60,7 +58,7 @@ int main(int argc, char** argv)
 					{
 						glm::vec2 sample_offset = pixel_sampler->Sample(s, rngs[omp_get_thread_num()]);
 						RayDifferential ray = camera->GenerateRayDifferential(u, ux, v, vy, sample_offset);
-						L += system.integrator->Li(*scene, &ray, rngs, mem_pool, omp_get_thread_num(), 0, system.max_depth);
+						L += system.integrator->Li(*scene, &ray, rngs, omp_get_thread_num(), 0, system.max_depth);
 					}
 					
 					glm::vec3 tmp_L = L / float(intervals[si + 1]);
@@ -107,7 +105,7 @@ int main(int argc, char** argv)
 				{
 					glm::vec2 sample_offset = pixel_sampler->Sample(s, rngs[omp_get_thread_num()]);
 					RayDifferential ray = camera->GenerateRayDifferential(u, ux, v, vy, sample_offset);
-					L += system.integrator->Li(*scene, &ray, rngs, mem_pool, omp_get_thread_num(), 0, system.max_depth);
+					L += system.integrator->Li(*scene, &ray, rngs, omp_get_thread_num(), 0, system.max_depth);
 				}
 				
 				L /= float(system.spp);
@@ -131,7 +129,6 @@ int main(int argc, char** argv)
 	delete camera;
 	delete[] film;
 	delete[] rngs;
-	delete mem_pool;
 	delete pixel_sampler;
 
 	return 0;

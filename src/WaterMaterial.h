@@ -12,7 +12,7 @@ struct WaterMaterial : Material
 
 	WaterMaterial(const glm::vec3& R, const glm::vec3& T);
 	void Info() const;
-	void ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const;
+	void ComputeScatteringFunctions(SurfaceInteraction* isect) const;
 };
 
 #endif

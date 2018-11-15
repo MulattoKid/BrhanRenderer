@@ -35,17 +35,15 @@ void MatteMaterial::Info() const
 	}
 }
 
-void MatteMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, MemoryPool* mem_pool, const int thread_id) const
+void MatteMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect) const
 {
-	isect->bsdf = (BSDF*)(mem_pool->Allocate(MemoryPoolObjectTypes::MEM_POOL_BSDF, thread_id));
-	new(isect->bsdf) BSDF();
+	isect->bsdf = new BSDF();
 	
 	if (t_Kd == NULL)
 	{
 		if (Kd != glm::vec3(0.0f))
 		{
-			LambertianBRDF* l_ptr = (LambertianBRDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
-			new(l_ptr) LambertianBRDF(Kd);
+			LambertianBRDF* l_ptr = new LambertianBRDF(Kd);
 			isect->bsdf->Add(l_ptr);
 			
 			//isect->bsdf->Add(new OrenNayarBRDF(Kd, 20.0f));
@@ -56,8 +54,7 @@ void MatteMaterial::ComputeScatteringFunctions(SurfaceInteraction* isect, Memory
 		const glm::vec3 point(isect->point.x.f, isect->point.y.f, isect->point.z.f);
 		const glm::vec2 uv = isect->shape->UV(point);
 
-		LambertianBRDF* l_ptr = (LambertianBRDF*)(mem_pool->Allocate(MEM_POOL_BxDF, thread_id));
-		new(l_ptr) LambertianBRDF(t_Kd->Sample(uv.x, uv.y, isect->dudx, isect->dvdx, isect->dudy, isect->dvdy));
+		LambertianBRDF* l_ptr = new LambertianBRDF(t_Kd->Sample(uv.x, uv.y, isect->dudx, isect->dvdx, isect->dudy, isect->dvdy));
 		isect->bsdf->Add(l_ptr);
 		
 		//isect->bsdf->Add(new OrenNayarBRDF(t_Kd->Sample(uv.x, uv.y, 20.0f));

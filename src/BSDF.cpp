@@ -15,11 +15,11 @@ BSDF::BSDF()
 {}
 
 BSDF::~BSDF()
-{}
-
-void BSDF::Delete(MemoryPool* mem_pool, const int thread_id)
-{
-	mem_pool->Free(thread_id);
+{	
+	for (int i = 0; i < num_bxdfs; i++)
+	{
+		delete bxdfs[i];
+	}
 }
 
 void BSDF::Add(BxDF* bxdf)
