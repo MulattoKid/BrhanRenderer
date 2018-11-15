@@ -43,6 +43,10 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& view_direction, const
 					  vertical_fov);
 }
 
+Ray Camera::GenerateRay(const float u, const float v) const
+{
+	return Ray(position, top_left_corner + (u * horizontal_end) + (v * vertical_end) - position);
+}
 
 RayDifferential Camera::GenerateRayDifferential(const float u, const float ux, const float v, const float vy, const glm::vec2& sample_offset) const
 {

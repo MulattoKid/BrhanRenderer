@@ -53,19 +53,20 @@ struct BrhanSystem
 	unsigned int max_depth;
 	unsigned int save_intervals = 0;
 	bool save_intervals_enabled = false;
+	bool gen_depth_image = false;
 	Integrator* integrator;
-	IntegratorType integrator_type;
 	char* scene_file;
 	std::string path;
 	std::vector<ModelLoad> models;
 	std::vector<SphereLoad> spheres;
 	
-	BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, PixelSampler** pixel_sampler);
+	BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, float**depth_film, RNG** rngs, PixelSampler** pixel_sampler);
 	~BrhanSystem();
 	std::string ExtractFileNameOnly() const;
 	void LoadCamera(const std::string& line);
 	void LoadIntegrator(const std::string& line);
 	void LoadSaveIntervals(const std::string& line);
+	void LoadGenDepthImage(const std::string& line);
 	void AddModel(const std::string& line);
 	void AddSphere(const std::string& line);
 	void LoadSceneFile(const std::string& scene_file);

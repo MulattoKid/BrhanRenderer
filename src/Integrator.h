@@ -15,6 +15,7 @@ enum IntegratorType
 struct Integrator
 {
 	virtual ~Integrator();
+	float Depth(const Scene& scene, Ray* ray) const;
 	virtual glm::vec3 Li(const Scene& scene, RayDifferential* ray, RNG* rngs, const int thread_id, const unsigned int depth, const unsigned int max_depth) const = 0;
 };
 

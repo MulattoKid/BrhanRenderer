@@ -19,6 +19,7 @@ struct Camera
 	float FAR_PLANE;
 
 	Camera(const glm::vec3& position, const glm::vec3& view_direction, const float vertical_fov, const float aspect_ratio);
+	Ray GenerateRay(const float u, const float v) const;
 	RayDifferential GenerateRayDifferential(const float u, const float ux, const float v, const float vy, const glm::vec2& sample_offset) const;
 };
 

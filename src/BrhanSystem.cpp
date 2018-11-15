@@ -184,7 +184,6 @@ void BrhanSystem::LoadIntegrator(const std::string& line)
 			type = line.substr(index, end - index);
 			if (type == "path")
 			{
-				integrator_type = PATH_INTEGRATOR;
 				integrator = new PathIntegrator();
 			}
 			else
@@ -241,13 +240,36 @@ void BrhanSystem::LoadSaveIntervals(const std::string& line)
 	{
 		if (line[index] == ']' || line[index] == ' ')
 		{
-			save_intervals = std::stoi(line.substr(start_index, index).c_str());
+			save_intervals = std::stoi(line.substr(start_index, index - start_index).c_str());
+			if (save_intervals > 0)
+			{	
+  				save_intervals_enabled = true;
+			}
 			break;
 		}
 		index++;
 	}
 	
 	LOG_MESSAGE(true, "Save intervals ENABLED: %lu\n", save_intervals);
+}
+
+void BrhanSystem::LoadGenDepthImage(const std::string& line)
+{
+	unsigned int start_index = 14; //Eat 'GenDepthImage['
+	unsigned int index = start_index;
+	while (index < line.length())
+	{
+		if (line[index] == ']' || line[index] == ' ')
+		{
+			std::string value = line.substr(start_index, index - start_index);
+			if (value == "true")
+			{
+				gen_depth_image = true;
+			}
+			break;
+		}
+		index++;
+	}
 }
 
 void BrhanSystem::AddModel(const std::string& line)
@@ -607,6 +629,7 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   	static const std::string integrator_str = "Integrator";
   	bool found_integrator = false;
   	static const std::string save_intervals_str = "SaveIntervals";
+  	static const std::string gen_depth_image_str = "GenDepthImage";
   	static const std::string model_str = "Model";
   	static const std::string sphere_str = "Sphere";
   	
@@ -627,7 +650,10 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   		else if (line.compare(0, save_intervals_str.length(), save_intervals_str) == 0)
   		{
   			LoadSaveIntervals(line);
-  			save_intervals_enabled = true;
+  		}
+  		else if (line.compare(0, gen_depth_image_str.length(), gen_depth_image_str) == 0)
+  		{
+  			LoadGenDepthImage(line);
   		}
   		else if (line.compare(0, model_str.length(), model_str) == 0)
   		{
@@ -655,7 +681,7 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   	}
 }
 
-BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, RNG** rngs, PixelSampler** pixel_sampler)
+BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, float** depth_film, RNG** rngs, PixelSampler** pixel_sampler)
 {
 	const unsigned int num_args = 2;
 	const unsigned int arg_scene_file = 1;
@@ -686,6 +712,7 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 	
 	*camera = new Camera(camera_position, camera_view_direction, camera_vertical_fov, float(film_width) / float(film_height));
 	*film = new float[film_width * film_height * 3];
+	*depth_film = new float[film_width * film_height];
 	*rngs = new RNG[omp_get_max_threads()];
 	*pixel_sampler = new PixelSampler(spp, film_width, film_height);
 	*scene = new Scene(models, spheres);
