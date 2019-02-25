@@ -23,7 +23,7 @@ struct Shape
 	virtual glm::vec2 UV(const glm::vec3& point) const = 0;
 	virtual float Area() const = 0;
 	virtual float Pdf(const SurfaceInteraction& isect, const glm::vec3& wi) const;
-	virtual glm::vec3 Sample(RNG& rng, const float u[2]) const = 0;
+	virtual glm::vec3 Sample(RNG& rng, const float u[2], const glm::vec3& normal) const = 0;
 	virtual void ComputeDifferentialSurface(glm::vec3* dpdu, glm::vec3* dpdv) const = 0;
 	virtual bool Intersect(Ray* ray, SurfaceInteraction* isect, const float t_min, const float t_max) const = 0;
 	void ComputeScatteringFunctions(SurfaceInteraction* isect) const;

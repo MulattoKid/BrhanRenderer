@@ -441,7 +441,7 @@ void BrhanSystem::AddModel(const std::string& line)
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
 		}
-		if (model.material == "plastic" && (!found_specular || !found_specular))
+		if (model.material == "plastic" && (!found_diffuse || !found_specular))
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse or specular spectrum of model %s on line: '%s'\n", model.file.c_str(), line.c_str());
 		}
@@ -590,7 +590,7 @@ void BrhanSystem::AddSphere(const std::string& line)
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find specular spectrum of sphere on line: '%s'\n", line.c_str());
 		}
-		if (sphere.material == "plastic" && (!found_specular || !found_specular))
+		if (sphere.material == "plastic" && (!found_diffuse || !found_specular))
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find diffuse or specular spectrum of sphere on line: '%s'\n", line.c_str());
 		}
@@ -615,6 +615,72 @@ void BrhanSystem::AddSphere(const std::string& line)
 	spheres.push_back(sphere);
 }
 
+void BrhanSystem::AddSphericalLight(const std::string& line)
+{
+	SphericalLightLoad sL;
+	static const std::string centerStr = "center";
+	bool foundCenter = false;
+	static const std::string radiusStr = "radius";
+	bool foundRadius = false;
+	static const std::string emittanceStr = "emittance";
+	bool foundEmittance = false;
+	
+	unsigned int index = 15; //Eat "SphericalLight "
+	while (index < line.length())
+	{
+		if (line.compare(index, centerStr.length(), centerStr) == 0)
+		{
+			index += 7; //Eat "center["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				sL.center[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			foundCenter = true;
+		}
+		else if (line.compare(index, radiusStr.length(), radiusStr) == 0)
+		{
+			index += 7; //Eat "radius["
+			unsigned int end = index + 1;
+			while (line[end] != ']') { end++; }
+			sL.radius = std::stof(line.substr(index, end - index));
+			index = end + 1; //+1 to eat space
+			foundRadius = true;
+		}
+		else if (line.compare(index, emittanceStr.length(), emittanceStr) == 0)
+		{
+			index += 10; //Eat "emittance["
+			for (int i = 0; i < 3; i++)
+			{
+				unsigned int end = index + 1;
+				while (line[end] != ' ' && line[end] != ']') { end++; }
+				sL.emittance[i] = std::stof(line.substr(index, end - index));
+				index = end + 1; //+1 to eat space
+			}
+			foundEmittance = true;
+		}
+		
+		index++;
+	}
+	
+	if (!foundCenter)
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find center for spherical light source");
+	}
+	if (!foundRadius)
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find radius for spherical light source");
+	}
+	if (!foundEmittance)
+	{
+		LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to find emittance for spherical light source");
+	}
+	
+	sphericalLights.push_back(sL);
+}
+
 void BrhanSystem::LoadSceneFile(const std::string& scene_file)
 {
 	std::ifstream file(scene_file.c_str());
@@ -632,6 +698,7 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   	static const std::string gen_depth_image_str = "GenDepthImage";
   	static const std::string model_str = "Model";
   	static const std::string sphere_str = "Sphere";
+  	static const std::string spheicalLight_str = "SphericalLight";
   	
   	std::string line;
   	while (std::getline(file, line))
@@ -662,6 +729,10 @@ void BrhanSystem::LoadSceneFile(const std::string& scene_file)
   		else if (line.compare(0, sphere_str.length(), sphere_str) == 0)
   		{
   			AddSphere(line);
+  		}
+  		else if (line.compare(0, spheicalLight_str.length(), spheicalLight_str) == 0)
+  		{
+  			AddSphericalLight(line);
   		}
   	}
   	
@@ -715,7 +786,7 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 	*depth_film = new float[film_width * film_height];
 	*rngs = new RNG[omp_get_max_threads()];
 	*pixel_sampler = new PixelSampler(spp, film_width, film_height);
-	*scene = new Scene(models, spheres);
+	*scene = new Scene(models, spheres, sphericalLights);
 }
 
 BrhanSystem::~BrhanSystem()

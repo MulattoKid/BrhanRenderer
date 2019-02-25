@@ -9,14 +9,14 @@
 # http://www.graphics.cornell.edu/online/box/data.html
 #
 
-mtllib models/Buddha/light.mtl
+mtllib models/Dragon/plane.mtl
 
 ## Object light 
-v	-1.0  1.0   1.0
-v	-1.0  1.0  -1.0
-v	 1.0  1.0  -1.0
-v	 1.0  1.0   1.0
+v	-100.0  -2.5   100.0
+v	-100.0  -2.5  -100.0
+v	 100.0  -2.5  -100.0
+v	 100.0  -2.5   100.0
 
-g light
-usemtl light
+g plane
+usemtl plane
 f -4 -3 -2 -1

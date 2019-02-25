@@ -5,9 +5,9 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tinyobjloader/tiny_obj_loader.h"
 
-Scene::Scene(const std::vector<ModelLoad>& models, const std::vector<SphereLoad>& spheres)
+Scene::Scene(const std::vector<ModelLoad>& models, const std::vector<SphereLoad>& spheres, const std::vector<SphericalLightLoad>& sphericalLights)
 {	
-	this->models.resize(models.size() + spheres.size());
+	this->models.resize(models.size() + spheres.size() + sphericalLights.size());
 
 	//Load obj files
 	unsigned int model_index = 0;
@@ -21,15 +21,29 @@ Scene::Scene(const std::vector<ModelLoad>& models, const std::vector<SphereLoad>
 	}
 	
 	//Load spheres
+	unsigned int model_index_offset = models.size();
 	unsigned int sphere_index = 0;
 	for (const SphereLoad& sphere : spheres)
 	{
-		if (!LoadSphere(sphere, models.size() + sphere_index))
+		if (!LoadSphere(sphere, model_index_offset + sphere_index))
 		{
 			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to load sphere number %lu\n", sphere_index);
 		}
 		sphere_index++;
 	}
+	
+	// Load spherical lights
+	model_index_offset += spheres.size();
+	unsigned int sphere_light_index = 0;
+	for (const SphericalLightLoad& sphericalLight : sphericalLights)
+	{
+		if (!LoadSphericalLight(sphericalLight, model_index_offset + sphere_light_index))
+		{
+			LOG_ERROR(false, __FILE__, __FUNCTION__, __LINE__, "Failed to load spherical light number %lu\n", sphere_light_index);
+		}
+		sphere_light_index++;
+	}
+	
 	
 	//Create area lights
 	for (DiffuseAreaLight& dal : diffuse_area_lights)
@@ -521,6 +535,40 @@ bool Scene::LoadSphere(const SphereLoad& sphere, const unsigned int model_index)
 				sphere.specular.x, sphere.specular.y, sphere.specular.z,
 				sphere.reflectance.x, sphere.reflectance.y, sphere.reflectance.z,
 				sphere.transmittance.x, sphere.transmittance.y, sphere.transmittance.z);
+				
+	return true;
+}
+
+bool Scene::LoadSphericalLight(const SphericalLightLoad& sphericalLight, const unsigned int model_index)
+{
+	Model* model = &models[model_index];
+	model->spheres.push_back(Sphere(sphericalLight.center, sphericalLight.radius));
+	
+	// Matte material
+	model->matte_materials.push_back(MatteMaterial(glm::vec3(1.0f)));
+	model->materials.push_back(&model->matte_materials[0]);
+	
+	// Diffuse area light
+	DiffuseAreaLight dal;
+	dal.shape = (Shape*)(&model->spheres[0]);
+	dal.L_emit = sphericalLight.emittance;
+	diffuse_area_lights.push_back(dal);
+	model->spheres[0].area_light_index = diffuse_area_lights.size() - 1;
+	
+	model->spheres[0].material = model->materials[0];
+	model->shapes.push_back(&model->spheres[0]);
+	
+	LOG_MESSAGE(true,
+				"Successfully loaded spherical light:\n"
+				"\t[%f %f %f] center\n"
+				"\t%f radius\n"
+				"\tdiffuse material\n"
+				"\t\t[%f %f %f] Kd \n"
+				"\t\t[%f %f %f] Ke \n",
+				model->spheres[0].center.x, model->spheres[0].center.y, model->spheres[0].center.z,
+				model->spheres[0].radius,
+				1.0f, 1.0f, 1.0f,
+				sphericalLight.emittance.x, sphericalLight.emittance.y, sphericalLight.emittance.z);
 				
 	return true;
 }

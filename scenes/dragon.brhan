@@ -1,6 +1,7 @@
-Camera position[0.0 1.0 120] view_direction[0.0 0.0 -1.0] vertical_fov[60] width[1024] height[1024]
+Camera position[0.0 4.0 12] view_direction[0.0 -0.4 -1.0] vertical_fov[45] width[1920] height[1080]
 
-Integrator type[path] spp[1] max_depth[1]
+Integrator type[path] spp[512] max_depth[8]
 
-Model file[models/Dragon/dragon.obj] translate[0 0 0] rotate[0 0 0] material[glass] reflectance[1 1 1] transmittance[1 1 1]
-Model file[models/Dragon/light.obj]
+Model file[models/Dragon/dragon.obj] translate[0 -1.5 0] rotate[-140 15 -100] scale[0.03 0.03 0.03] material[copper] specular[0.38 0.27 0.18]
+Model file[models/Dragon/light.obj] rotate[20 0 0]
+Model file[models/Dragon/plane.obj]

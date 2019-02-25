@@ -52,6 +52,8 @@ int main(int argc, char** argv)
 
 void Render(BrhanSystem* system, Camera* camera, float* film, PixelSampler* pixel_sampler, RNG* rngs, Scene* scene)
 {
+	omp_set_dynamic(0);
+	omp_set_num_threads(12);
 	auto start_time = GetTime();
 	//for (unsigned int y = system->film_height / 2; y < system->film_height / 2 + 1; y++)
 	for (unsigned int y = 0; y < system->film_height; y++)

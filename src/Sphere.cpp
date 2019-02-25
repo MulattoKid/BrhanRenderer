@@ -28,7 +28,7 @@ float Sphere::Area() const
 	return 4.0f * glm::pi<float>() * glm::pow(radius, 2);
 }
 
-glm::vec3 Sphere::Sample(RNG& rng, const float u[2]) const
+glm::vec3 Sphere::Sample(RNG& rng, const float u[2], const glm::vec3& normal) const
 {
 	const float param0 = 1.0f - glm::pow(u[0], 2);
 	const float param1 = glm::two_pi<float>() * u[1];
@@ -38,8 +38,17 @@ glm::vec3 Sphere::Sample(RNG& rng, const float u[2]) const
 	const float z = param0;
 	glm::vec3 sample(x, y, z);
 	
-	sample += center;
+	// Scale sample point according to sphere's radius
 	sample *= radius;
+	// Move to sphere's center
+	sample += center;
+	
+	// Flip the sample point if it's on the wrong side of the sphere
+	glm::vec3 center_to_sample_point = glm::normalize(sample - center);
+	if (glm::dot(center_to_sample_point, normal) <= 0)
+	{
+		sample = center - (sample - center);
+	}
 	
 	return sample;
 }

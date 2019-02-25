@@ -39,7 +39,7 @@ float Triangle::Area() const
 }
 
 //p.782
-glm::vec3 Triangle::Sample(RNG& rng, const float u[2]) const
+glm::vec3 Triangle::Sample(RNG& rng, const float u[2], const glm::vec3& normal) const
 {
 	const float sqrt_u0 = glm::sqrt(u[0]);
 	const float lamda0 = 1.0f - sqrt_u0;

@@ -30,7 +30,8 @@ glm::vec3 UniformSampleOne(const Scene& scene, const SurfaceInteraction& isect, 
 
 glm::vec3 EstimateDirect(const Scene& scene, RNG& rng, const AreaLight* area_light, const SurfaceInteraction& isect, const float u_light[2], float u_scattering[2])
 {
-	glm::vec3 Ld(0.0f); //Direct lighting
+	//Direct lighting
+	glm::vec3 Ld(0.0f);
 
 	//Sample light source
 	glm::vec3 sample_point(0.0f), wi(0.0f);

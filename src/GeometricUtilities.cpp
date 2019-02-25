@@ -96,6 +96,7 @@ float UniformHemispherePdf(const glm::vec3& wo, const glm::vec3& wi, const glm::
 {
 	if (SameHemisphere(wo, wi, normal))
 	{
+		// TODO: what...shouldn't this be one_over_two_pi p.775
 		return glm::two_over_pi<float>();
 
 	}

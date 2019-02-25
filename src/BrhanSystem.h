@@ -42,6 +42,13 @@ struct SphereLoad
 	glm::vec3 transmittance;
 };
 
+struct SphericalLightLoad
+{
+	glm::vec3 center;
+	float radius;
+	glm::vec3 emittance;
+};
+
 struct BrhanSystem
 {
 	glm::vec3 camera_position;
@@ -59,6 +66,7 @@ struct BrhanSystem
 	std::string path;
 	std::vector<ModelLoad> models;
 	std::vector<SphereLoad> spheres;
+	std::vector<SphericalLightLoad> sphericalLights;
 	
 	BrhanSystem(const int argc, char** argv, Camera** camera, Scene** scene, float** film, float**depth_film, RNG** rngs, PixelSampler** pixel_sampler);
 	~BrhanSystem();
@@ -69,6 +77,7 @@ struct BrhanSystem
 	void LoadGenDepthImage(const std::string& line);
 	void AddModel(const std::string& line);
 	void AddSphere(const std::string& line);
+	void AddSphericalLight(const std::string& line);
 	void LoadSceneFile(const std::string& scene_file);
 	void UpdateProgress(unsigned int y, std::chrono::high_resolution_clock::time_point start_time, std::chrono::high_resolution_clock::time_point update_time, unsigned int save_interval = 0) const;
 };
