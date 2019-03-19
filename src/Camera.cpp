@@ -10,10 +10,10 @@
 Camera::Camera(const glm::vec3& position, const glm::vec3& view_direction, const float vertical_fov, const float aspect_ratio)
 {
 	const float theta = (vertical_fov * glm::pi<float>()) / 180.0f; //Convert to radians
-	const float lens_height = glm::tan(theta);
-	const float lens_width = lens_height * aspect_ratio;
-	const float lens_half_width = lens_width / 2.0f;
-	const float lens_half_height = lens_height / 2.0f;
+	const float lens_half_height = glm::tan(theta / 2.0f);
+	const float lens_half_width = lens_half_height * aspect_ratio;
+	const float lens_width = lens_half_width * 2.0f;
+	const float lens_height = lens_half_height * 2.0f;
 
 	//Calculate the three vectors that define the camera	
 	const glm::vec3 base_up(0.0f, 1.0f, 0.0f);
