@@ -768,7 +768,7 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 	}
 	
 	scene_file = argv[arg_scene_file];
-	path = "renders/" + ExtractFileNameOnly(); //scene_file MUST be set first
+	path = "renders/";
 	time_t now = time(NULL);
 	struct tm *t = localtime(&now);
 	int sec = t->tm_sec;
@@ -777,7 +777,8 @@ BrhanSystem::BrhanSystem(const int argc, char** argv, Camera** camera, Scene** s
 	int day = t->tm_mday;
 	int month = t->tm_mon + 1; // Month is 0 - 11, add 1 to get a jan-dec 1-12 concept
 	int year = t->tm_year + 1900; // Year is # years since 1900
-	path += "-" + std::to_string(year) + "-" + std::to_string(month) + "-" + std::to_string(day) + "-" + std::to_string(hour) + ":" + std::to_string(min) + ":" + std::to_string(sec);
+	path += std::to_string(year) + "-" + std::to_string(month) + "-" + std::to_string(day) + "-" + std::to_string(hour) + ":" + std::to_string(min) + ":" + std::to_string(sec) + "-";
+	path += ExtractFileNameOnly();
 	filesystem::create_directory(path.c_str());
 	LoadSceneFile(scene_file);
 	

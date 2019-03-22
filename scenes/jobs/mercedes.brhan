@@ -1,0 +1,9 @@
+Camera position[-2.655376 1.121323 5.439187] view_direction[0.844073 -0.494889 -0.206460] vertical_fov[45] width[1920] height[1080]
+
+#Integrator type[path] spp[8196] max_depth[4]
+Integrator type[path] spp[1] max_depth[4]
+
+Model file[models/Mercedes/Mercedes_AMG_GT-R_OBJ.obj] translate[0 0 0] rotate[0 0 0] scale[0.02 0.02 0.02] material[matte] diffuse[1 1 1]
+
+SphericalLight center[-5 5 0] radius[4] emittance[25 25 25]
+SphericalLight center[5 5 0] radius[4] emittance[25 25 25]

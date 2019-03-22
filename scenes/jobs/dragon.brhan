@@ -1,0 +1,10 @@
+Camera position[-3.191381 0.620537 3.625849] view_direction[0.741272 -0.645010 -0.185682] vertical_fov[45] width[1920] height[1080]
+
+#Integrator type[path] spp[8196] max_depth[4]
+Integrator type[path] spp[1] max_depth[4]
+
+Model file[models/Dragon/dragon.obj] translate[0 -1.5 0] rotate[-140 15 -100] scale[0.03 0.03 0.03] material[matte] diffuse[1 1 1]
+Model file[models/Dragon/plane.obj]
+
+SphericalLight center[5 10 5] radius[4] emittance[35 35 35]
+SphericalLight center[-5 10 -5] radius[4] emittance[35 35 35]

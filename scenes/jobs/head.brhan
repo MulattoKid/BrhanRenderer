@@ -1,0 +1,9 @@
+Camera position[0.003058 0.016529 0.295019] view_direction[0.007949 -0.236273 -0.971654] vertical_fov[60] width[1920] height[1080]
+
+Integrator type[path] spp[2048] max_depth[1]
+Integrator type[path] spp[1] max_depth[1]
+
+Model file[models/Head/head.obj] translate[0 0 0] rotate[0 0 0] scale[1 1 1] material[matte] diffuse[1 1 1]
+Model file[models/Head/plane.obj] material[matte] diffuse[1 1 1]
+
+SphericalLight center[0 5 0] radius[2] emittance[20 20 20]
